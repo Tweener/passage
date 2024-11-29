@@ -1,0 +1,52 @@
+name: Weekly check for new versions of dependencies
+
+on:
+  workflow_dispatch:
+
+  schedule:
+    - cron: '0 9 * * 1' # run every Monday at 9am UTC
+
+jobs:
+  dependencyUpdates:
+    name: Check for new versions of dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'zulu'
+          cache: gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Check for new versions of dependencies
+        run: ./gradlew dependencyUpdates
+
+      - name: Adds the content of the list of dependencies to the environment variable
+        id: get-dependencies-list
+        run: |
+          file_output=$(<build/dependencyUpdates/report.txt)
+          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+          echo "DEPENDENCIES_LIST_FILE<<$EOF" >> $GITHUB_OUTPUT
+          echo "$file_output" >> $GITHUB_OUTPUT
+          echo "$EOF" >> $GITHUB_OUTPUT
+
+      - name: Print the content of the environment variable
+        run: echo "${{ steps.get-dependencies-list.outputs.DEPENDENCIES_LIST_FILE }}"
+
+      - name: Send notification on Slack
+        uses: rtCamp/action-slack-notify@v2.2.0
+        if: ${{ success() }}
+        env:
+          SLACK_CHANNEL: ${{ vars.SLACK_GITHUB_ACTIONS_CHANNEL_NAME }}
+          SLACK_COLOR: ${{ job.status }}
+          SLACK_ICON: ${{ vars.SLACK_GITHUB_ACTIONS_DEPENDENCY_UPDATES_ICON_URL }}
+          SLACK_MESSAGE: ${{ steps.get-dependencies-list.outputs.DEPENDENCIES_LIST_FILE }}
+          SLACK_TITLE: Dependencies with outdated versions
+          SLACK_USERNAME: Dependency Updates
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
+          MSG_MINIMAL: true
