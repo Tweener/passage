@@ -63,6 +63,6 @@ We love your input and welcome any contributions! Please read our [contribution 
 
 ## 🙏 Credits
 
-- Logo by [Freeicons](https://freeicons.io/essential-collection/alarm-icon-icon-2)
+- Logo by [Freeicons](https://freeicons.io/pet-shop-32/mine-tunnel-passage-passageway-underground-icon-904280)
 
 ## 🪪 Licence
