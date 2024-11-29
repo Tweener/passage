@@ -1,4 +1,4 @@
-name: Kmplate_Library build
+name: Passage build
 
 on:
   workflow_call:

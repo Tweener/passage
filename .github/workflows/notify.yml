@@ -18,7 +18,7 @@ jobs:
           SLACK_COLOR: ${{ job.status }}
           SLACK_ICON: ${{ vars.SLACK_GITHUB_ACTIONS_ICON_URL }}
           SLACK_MESSAGE: ':white_check_mark: Build successful! :rocket:'
-          SLACK_TITLE: Kmplate_Library build status
+          SLACK_TITLE: Passage build status
           SLACK_USERNAME: Github Actions CI
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
 
@@ -30,6 +30,6 @@ jobs:
           SLACK_COLOR: ${{ job.status }}
           SLACK_ICON: ${{ vars.SLACK_GITHUB_ACTIONS_ICON_URL }}
           SLACK_MESSAGE: ':x: Build failed! :pensive:'
-          SLACK_TITLE: Kmplate_Library build status
+          SLACK_TITLE: Passage build status
           SLACK_USERNAME: Github Actions CI
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
