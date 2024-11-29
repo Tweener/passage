@@ -11,16 +11,16 @@ object ProjectConfiguration {
         const val packageName = "com.tweener.passage"
         const val versionName = "1.0.0"
         const val namespace = "$packageName.android"
-        const val compileSDK = 34
+        const val compileSDK = 35
         const val minSDK = 24
 
         // TODO Change all the values in this block to your needs
         object Maven {
-            const val name = "MyKMPLibrary"
-            const val description = "All Tweener commons stuff for Kotlin Multiplatform"
+            const val name = "Passage"
+            const val description = "A Kotlin/Compose Multiplatform library for seamless authentication on Android and iOS."
             const val group = "io.github.tweener"
-            const val packageUrl = "https://github.com/Tweener/kmp-common"
-            const val gitUrl = "github.com:Tweener/kmp-common.git"
+            const val packageUrl = "https://github.com/Tweener/passage"
+            const val gitUrl = "github.com:Tweener/passage.git"
 
             object Developer {
                 const val id = "Tweener"
@@ -31,7 +31,7 @@ object ProjectConfiguration {
     }
 
     object Compiler {
-        const val jvmTarget = "17"
-        val javaCompatibility = JavaVersion.VERSION_17
+        val javaCompatibility = JavaVersion.VERSION_21
+        val jvmTarget = javaCompatibility.toString()
     }
 }
