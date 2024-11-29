@@ -66,3 +66,5 @@ We love your input and welcome any contributions! Please read our [contribution 
 - Logo by [Freeicons](https://freeicons.io/pet-shop-32/mine-tunnel-passage-passageway-underground-icon-904280)
 
 ## 🪪 Licence
+
+Passage is licensed under the [Apache-2.0](https://github.com/Tweener/passage?tab=Apache-2.0-1-ov-file#readme).
