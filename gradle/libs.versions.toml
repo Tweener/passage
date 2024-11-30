@@ -8,6 +8,7 @@ androidAnnotations = "1.9.1"
 coroutines = "1.9.0"
 napier = "2.7.1"
 composeMultiplatform = "1.7.0"
+firebaseGitLiveApp = "2.1.0" # Firebase for KMP https://firebaseopensource.com/projects/gitliveapp/firebase-kotlin-sdk/
 
 # Tweener
 tweenerBom = "2.1.3"
@@ -28,11 +29,20 @@ tweener-common = { group = "io.github.tweener", name = "kmp-common" }
 kotlin-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlin-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
 
+# Firebase GitLive
+firebase-firestore = { group = "dev.gitlive", name = "firebase-firestore", version.ref = "firebaseGitLiveApp" }
+firebase-config = { group = "dev.gitlive", name = "firebase-config", version.ref = "firebaseGitLiveApp" }
+firebase-auth = { group = "dev.gitlive", name = "firebase-auth", version.ref = "firebaseGitLiveApp" }
+firebase-crashlytics = { group = "dev.gitlive", name = "firebase-crashlytics", version.ref = "firebaseGitLiveApp" }
+
 # Android
 android-core = { group = "androidx.core", name = "core-ktx", version.ref = "androidCore" }
 android-annotations = { group = "androidx.annotation", name = "annotation", version.ref = "androidAnnotations" }
 android-activity = { group = "androidx.activity", name = "activity-ktx", version.ref = "androidActivity" }
 android-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidActivity" }
+
+[bundles]
+firebase = ["firebase-auth", "firebase-config", "firebase-crashlytics", "firebase-firestore"] # TODO check which dep to remove
 
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }

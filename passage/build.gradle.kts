@@ -80,6 +80,8 @@ kotlin {
         binaries.executable()
     }
 
+    jvm()
+
     sourceSets {
         commonMain.dependencies {
             implementation(libs.napier)
@@ -91,6 +93,8 @@ kotlin {
 
             // Coroutines
             implementation(libs.kotlin.coroutines.core)
+
+            implementation(libs.bundles.firebase)
         }
 
         androidMain.dependencies {
