@@ -14,7 +14,6 @@ object ProjectConfiguration {
         const val compileSDK = 35
         const val minSDK = 24
 
-        // TODO Change all the values in this block to your needs
         object Maven {
             const val name = "Passage"
             const val description = "A Kotlin/Compose Multiplatform library for seamless authentication on Android and iOS."
