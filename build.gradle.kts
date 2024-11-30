@@ -12,7 +12,7 @@ plugins {
     alias(libs.plugins.dependency.versions) // ./gradlew dependencyUpdates
 }
 
-tasks.register<RenameProjectTask>("renameProject")
+tasks.register<gradle.RenameProjectTask>("renameProject")
 
 nexusPublishing {
     repositories {
