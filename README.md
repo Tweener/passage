@@ -7,6 +7,11 @@
 [![Website](https://img.shields.io/badge/Author-vivienmahe.com-purple)](https://vivienmahe.com/)
 [![X/Twitter](https://img.shields.io/twitter/follow/VivienMahe)](https://twitter.com/VivienMahe)
 
+<br>
+
+![Passage logo](https://github.com/user-attachments/assets/c92f7d44-df02-4860-9ba4-fb4d4c3f3d68#gh-light-mode-only)
+![Passage logo](https://github.com/user-attachments/assets/28914622-f8b9-403b-a1b6-3c736af5e98a#gh-dark-mode-only)
+
 ---
 
 <h3>A Kotlin/Compose Multiplatform library for seamless authentication on Android and iOS.</h3>
@@ -58,6 +63,8 @@ We love your input and welcome any contributions! Please read our [contribution 
 
 ## 🙏 Credits
 
-- Logo by [Freeicons](https://freeicons.io/essential-collection/alarm-icon-icon-2)
+- Logo by [Freeicons](https://freeicons.io/pet-shop-32/mine-tunnel-passage-passageway-underground-icon-904280)
 
 ## 🪪 Licence
+
+Passage is licensed under the [Apache-2.0](https://github.com/Tweener/passage?tab=Apache-2.0-1-ov-file#readme).
