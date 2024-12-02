@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.compose)
     alias(libs.plugins.jetbrains.compose.compiler)
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.firebase.crashlytics)
 }
 
 kotlin {
@@ -73,9 +75,15 @@ android {
     compileOptions {
         sourceCompatibility = ProjectConfiguration.Compiler.javaCompatibility
         targetCompatibility = ProjectConfiguration.Compiler.javaCompatibility
+
+        isCoreLibraryDesugaringEnabled = true
     }
 
     buildFeatures {
         compose = true
+    }
+
+    dependencies {
+        coreLibraryDesugaring(libs.android.desugarjdklibs)
     }
 }

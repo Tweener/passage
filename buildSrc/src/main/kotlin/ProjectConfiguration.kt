@@ -33,4 +33,8 @@ object ProjectConfiguration {
         val javaCompatibility = JavaVersion.VERSION_21
         val jvmTarget = javaCompatibility.toString()
     }
+
+    object iOS {
+        const val deploymentTarget = "12.0"
+    }
 }

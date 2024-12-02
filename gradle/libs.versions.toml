@@ -9,13 +9,19 @@ coroutines = "1.9.0"
 napier = "2.7.1"
 composeMultiplatform = "1.7.0"
 firebaseGitLiveApp = "2.1.0" # Firebase for KMP https://firebaseopensource.com/projects/gitliveapp/firebase-kotlin-sdk/
+googleServicesPlugin = "4.4.2"
+crashlyticsPlugin = "3.0.2"
 
 # Tweener
-tweenerBom = "2.1.3"
+tweenerBom = "2.1.4"
 
 # Android
 androidCore = "1.15.0"
 androidActivity = "1.9.3"
+playServices = "21.2.0"
+googleIdIdentity = "1.1.1"
+androidCredentials = "1.3.0"
+androidDesugarJdkLibs = "2.1.3"
 
 [libraries]
 napier = { group = "io.github.aakira", name = "napier", version.ref = "napier" }
@@ -40,9 +46,17 @@ android-core = { group = "androidx.core", name = "core-ktx", version.ref = "andr
 android-annotations = { group = "androidx.annotation", name = "annotation", version.ref = "androidAnnotations" }
 android-activity = { group = "androidx.activity", name = "activity-ktx", version.ref = "androidActivity" }
 android-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidActivity" }
+android-desugarjdklibs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "androidDesugarJdkLibs" }
+
+# Google Sign In
+googleSignIn-playServicesAuth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServices" }
+googleSignIn-identity = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleIdIdentity" }
+googleSignIn-credentials = { module = "androidx.credentials:credentials", version.ref = "androidCredentials" }
+googleSignIn-credentials-playServicesAuth = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "androidCredentials" }
 
 [bundles]
 firebase = ["firebase-auth", "firebase-config", "firebase-crashlytics", "firebase-firestore"] # TODO check which dep to remove
+googleSignIn = ["googleSignIn-credentials", "googleSignIn-credentials-playServicesAuth", "googleSignIn-identity", "googleSignIn-playServicesAuth"]
 
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
@@ -53,3 +67,6 @@ dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 nexus-sonatype = { id = "io.github.gradle-nexus.publish-plugin", version.ref = "nexusSonatype" }
 jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
 jetbrains-compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlin-nativeCocoaPods = { id = "org.jetbrains.kotlin.native.cocoapods", version.ref = "kotlin" }
+google-services = { id = "com.google.gms.google-services", version.ref = "googleServicesPlugin" }
+firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "crashlyticsPlugin" }

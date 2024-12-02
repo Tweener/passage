@@ -15,7 +15,9 @@ struct iosApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView().onOpenURL(perform: { url in
+                appDelegate.handleIncomingURL(url)
+            })
         }
     }
 }

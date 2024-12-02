@@ -8,6 +8,9 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.android.library)
     alias(libs.plugins.dokka)
+    alias(libs.plugins.kotlin.nativeCocoaPods)
+    alias(libs.plugins.jetbrains.compose)
+    alias(libs.plugins.jetbrains.compose.compiler)
     id("maven-publish")
     id("signing")
 }
@@ -30,6 +33,10 @@ android {
 
         getByName("debug") {
         }
+    }
+
+    buildFeatures {
+        compose = true
     }
 
     compileOptions {
@@ -61,26 +68,11 @@ kotlin {
         }
     }
 
-    @OptIn(ExperimentalWasmDsl::class)
-    wasmJs {
-        browser {
-            commonWebpackConfig {
-                outputFileName = "passage.js"
-            }
-        }
-        binaries.executable()
-    }
+    cocoapods {
+        ios.deploymentTarget = ProjectConfiguration.iOS.deploymentTarget
 
-    js(IR) {
-        browser {
-            commonWebpackConfig {
-                outputFileName = "passage.js"
-            }
-        }
-        binaries.executable()
+        pod("GoogleSignIn")
     }
-
-    jvm()
 
     sourceSets {
         commonMain.dependencies {
@@ -94,7 +86,12 @@ kotlin {
             // Coroutines
             implementation(libs.kotlin.coroutines.core)
 
+            // Firebase
             implementation(libs.bundles.firebase)
+
+            // Compose
+            implementation(compose.foundation)
+
         }
 
         androidMain.dependencies {
@@ -103,6 +100,9 @@ kotlin {
 
             // Android
             implementation(libs.android.core)
+
+            // Google Sign In
+            implementation(libs.bundles.googleSignIn)
         }
 
         iosMain.dependencies {

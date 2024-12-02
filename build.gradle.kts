@@ -7,6 +7,9 @@ plugins {
     alias(libs.plugins.android.library).apply(false)
     alias(libs.plugins.jetbrains.compose).apply(false)
     alias(libs.plugins.jetbrains.compose.compiler).apply(false)
+    alias(libs.plugins.kotlin.nativeCocoaPods).apply(false)
+    alias(libs.plugins.google.services).apply(false)
+    alias(libs.plugins.firebase.crashlytics).apply(false)
     alias(libs.plugins.dokka).apply(false)
     alias(libs.plugins.nexus.sonatype)
     alias(libs.plugins.dependency.versions) // ./gradlew dependencyUpdates
