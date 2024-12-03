@@ -18,13 +18,19 @@ import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 /**
- * Handles Google Sign-In on iOS.
+ * An iOS-specific implementation of the [PassageGoogleGatekeeper].
  *
- * This class provides functionality for signing in users using their Google account on an iOS device.
- * It utilizes the GIDSignIn API to manage credentials and handle the sign-in process.
+ * This class handles authentication using Google Sign-In on iOS devices. It integrates with Firebase
+ * for user management and utilizes the Google Identity SDK for iOS to retrieve tokens for Google authentication.
+ * The class provides functionality for signing in, signing out, and re-authenticating users.
  *
- * @param passageService The service for handling authentication with Passage.
- * @param serverClientId The server client ID for authenticating with Google.
+ * Responsibilities:
+ * - Facilitating Google Sign-In on iOS and retrieving authentication tokens.
+ * - Using Firebase credentials to authenticate or re-authenticate users.
+ * - Managing error handling for the authentication process.
+ *
+ * @param firebaseAuth The Firebase authentication instance used for managing authenticated users.
+ * @param serverClientId The server client ID associated with the Google Sign-In configuration.
  *
  * @author Vivien Mahe
  * @since 01/12/2024
@@ -34,6 +40,16 @@ internal class PassageGoogleGatekeeperIos(
     serverClientId: String,
 ) : PassageGoogleGatekeeper(serverClientId = serverClientId) {
 
+    /**
+     * Signs in a user using Google Sign-In on iOS.
+     *
+     * This method retrieves Google tokens using the Google Identity SDK, then authenticates the user
+     * with Firebase. On success, it returns an authenticated [Entrant]. On failure, it logs the error
+     * and provides an appropriate exception.
+     *
+     * @param params Unused, as no parameters are required for Google Sign-In.
+     * @return A [Result] containing the authenticated [Entrant] if successful, or an error if the process fails.
+     */
     override suspend fun signIn(params: Unit): Result<Entrant> = suspendCatching {
         retrieveGoogleTokens().fold(
             onSuccess = { googleTokens ->
@@ -47,10 +63,23 @@ internal class PassageGoogleGatekeeperIos(
         Napier.e(throwable) { "Couldn't sign in the user." }
     }
 
+    /**
+     * Signs out the current user for Google Sign-In on iOS.
+     *
+     * As Google Sign-In on iOS does not require explicit session management, this method performs no actions.
+     */
     override suspend fun signOut() {
         // Nothing to do here
     }
 
+    /**
+     * Re-authenticates the currently authenticated user using Google Sign-In on iOS.
+     *
+     * This method retrieves new Google tokens and uses them to re-authenticate the user with Firebase.
+     * On success, it ensures the user's session is refreshed.
+     *
+     * @return A [Result] indicating the success or failure of the re-authentication process.
+     */
     override suspend fun reauthenticate(): Result<Unit> = suspendCatching {
         retrieveGoogleTokens().fold(
             onSuccess = { googleTokens ->

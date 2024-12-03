@@ -64,8 +64,8 @@ internal class PassageEmailGatekeeper(
     suspend fun sendPasswordResetEmail(params: PassageForgotPasswordParams): Result<Unit> = suspendCatching {
         val actionCodeSettings = buildActionCodeSettings(
             url = params.url,
-            iOSBundleId = params.iosParams?.iOSBundleId,
-            androidPackageName = params.androidParams?.androidPackageName,
+            iOSBundleId = params.iosParams?.bundleId,
+            androidPackageName = params.androidParams?.packageName,
             installIfNotAvailable = params.androidParams?.installIfNotAvailable ?: true,
             minimumVersion = params.androidParams?.minimumVersion,
             canHandleCodeInApp = params.canHandleCodeInApp,
@@ -98,8 +98,8 @@ internal class PassageEmailGatekeeper(
     suspend fun sendEmailVerification(params: PassageEmailVerificationParams): Result<Unit> = suspendCatching {
         val actionCodeSettings = buildActionCodeSettings(
             url = params.url,
-            iOSBundleId = params.iosParams?.iOSBundleId,
-            androidPackageName = params.androidParams?.androidPackageName,
+            iOSBundleId = params.iosParams?.bundleId,
+            androidPackageName = params.androidParams?.packageName,
             installIfNotAvailable = params.androidParams?.installIfNotAvailable ?: true,
             minimumVersion = params.androidParams?.minimumVersion,
             canHandleCodeInApp = params.canHandleCodeInApp,

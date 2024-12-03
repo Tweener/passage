@@ -12,32 +12,53 @@ import com.tweener.passage.model.AppleGatekeeperConfiguration
 import com.tweener.passage.model.GoogleGatekeeperConfiguration
 import dev.gitlive.firebase.auth.FirebaseAuth
 
-/**
- * @author Vivien Mahe
- * @since 02/12/2024
- */
-
 @Composable
 actual fun rememberPassageService(): PassageService {
     val context = LocalContext.current
     return remember { PassageServiceAndroid(context = context) }
 }
 
+/**
+ * An Android-specific implementation of the [PassageService].
+ *
+ * This class provides platform-specific configurations and implementations for authentication on Android.
+ * It creates Android-specific Gatekeepers for Google and Apple authentication,
+ * and integrates with the necessary platform APIs.
+ *
+ * Responsibilities:
+ * - Creating Android-specific Gatekeepers for Google and Apple authentication.
+ *
+ * @param context The Android [Context] required for accessing platform resources.
+ *
+ * @author Vivien Mahe
+ * @since 02/12/2024
+ */
 class PassageServiceAndroid(
     private val context: Context,
 ) : PassageService() {
 
     override fun initializeFirebase() {
-//        Firebase.initialize(context = context)
+        // Nothing to do here
     }
 
     // region Google gatekeeper
 
+    /**
+     * Creates a Google Gatekeeper specifically for the Android platform.
+     *
+     * This method uses the provided configuration and Firebase instance to create
+     * an instance of [PassageGoogleGatekeeperAndroid], which handles Google Sign-In
+     * operations on Android.
+     *
+     * @param configuration The configuration for the Google Gatekeeper.
+     * @param firebaseAuth The Firebase authentication instance used for user management.
+     * @return An instance of [PassageGoogleGatekeeperAndroid].
+     */
     override fun createGoogleGatekeeper(configuration: GoogleGatekeeperConfiguration, firebaseAuth: FirebaseAuth): PassageGoogleGatekeeper =
         PassageGoogleGatekeeperAndroid(
+            serverClientId = configuration.serverClientId,
             firebaseAuth = firebaseAuth,
             context = context,
-            serverClientId = configuration.serverClientId,
             filterByAuthorizedAccounts = configuration.android.filterByAuthorizedAccounts,
             autoSelectEnabled = configuration.android.autoSelectEnabled,
             maxRetries = configuration.android.maxRetries,
@@ -47,6 +68,16 @@ class PassageServiceAndroid(
 
     // region Apple gatekeeper
 
+    /**
+     * Creates an Apple Gatekeeper specifically for the Android platform.
+     *
+     * As Apple Sign-In is not natively supported on Android, this method returns an
+     * instance of [PassageAppleGatekeeperAndroid], which provides a placeholder
+     * implementation for Apple authentication on Android.
+     *
+     * @param configuration The configuration for the Apple Gatekeeper.
+     * @return An instance of [PassageAppleGatekeeperAndroid].
+     */
     override fun createAppleGatekeeper(configuration: AppleGatekeeperConfiguration): PassageAppleGatekeeper =
         PassageAppleGatekeeperAndroid()
 

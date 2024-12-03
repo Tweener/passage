@@ -20,30 +20,49 @@ import dev.gitlive.firebase.auth.GoogleAuthProvider
 import io.github.aakira.napier.Napier
 
 /**
- * Handles Google Sign-In on Android.
+ * An Android-specific implementation of the [PassageGoogleGatekeeper].
  *
- * This class provides functionality for signing in users using their Google account on an Android device.
- * It utilizes the CredentialManager API to manage credentials and handle the sign-in process.
+ * This class handles authentication using Google Sign-In on Android devices. It integrates with Firebase
+ * for user management and leverages the Credential Manager API to retrieve and manage Google credentials.
+ * The class provides functionality for signing in, signing out, and re-authenticating users.
  *
- * @param serverClientId The server client ID for authenticating with Google.
- * @param context The context of the calling activity or application.
- * @param filterByAuthorizedAccounts Flag indicating whether to filter by authorized accounts.
+ * Responsibilities:
+ * - Initiating Google Sign-In and retrieving tokens for Firebase authentication.
+ * - Managing user sessions, including signing out and re-authentication.
+ * - Handling credential retrieval and error scenarios during authentication flows.
+ *
+ * @param serverClientId The server client ID associated with the Google Sign-In configuration.
+ * @param firebaseAuth The Firebase authentication instance used for managing authenticated users.
+ * @param context The Android [Context] required for accessing system resources and APIs.
+ * @param filterByAuthorizedAccounts If true, filters credentials by authorized accounts for the app.
+ * @param autoSelectEnabled If true, enables automatic credential selection when possible.
+ * @param maxRetries The maximum number of retries for authentication attempts.
  *
  * @author Vivien Mahe
  * @since 01/12/2024
  */
 internal class PassageGoogleGatekeeperAndroid(
-    private val firebaseAuth: FirebaseAuth,
     serverClientId: String,
+    private val firebaseAuth: FirebaseAuth,
     private val context: Context,
-    private val filterByAuthorizedAccounts: Boolean = false,
-    private val autoSelectEnabled: Boolean = true,
-    private val maxRetries: Int = 3,
+    private val filterByAuthorizedAccounts: Boolean,
+    private val autoSelectEnabled: Boolean,
+    private val maxRetries: Int,
 ) : PassageGoogleGatekeeper(serverClientId = serverClientId) {
 
     private val credentialManager = CredentialManager.create(context)
     private var retryAttempts = 0
 
+    /**
+     * Signs in a user using Google Sign-In.
+     *
+     * This method retrieves Google tokens using the Credential Manager API and uses them to
+     * authenticate the user with Firebase. On success, it returns an authenticated [Entrant].
+     * On failure, it logs the error and provides an appropriate exception.
+     *
+     * @param params Unused, as no parameters are required for Google Sign-In.
+     * @return A [Result] containing the authenticated [Entrant] if successful, or an error if the process fails.
+     */
     override suspend fun signIn(params: Unit): Result<Entrant> = suspendCatching {
         retrieveGoogleTokens(credential = createCredentials()).fold(
             onSuccess = { googleTokens ->
@@ -73,10 +92,21 @@ internal class PassageGoogleGatekeeperAndroid(
         // https://developer.android.com/identity/sign-in/credential-manager#handle-exceptions
     }
 
+    /**
+     * Signs out the current user by clearing the credential state.
+     */
     override suspend fun signOut() {
         credentialManager.clearCredentialState(ClearCredentialStateRequest())
     }
 
+    /**
+     * Re-authenticates the currently authenticated user using Google Sign-In.
+     *
+     * This method retrieves new Google tokens and uses them to re-authenticate the user with Firebase.
+     * On success, it ensures the user's session is refreshed.
+     *
+     * @return A [Result] indicating the success or failure of the re-authentication process.
+     */
     override suspend fun reauthenticate(): Result<Unit> = suspendCatching {
         retrieveGoogleTokens(createCredentials()).fold(
             onSuccess = { googleTokens ->

@@ -7,6 +7,7 @@ package com.tweener.passage.sample
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -14,6 +15,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -26,9 +29,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.tweener.passage.gatekeeper.email.model.PassageEmailAuthParams
-import com.tweener.passage.model.Entrant
+import com.tweener.passage.gatekeeper.email.model.PassageEmailVerificationAndroidParams
+import com.tweener.passage.gatekeeper.email.model.PassageEmailVerificationIosParams
+import com.tweener.passage.gatekeeper.email.model.PassageEmailVerificationParams
+import com.tweener.passage.gatekeeper.email.model.PassageForgotPasswordAndroidParams
+import com.tweener.passage.gatekeeper.email.model.PassageForgotPasswordIosParams
+import com.tweener.passage.gatekeeper.email.model.PassageForgotPasswordParams
 import com.tweener.passage.model.AppleGatekeeperConfiguration
 import com.tweener.passage.model.EmailPasswordGatekeeperConfiguration
+import com.tweener.passage.model.Entrant
 import com.tweener.passage.model.GoogleGatekeeperAndroidConfiguration
 import com.tweener.passage.model.GoogleGatekeeperConfiguration
 import com.tweener.passage.model.PassageServiceConfiguration
@@ -38,6 +47,8 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun App() {
+    val snackbarScope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val passageService = rememberPassageService()
     var entrant by remember { mutableStateOf<Entrant?>(null) }
@@ -56,48 +67,147 @@ fun App() {
     }
 
     PassageTheme {
-        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+        ) { innerPadding ->
             Column(
                 modifier = Modifier.fillMaxSize().padding(innerPadding),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(space = 24.dp, alignment = Alignment.CenterVertically),
+                verticalArrangement = Arrangement.spacedBy(space = 24.dp),
             ) {
-                Text("Entrant email: ${entrant?.email}")
+                Spacer(modifier = Modifier.padding(vertical = 8.dp))
 
-                HorizontalDivider(modifier = Modifier.width(150.dp), thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
+                Text(entrant?.email?.let { "Entrant email: $it" } ?: "User not logged in")
 
-                Button(onClick = { scope.launch { passageService.authenticateWithGoogle().onSuccess { entrant = it }.onFailure { println(it) } } }) {
-                    Text("Sign in with Google")
-                }
+                HorizontalDivider(modifier = Modifier.width(250.dp), thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
 
-                HorizontalDivider(modifier = Modifier.width(50.dp), thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
-
-                Button(onClick = { scope.launch { passageService.authenticateWithApple().onSuccess { entrant = it }.onFailure { println(it) } } }) {
-                    Text("Sign in with Apple")
-                }
-
-                HorizontalDivider(modifier = Modifier.width(50.dp), thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
-
-                Button(onClick = {
-                    scope.launch {
-                        passageService
-                            .createUserWithEmailAndPassword(params = PassageEmailAuthParams(email = "vivien.mahe@gmail.com", password = "testest1!"))
-                            .onSuccess { entrant = it }
-                            .onFailure { println(it) }
+                if (entrant == null) {
+                    Button(onClick = {
+                        scope.launch {
+                            passageService.authenticateWithGoogle()
+                                .onSuccess { entrant = it }
+                                .onFailure {
+                                    println(it)
+                                    it.message?.let { message -> snackbarScope.launch { snackbarHostState.showSnackbar(message = message) } }
+                                }
+                        }
+                    }) {
+                        Text("Sign in with Google")
                     }
-                }) {
-                    Text("Sign up with Email/Password")
-                }
 
-                Button(onClick = {
-                    scope.launch {
-                        passageService
-                            .authenticateWithEmailAndPassword(params = PassageEmailAuthParams(email = "vivien.mahe@gmail.com", password = "testest1!"))
-                            .onSuccess { entrant = it }
-                            .onFailure { println(it) }
+                    HorizontalDivider(modifier = Modifier.width(50.dp), thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
+
+                    Button(onClick = {
+                        scope.launch {
+                            passageService.authenticateWithApple()
+                                .onSuccess { entrant = it }
+                                .onFailure {
+                                    println(it)
+                                    it.message?.let { message -> snackbarScope.launch { snackbarHostState.showSnackbar(message = message) } }
+                                }
+                        }
+                    }) {
+                        Text("Sign in with Apple")
                     }
-                }) {
-                    Text("Sign in with Email/Password")
+
+                    HorizontalDivider(modifier = Modifier.width(50.dp), thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
+
+                    Button(onClick = {
+                        scope.launch {
+                            passageService
+                                .createUserWithEmailAndPassword(params = PassageEmailAuthParams(email = "vivien.mahe@gmail.com", password = "testest1!"))
+                                .onSuccess { entrant = it }
+                                .onFailure {
+                                    println(it)
+                                    it.message?.let { message -> snackbarScope.launch { snackbarHostState.showSnackbar(message = message) } }
+                                }
+                        }
+                    }) {
+                        Text("Sign up with Email/Password")
+                    }
+
+                    Button(onClick = {
+                        scope.launch {
+                            passageService
+                                .authenticateWithEmailAndPassword(params = PassageEmailAuthParams(email = "vivien.mahe@gmail.com", password = "testest1!"))
+                                .onSuccess { entrant = it }
+                                .onFailure {
+                                    println(it)
+                                    it.message?.let { message -> snackbarScope.launch { snackbarHostState.showSnackbar(message = message) } }
+                                }
+                        }
+                    }) {
+                        Text("Sign in with Email/Password")
+                    }
+                } else {
+                    Button(onClick = {
+                        scope.launch {
+                            passageService
+                                .sendEmailVerification(
+                                    params = PassageEmailVerificationParams(
+                                        url = "https://passagesample.com/action/email_verified",
+                                        iosParams = PassageEmailVerificationIosParams(bundleId = "com.tweener.passage"),
+                                        androidParams = PassageEmailVerificationAndroidParams(
+                                            packageName = "com.tweener.passage",
+                                            installIfNotAvailable = true,
+                                            minimumVersion = "1.0",
+                                        ),
+                                        canHandleCodeInApp = true,
+                                    )
+                                )
+                                .onSuccess {
+                                    entrant?.email?.let { snackbarScope.launch { snackbarHostState.showSnackbar(message = "An email has been sent to $it to verify this address.") } }
+                                }
+                                .onFailure {
+                                    println(it)
+                                    it.message?.let { message -> snackbarScope.launch { snackbarHostState.showSnackbar(message = message) } }
+                                }
+                        }
+                    }) {
+                        Text("Send email address verification email")
+                    }
+
+                    HorizontalDivider(modifier = Modifier.width(50.dp), thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
+
+                    Button(onClick = {
+                        scope.launch {
+                            passageService
+                                .sendPasswordResetEmail(
+                                    params = PassageForgotPasswordParams(
+                                        email = entrant?.email!!,
+                                        url = "https://passagesample.com/action/email_verified",
+                                        iosParams = PassageForgotPasswordIosParams(bundleId = "com.tweener.passage"),
+                                        androidParams = PassageForgotPasswordAndroidParams(
+                                            packageName = "com.tweener.passage",
+                                            installIfNotAvailable = true,
+                                            minimumVersion = "1.0",
+                                        ),
+                                        canHandleCodeInApp = true,
+                                    )
+                                )
+                                .onSuccess {
+                                    entrant?.email?.let { snackbarScope.launch { snackbarHostState.showSnackbar(message = "An email has been sent to $it to verify this address.") } }
+                                }
+                                .onFailure {
+                                    println(it)
+                                    it.message?.let { message -> snackbarScope.launch { snackbarHostState.showSnackbar(message = message) } }
+                                }
+                        }
+                    }) {
+                        Text("Send password reset email")
+                    }
+
+                    HorizontalDivider(modifier = Modifier.width(250.dp), thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
+
+                    Button(onClick = {
+                        scope.launch {
+                            passageService.signOut()
+                            entrant = passageService.getCurrentUser()
+                        }
+                    }) {
+                        Text("Sign out")
+                    }
                 }
             }
         }

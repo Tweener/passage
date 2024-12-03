@@ -3,26 +3,31 @@ package com.tweener.passage.gatekeeper
 import com.tweener.passage.model.Entrant
 
 /**
- * Handles Firebase Authentication.
+ * An abstract representation of a Gatekeeper in the Passage library.
  *
- * This abstract class defines the common interface and shared functionality for platform-specific authentication implementations.
+ * A **Gatekeeper** is responsible for authenticating and managing users (Entrants) for a specific authentication provider,
+ * such as Google, Apple, or Email/Password. It acts as the bridge between the user (Entrant) and the Passage, verifying
+ * the user's identity and granting or revoking access.
  *
- * @param SignInParams The type of the parameters required for the sign-in process.
- * @param passageService The service for handling authentication with Passage.
+ * @param SignInParams The type of parameters required for the Gatekeeper's sign-in process.
  *
  * @author Vivien Mahe
  * @since 30/11/2024
  */
 internal abstract class PassageGatekeeper<SignInParams> {
+
     /**
-     * Initiate the sign-in process.
+     * Authenticates an Entrant using the specified parameters.
      *
-     * @param params The parameters required for the sign-in process.
+     * @param params The parameters required for signing in with this Gatekeeper (e.g., credentials or tokens).
+     * @return A [Result] containing the authenticated [Entrant] if successful, or an error if the sign-in fails.
      */
     abstract suspend fun signIn(params: SignInParams): Result<Entrant>
 
     /**
-     * Signs out the current user.
+     * Signs out the currently authenticated Entrant for this Gatekeeper.
+     *
+     * This revokes the user's session or token for the specific authentication provider managed by the Gatekeeper.
      */
     abstract suspend fun signOut()
 }

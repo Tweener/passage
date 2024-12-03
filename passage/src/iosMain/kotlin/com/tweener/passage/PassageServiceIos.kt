@@ -12,24 +12,52 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.FirebaseAuth
 import dev.gitlive.firebase.initialize
 
-/**
- * @author Vivien Mahe
- * @since 02/12/2024
- */
-
 @Composable
 actual fun rememberPassageService(): PassageService {
     return remember { PassageServiceIos() }
 }
 
+/**
+ * An iOS-specific implementation of the [PassageService].
+ *
+ * This class provides platform-specific configurations and implementations for authentication on iOS.
+ * It initializes Firebase and creates iOS-specific Gatekeepers for Google and Apple authentication,
+ * leveraging platform APIs and SDKs to manage user authentication.
+ *
+ * Responsibilities:
+ * - Initializing Firebase for iOS.
+ * - Creating iOS-specific Gatekeepers for Google and Apple authentication.
+ *
+ * @see PassageService
+ *
+ * @author Vivien Mahe
+ * @since 02/12/2024
+ */
 class PassageServiceIos : PassageService() {
 
+    /**
+     * Initializes Firebase for the iOS platform.
+     *
+     * This method sets up Firebase for use on iOS. Ensure that the Firebase iOS SDK
+     * is properly configured in your project.
+     */
     override fun initializeFirebase() {
         Firebase.initialize()
     }
 
     // region Google gatekeeper
 
+    /**
+     * Creates a Google Gatekeeper specifically for the iOS platform.
+     *
+     * This method uses the provided configuration and Firebase instance to create
+     * an instance of [PassageGoogleGatekeeperIos], which handles Google Sign-In
+     * operations on iOS using the Google Identity SDK.
+     *
+     * @param configuration The configuration for the Google Gatekeeper.
+     * @param firebaseAuth The Firebase authentication instance used for user management.
+     * @return An instance of [PassageGoogleGatekeeperIos].
+     */
     override fun createGoogleGatekeeper(configuration: GoogleGatekeeperConfiguration, firebaseAuth: FirebaseAuth): PassageGoogleGatekeeper =
         PassageGoogleGatekeeperIos(
             firebaseAuth = firebaseAuth,
@@ -40,6 +68,15 @@ class PassageServiceIos : PassageService() {
 
     // region Apple gatekeeper
 
+    /**
+     * Creates an Apple Gatekeeper specifically for the iOS platform.
+     *
+     * This method creates an instance of [PassageAppleGatekeeperIos], which manages
+     * Apple Sign-In operations on iOS using the `ASAuthorizationAppleIDProvider`.
+     *
+     * @param configuration The configuration for the Apple Gatekeeper.
+     * @return An instance of [PassageAppleGatekeeperIos].
+     */
     override fun createAppleGatekeeper(configuration: AppleGatekeeperConfiguration): PassageAppleGatekeeper =
         PassageAppleGatekeeperIos(firebaseAuth = firebaseAuth)
 

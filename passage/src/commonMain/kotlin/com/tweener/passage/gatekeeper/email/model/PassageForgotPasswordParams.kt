@@ -23,21 +23,21 @@ data class PassageForgotPasswordParams(
 /**
  * Specific iOS parameters required for sending a password reset email.
  *
- * @param iOSBundleId The iOS bundle ID for the app. Default is null.
+ * @param bundleId The iOS bundle ID for the app. Default is null.
  */
 data class PassageForgotPasswordIosParams(
-    val iOSBundleId: String,
+    val bundleId: String,
 )
 
 /**
  * Specific Android parameters required for sending a password reset email.
  *
- * @param androidPackageName The Android package name for the app. Default is null.
+ * @param packageName The Android package name for the app. Default is null.
  * @param installIfNotAvailable Whether to install the Android app if not available. Default is true.
  * @param minimumVersion The minimum Android version of the app required. Default is null.
  */
 data class PassageForgotPasswordAndroidParams(
-    val androidPackageName: String,
+    val packageName: String,
     val installIfNotAvailable: Boolean = true,
     val minimumVersion: String? = null,
 )

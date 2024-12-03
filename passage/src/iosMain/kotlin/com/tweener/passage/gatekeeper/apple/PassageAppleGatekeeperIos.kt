@@ -32,6 +32,21 @@ import platform.darwin.NSObject
 import kotlin.coroutines.cancellation.CancellationException
 
 /**
+ * An iOS-specific implementation of the [PassageAppleGatekeeper].
+ *
+ * This class handles authentication using Apple Sign-In on iOS devices. It integrates with
+ * Firebase for user management and uses the `ASAuthorizationAppleIDProvider` to initiate
+ * the Apple Sign-In process. The `signIn` method facilitates the authentication flow, while
+ * the `signOut` method is a no-op since Apple Sign-In does not require explicit sign-out
+ * operations.
+ *
+ * Responsibilities:
+ * - Initiating the Apple Sign-In process using the Apple ID provider.
+ * - Generating and securely hashing a nonce for secure communication with Firebase.
+ * - Managing callbacks and responses via the `AuthorizationControllerDelegate`.
+ *
+ * @param firebaseAuth The Firebase authentication instance used for managing authenticated users.
+ *
  * @author Vivien Mahe
  * @since 02/12/2024
  */
@@ -42,6 +57,15 @@ internal class PassageAppleGatekeeperIos(
     private lateinit var delegate: AuthorizationControllerDelegate
     private val presentationContextProvider = PresentationContextProvider()
 
+    /**
+     * Authenticates a user using Apple Sign-In on iOS.
+     *
+     * This method initiates the Apple Sign-In flow using the `ASAuthorizationAppleIDProvider`,
+     * generates a secure nonce, and integrates with Firebase to complete the authentication process.
+     *
+     * @param params Unused, as no parameters are required for Apple Sign-In.
+     * @return A [Result] containing the authenticated [Entrant] if successful, or an error if the process fails.
+     */
     override suspend fun signIn(params: Unit): Result<Entrant> = suspendCancellableCoroutine { continuation ->
         try {
             val rawNonce = AppleNonceFactory.createRandomNonceString()
@@ -71,6 +95,11 @@ internal class PassageAppleGatekeeperIos(
         }
     }
 
+    /**
+     * Signs out the current user for Apple Sign-In on iOS.
+     *
+     * Since Apple Sign-In does not require explicit session management on iOS, this method performs no actions.
+     */
     override suspend fun signOut() {
         // Nothing to do here
     }
