@@ -3,7 +3,7 @@ package com.tweener.passage.gatekeeper.apple
 import com.tweener.common._internal.Platform
 import com.tweener.common._internal.thread.suspendCatching
 import com.tweener.passage.error.PassageGatekeeperNotImplementedException
-import com.tweener.passage.model.Admittee
+import com.tweener.passage.model.Entrant
 
 /**
  * @author Vivien Mahe
@@ -11,7 +11,7 @@ import com.tweener.passage.model.Admittee
  */
 internal class PassageAppleGatekeeperAndroid : PassageAppleGatekeeper() {
 
-    override suspend fun signIn(params: Unit): Result<Admittee> = suspendCatching {
+    override suspend fun signIn(params: Unit): Result<Entrant> = suspendCatching {
         throw PassageGatekeeperNotImplementedException(gatekeeper = "Apple", platform = Platform.ANDROID)
     }
 

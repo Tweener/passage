@@ -1,6 +1,6 @@
 package com.tweener.passage.mapper
 
-import com.tweener.passage.model.Admittee
+import com.tweener.passage.model.Entrant
 import dev.gitlive.firebase.auth.FirebaseUser
 
 /**
@@ -8,8 +8,8 @@ import dev.gitlive.firebase.auth.FirebaseUser
  * @since 30/11/2024
  */
 
-internal fun FirebaseUser.toAdmittee(): Admittee =
-    Admittee(
+internal fun FirebaseUser.toEntrant(): Entrant =
+    Entrant(
         uid = uid,
         email = email,
         displayName = displayName ?: providerData.map { it.displayName }.firstOrNull { it != null },

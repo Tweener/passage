@@ -14,7 +14,7 @@ package com.tweener.passage.model
  * @author Vivien Mahe
  * @since 30/11/2024
  */
-data class Admittee(
+data class Entrant(
     val uid: String,
     val email: String?,
     val displayName: String?,

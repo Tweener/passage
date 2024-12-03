@@ -1,13 +1,13 @@
 package com.tweener.passage.gatekeeper.email
 
 import com.tweener.common._internal.thread.suspendCatching
-import com.tweener.passage.error.PassageGatekeeperUnknownAdmitteeException
+import com.tweener.passage.error.PassageGatekeeperUnknownEntrantException
 import com.tweener.passage.gatekeeper.PassageGatekeeper
 import com.tweener.passage.gatekeeper.email.model.PassageEmailAuthParams
 import com.tweener.passage.gatekeeper.email.model.PassageEmailVerificationParams
 import com.tweener.passage.gatekeeper.email.model.PassageForgotPasswordParams
-import com.tweener.passage.mapper.toAdmittee
-import com.tweener.passage.model.Admittee
+import com.tweener.passage.mapper.toEntrant
+import com.tweener.passage.model.Entrant
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.ActionCodeResult
 import dev.gitlive.firebase.auth.ActionCodeSettings
@@ -30,9 +30,9 @@ internal class PassageEmailGatekeeper(
     private val firebaseAuth: FirebaseAuth,
 ) : PassageGatekeeper<PassageEmailAuthParams>() {
 
-    override suspend fun signIn(params: PassageEmailAuthParams): Result<Admittee> = suspendCatching {
-        firebaseAuth.signInWithEmailAndPassword(email = params.email, password = params.password).user?.toAdmittee()
-            ?: throw PassageGatekeeperUnknownAdmitteeException()
+    override suspend fun signIn(params: PassageEmailAuthParams): Result<Entrant> = suspendCatching {
+        firebaseAuth.signInWithEmailAndPassword(email = params.email, password = params.password).user?.toEntrant()
+            ?: throw PassageGatekeeperUnknownEntrantException()
     }.onFailure { throwable ->
         Napier.e(throwable) { "Couldn't sign in the user." }
     }
@@ -41,9 +41,9 @@ internal class PassageEmailGatekeeper(
         // Nothing to do here
     }
 
-    suspend fun signUp(params: PassageEmailAuthParams): Result<Admittee> = suspendCatching {
-        firebaseAuth.createUserWithEmailAndPassword(email = params.email, password = params.password).user?.toAdmittee()
-            ?: throw PassageGatekeeperUnknownAdmitteeException()
+    suspend fun signUp(params: PassageEmailAuthParams): Result<Entrant> = suspendCatching {
+        firebaseAuth.createUserWithEmailAndPassword(email = params.email, password = params.password).user?.toEntrant()
+            ?: throw PassageGatekeeperUnknownEntrantException()
     }.onFailure { throwable ->
         Napier.e(throwable) { "Couldn't sign in the user." }
     }
@@ -51,7 +51,7 @@ internal class PassageEmailGatekeeper(
     suspend fun reauthenticate(params: PassageEmailAuthParams): Result<Unit> = suspendCatching {
         val firebaseCredential = EmailAuthProvider.credential(email = params.email, password = params.password)
         firebaseAuth.currentUser?.reauthenticate(credential = firebaseCredential)
-            ?: throw PassageGatekeeperUnknownAdmitteeException()
+            ?: throw PassageGatekeeperUnknownEntrantException()
     }.onFailure { throwable ->
         Napier.e(throwable) { "Couldn't sign in the user." }
     }
@@ -106,7 +106,7 @@ internal class PassageEmailGatekeeper(
         )
 
         firebaseAuth.currentUser?.sendEmailVerification(actionCodeSettings = actionCodeSettings)
-            ?: throw PassageGatekeeperUnknownAdmitteeException()
+            ?: throw PassageGatekeeperUnknownEntrantException()
     }.onFailure { throwable ->
         Napier.e(throwable) { "Couldn't send email address verification email." }
     }
@@ -116,7 +116,7 @@ internal class PassageEmailGatekeeper(
      *
      * This method verifies the email verification action code, applies it to confirm the user's email,
      * and reloads the current user to reflect the updated email verification status.
-     * If the email is successfully verified, the [Admittee.isEmailVerified] property will be set to `true`.
+     * If the email is successfully verified, the [Entrant.isEmailVerified] property will be set to `true`.
      *
      * @param oobCode The out-of-band code received from the email verification link.
      * @return A [Result] containing the success or failure of the email verification process.

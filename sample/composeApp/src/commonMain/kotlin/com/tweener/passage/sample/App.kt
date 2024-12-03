@@ -26,7 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.tweener.passage.gatekeeper.email.model.PassageEmailAuthParams
-import com.tweener.passage.model.Admittee
+import com.tweener.passage.model.Entrant
 import com.tweener.passage.model.AppleGatekeeperConfiguration
 import com.tweener.passage.model.EmailPasswordGatekeeperConfiguration
 import com.tweener.passage.model.GoogleGatekeeperAndroidConfiguration
@@ -40,7 +40,7 @@ import kotlinx.coroutines.launch
 fun App() {
     val scope = rememberCoroutineScope()
     val passageService = rememberPassageService()
-    var admittee by remember { mutableStateOf<Admittee?>(null) }
+    var entrant by remember { mutableStateOf<Entrant?>(null) }
 
     LaunchedEffect(passageService) {
         passageService.initialize(
@@ -62,17 +62,17 @@ fun App() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(space = 24.dp, alignment = Alignment.CenterVertically),
             ) {
-                Text("Admittee email: ${admittee?.email}")
+                Text("Entrant email: ${entrant?.email}")
 
                 HorizontalDivider(modifier = Modifier.width(150.dp), thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
 
-                Button(onClick = { scope.launch { passageService.authenticateWithGoogle().onSuccess { admittee = it }.onFailure { println(it) } } }) {
+                Button(onClick = { scope.launch { passageService.authenticateWithGoogle().onSuccess { entrant = it }.onFailure { println(it) } } }) {
                     Text("Sign in with Google")
                 }
 
                 HorizontalDivider(modifier = Modifier.width(50.dp), thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
 
-                Button(onClick = { scope.launch { passageService.authenticateWithApple().onSuccess { admittee = it }.onFailure { println(it) } } }) {
+                Button(onClick = { scope.launch { passageService.authenticateWithApple().onSuccess { entrant = it }.onFailure { println(it) } } }) {
                     Text("Sign in with Apple")
                 }
 
@@ -82,7 +82,7 @@ fun App() {
                     scope.launch {
                         passageService
                             .createUserWithEmailAndPassword(params = PassageEmailAuthParams(email = "vivien.mahe@gmail.com", password = "testest1!"))
-                            .onSuccess { admittee = it }
+                            .onSuccess { entrant = it }
                             .onFailure { println(it) }
                     }
                 }) {
@@ -93,7 +93,7 @@ fun App() {
                     scope.launch {
                         passageService
                             .authenticateWithEmailAndPassword(params = PassageEmailAuthParams(email = "vivien.mahe@gmail.com", password = "testest1!"))
-                            .onSuccess { admittee = it }
+                            .onSuccess { entrant = it }
                             .onFailure { println(it) }
                     }
                 }) {

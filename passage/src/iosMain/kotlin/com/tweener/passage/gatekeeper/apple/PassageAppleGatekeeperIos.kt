@@ -5,10 +5,10 @@ import cocoapods.FirebaseAuth.FIROAuthProvider
 import com.tweener.common._internal.contract.requireNotNullOrThrow
 import com.tweener.common._internal.thread.resumeIfActive
 import com.tweener.common._internal.thread.resumeWithExceptionIfActive
-import com.tweener.passage.error.PassageGatekeeperUnknownAdmitteeException
+import com.tweener.passage.error.PassageGatekeeperUnknownEntrantException
 import com.tweener.passage.gatekeeper.apple.error.PassageAppleGatekeeperException
-import com.tweener.passage.mapper.toAdmittee
-import com.tweener.passage.model.Admittee
+import com.tweener.passage.mapper.toEntrant
+import com.tweener.passage.model.Entrant
 import dev.gitlive.firebase.auth.FirebaseAuth
 import io.github.aakira.napier.Napier
 import kotlinx.cinterop.BetaInteropApi
@@ -42,7 +42,7 @@ internal class PassageAppleGatekeeperIos(
     private lateinit var delegate: AuthorizationControllerDelegate
     private val presentationContextProvider = PresentationContextProvider()
 
-    override suspend fun signIn(params: Unit): Result<Admittee> = suspendCancellableCoroutine { continuation ->
+    override suspend fun signIn(params: Unit): Result<Entrant> = suspendCancellableCoroutine { continuation ->
         try {
             val rawNonce = AppleNonceFactory.createRandomNonceString()
             delegate = AuthorizationControllerDelegate(firebaseAuth = firebaseAuth, nonce = rawNonce) { result -> continuation.resumeIfActive(result) }
@@ -79,7 +79,7 @@ internal class PassageAppleGatekeeperIos(
 private class AuthorizationControllerDelegate(
     private val firebaseAuth: FirebaseAuth,
     private val nonce: String,
-    var onResponse: (Result<Admittee>) -> Unit,
+    var onResponse: (Result<Entrant>) -> Unit,
 ) : ASAuthorizationControllerDelegateProtocol, NSObject() {
 
     @OptIn(BetaInteropApi::class, ExperimentalForeignApi::class)
@@ -102,9 +102,9 @@ private class AuthorizationControllerDelegate(
                     error != null || authResult == null -> onResponse(Result.failure(PassageAppleGatekeeperException(message = "FIRAuthDataResult is null")))
 
                     else -> {
-                        firebaseAuth.currentUser?.toAdmittee()
+                        firebaseAuth.currentUser?.toEntrant()
                             ?.let { user -> onResponse(Result.success(user)) }
-                            ?: onResponse(Result.failure(PassageGatekeeperUnknownAdmitteeException()))
+                            ?: onResponse(Result.failure(PassageGatekeeperUnknownEntrantException()))
                     }
                 }
             }

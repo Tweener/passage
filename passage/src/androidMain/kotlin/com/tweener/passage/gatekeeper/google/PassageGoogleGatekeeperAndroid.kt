@@ -10,11 +10,11 @@ import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
 import com.tweener.common._internal.thread.suspendCatching
-import com.tweener.passage.error.PassageGatekeeperUnknownAdmitteeException
+import com.tweener.passage.error.PassageGatekeeperUnknownEntrantException
 import com.tweener.passage.gatekeeper.google.error.PassageGoogleGatekeeperUnknownCredentialException
 import com.tweener.passage.gatekeeper.google.model.GoogleTokens
-import com.tweener.passage.mapper.toAdmittee
-import com.tweener.passage.model.Admittee
+import com.tweener.passage.mapper.toEntrant
+import com.tweener.passage.model.Entrant
 import dev.gitlive.firebase.auth.FirebaseAuth
 import dev.gitlive.firebase.auth.GoogleAuthProvider
 import io.github.aakira.napier.Napier
@@ -44,14 +44,14 @@ internal class PassageGoogleGatekeeperAndroid(
     private val credentialManager = CredentialManager.create(context)
     private var retryAttempts = 0
 
-    override suspend fun signIn(params: Unit): Result<Admittee> = suspendCatching {
+    override suspend fun signIn(params: Unit): Result<Entrant> = suspendCatching {
         retrieveGoogleTokens(credential = createCredentials()).fold(
             onSuccess = { googleTokens ->
                 retryAttempts = 0
 
                 val firebaseCredential = GoogleAuthProvider.credential(idToken = googleTokens.idToken, accessToken = googleTokens.accessToken)
-                firebaseAuth.signInWithCredential(authCredential = firebaseCredential).user?.toAdmittee()
-                    ?: throw PassageGatekeeperUnknownAdmitteeException()
+                firebaseAuth.signInWithCredential(authCredential = firebaseCredential).user?.toEntrant()
+                    ?: throw PassageGatekeeperUnknownEntrantException()
             },
             onFailure = { throwable -> throw throwable },
         )
@@ -84,7 +84,7 @@ internal class PassageGoogleGatekeeperAndroid(
 
                 val firebaseCredential = GoogleAuthProvider.credential(idToken = googleTokens.idToken, accessToken = googleTokens.accessToken)
                 firebaseAuth.currentUser?.reauthenticate(credential = firebaseCredential)
-                    ?: throw PassageGatekeeperUnknownAdmitteeException()
+                    ?: throw PassageGatekeeperUnknownEntrantException()
             },
             onFailure = { throwable -> throw throwable },
         )

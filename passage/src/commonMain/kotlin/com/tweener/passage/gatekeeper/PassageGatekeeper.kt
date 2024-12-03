@@ -1,8 +1,6 @@
 package com.tweener.passage.gatekeeper
 
-import com.tweener.passage.model.Admittee
-import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.contract
+import com.tweener.passage.model.Entrant
 
 /**
  * Handles Firebase Authentication.
@@ -21,7 +19,7 @@ internal abstract class PassageGatekeeper<SignInParams> {
      *
      * @param params The parameters required for the sign-in process.
      */
-    abstract suspend fun signIn(params: SignInParams): Result<Admittee>
+    abstract suspend fun signIn(params: SignInParams): Result<Entrant>
 
     /**
      * Signs out the current user.

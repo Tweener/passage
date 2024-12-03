@@ -8,8 +8,8 @@ import com.tweener.passage.gatekeeper.email.model.PassageEmailAuthParams
 import com.tweener.passage.gatekeeper.email.model.PassageEmailVerificationParams
 import com.tweener.passage.gatekeeper.email.model.PassageForgotPasswordParams
 import com.tweener.passage.gatekeeper.google.PassageGoogleGatekeeper
-import com.tweener.passage.mapper.toAdmittee
-import com.tweener.passage.model.Admittee
+import com.tweener.passage.mapper.toEntrant
+import com.tweener.passage.model.Entrant
 import com.tweener.passage.model.AppleGatekeeperConfiguration
 import com.tweener.passage.model.EmailPasswordGatekeeperConfiguration
 import com.tweener.passage.model.GoogleGatekeeperConfiguration
@@ -47,11 +47,11 @@ abstract class PassageService {
         configuration.emailPassword?.let { emailGatekeeper = createEmailGatekeeper(configuration = it) }
     }
 
-    fun getCurrentUser(): Admittee? =
-        firebaseAuth.currentUser?.toAdmittee()
+    fun getCurrentUser(): Entrant? =
+        firebaseAuth.currentUser?.toEntrant()
 
-    fun getCurrentUserAsFlow(): Flow<Admittee?> =
-        firebaseAuth.authStateChanged.map { it?.toAdmittee() }
+    fun getCurrentUserAsFlow(): Flow<Entrant?> =
+        firebaseAuth.authStateChanged.map { it?.toEntrant() }
 
     fun isUserLoggedIn(): Flow<Boolean> =
         getCurrentUserAsFlow().map { it != null }
@@ -75,9 +75,9 @@ abstract class PassageService {
     /**
      * Authenticates a user against Google gatekeeper.
      *
-     * @return The authenticated admittee, or null if authentication fails.
+     * @return The authenticated entrant, or null if authentication fails.
      */
-    suspend fun authenticateWithGoogle(): Result<Admittee> =
+    suspend fun authenticateWithGoogle(): Result<Entrant> =
         googleGatekeeper
             ?.signIn(Unit)
             ?: Result.failure(PassageGatekeeperNotConfiguredException(gatekeeper = "Google"))
@@ -99,9 +99,9 @@ abstract class PassageService {
     /**
      * Authenticates a user against Apple gatekeeper.
      *
-     * @return The authenticated admittee, or null if authentication fails.
+     * @return The authenticated entrant, or null if authentication fails.
      */
-    suspend fun authenticateWithApple(): Result<Admittee> =
+    suspend fun authenticateWithApple(): Result<Entrant> =
         appleGatekeeper
             ?.signIn(Unit)
             ?: Result.failure(PassageGatekeeperNotConfiguredException(gatekeeper = "Apple"))
@@ -118,9 +118,9 @@ abstract class PassageService {
      * Authenticates a user with an email and password.
      *
      * @param params TThe parameters required for authentication.
-     * @return The authenticated admittee, or null if authentication fails.
+     * @return The authenticated entrant, or null if authentication fails.
      */
-    suspend fun authenticateWithEmailAndPassword(params: PassageEmailAuthParams): Result<Admittee> =
+    suspend fun authenticateWithEmailAndPassword(params: PassageEmailAuthParams): Result<Entrant> =
         emailGatekeeper
             ?.signIn(params = params)
             ?: Result.failure(PassageGatekeeperNotConfiguredException(gatekeeper = "Email/Password"))
@@ -129,9 +129,9 @@ abstract class PassageService {
      * Creates a new user with the given email and password.
      *
      * @param params TThe parameters required for authentication.
-     * @return The created admittee, or null if creation fails.
+     * @return The created entrant, or null if creation fails.
      */
-    suspend fun createUserWithEmailAndPassword(params: PassageEmailAuthParams): Result<Admittee> =
+    suspend fun createUserWithEmailAndPassword(params: PassageEmailAuthParams): Result<Entrant> =
         emailGatekeeper
             ?.signUp(params = params)
             ?: Result.failure(PassageGatekeeperNotConfiguredException(gatekeeper = "Email/Password"))
@@ -185,7 +185,7 @@ abstract class PassageService {
      *
      * This method verifies the email verification action code, applies it to confirm the user's email,
      * and reloads the current user to reflect the updated email verification status.
-     * If the email is successfully verified, the [Admittee.isEmailVerified] property will be set to `true`.
+     * If the email is successfully verified, the [Entrant.isEmailVerified] property will be set to `true`.
      *
      * @param oobCode The out-of-band code received from the email verification link.
      * @return A [Result] containing the success or failure of the email verification process.
