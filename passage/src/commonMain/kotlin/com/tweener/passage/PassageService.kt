@@ -52,7 +52,7 @@ expect fun rememberPassageService(universalLinkHandler: PassageUniversalLinkHand
  * @since 30/11/2024
  */
 abstract class PassageService(
-    private val universalLinkHandler: PassageUniversalLinkHandler,
+    universalLinkHandler: PassageUniversalLinkHandler,
 ) {
     val universalLinkToHandle: StateFlow<FirebaseUniversalLink?> = universalLinkHandler.linkToHandle
 

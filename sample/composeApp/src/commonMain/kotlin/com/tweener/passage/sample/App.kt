@@ -59,7 +59,7 @@ fun App() {
     val lifecycleOwner = LocalLifecycleOwner.current
 
     LaunchedEffect(passageService) {
-        lifecycleOwner.repeatOnLifecycle(state = Lifecycle.State.STARTED) {
+        lifecycleOwner.repeatOnLifecycle(state = Lifecycle.State.CREATED) {
             // Initialize Passage
             passageService.initialize(
                 configuration = PassageServiceConfiguration(
@@ -79,7 +79,8 @@ fun App() {
 
     // Listen to universal links to be handled
     val link = passageService.universalLinkToHandle.collectAsStateWithLifecycle()
-    LaunchedEffect(link) {
+    LaunchedEffect(link.value) {
+        println("New link: ${link.value}")
         link.value?.let {
             snackbarScope.launch { snackbarHostState.showSnackbar(message = "Universal link handled for mode: ${it.mode} with continueUrl: ${it.continueUrl}") }
         }
@@ -165,7 +166,7 @@ fun App() {
                             passageService
                                 .sendEmailVerification(
                                     params = PassageEmailVerificationParams(
-                                        url = "https://passage.page.link/action/email_verified",
+                                        url = "https://passagesample.page.link/action/email_verified",
                                         iosParams = PassageEmailVerificationIosParams(bundleId = "com.tweener.passage.sample"),
                                         androidParams = PassageEmailVerificationAndroidParams(
                                             packageName = "com.tweener.passage.sample",
@@ -195,7 +196,7 @@ fun App() {
                                 .sendPasswordResetEmail(
                                     params = PassageForgotPasswordParams(
                                         email = entrant?.email!!,
-                                        url = "https://passage.page.link/action/password_reset",
+                                        url = "https://passagesample.page.link/action/password_reset",
                                         iosParams = PassageForgotPasswordIosParams(bundleId = "com.tweener.passage.sample"),
                                         androidParams = PassageForgotPasswordAndroidParams(
                                             packageName = "com.tweener.passage.sample",
