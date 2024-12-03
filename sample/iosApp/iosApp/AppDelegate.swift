@@ -43,5 +43,10 @@ class AppDelegate : NSObject, UIApplicationDelegate, UNUserNotificationCenterDel
         if (GIDSignIn.sharedInstance.handle(url)) {
             print("Handled by GIDSignIn")
         }
+
+        // Then check if the URL is handled by Firebase Authentication
+        else if (PassageUniversalLinkHandlerHelper().handle(url: url.absoluteString)) {
+            print("Handled by Passage")
+        }
     }
 }

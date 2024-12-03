@@ -10,12 +10,19 @@ import com.tweener.passage.gatekeeper.google.PassageGoogleGatekeeper
 import com.tweener.passage.gatekeeper.google.PassageGoogleGatekeeperAndroid
 import com.tweener.passage.model.AppleGatekeeperConfiguration
 import com.tweener.passage.model.GoogleGatekeeperConfiguration
+import com.tweener.passage.universallink.PassageUniversalLinkHandler
 import dev.gitlive.firebase.auth.FirebaseAuth
 
 @Composable
-actual fun rememberPassageService(): PassageService {
+actual fun rememberPassageService(universalLinkHandler: PassageUniversalLinkHandler): PassageService {
     val context = LocalContext.current
-    return remember { PassageServiceAndroid(context = context) }
+
+    return remember {
+        PassageServiceAndroid(
+            universalLinkHandler = universalLinkHandler,
+            context = context,
+        )
+    }
 }
 
 /**
@@ -34,8 +41,9 @@ actual fun rememberPassageService(): PassageService {
  * @since 02/12/2024
  */
 class PassageServiceAndroid(
+    universalLinkHandler: PassageUniversalLinkHandler,
     private val context: Context,
-) : PassageService() {
+) : PassageService(universalLinkHandler = universalLinkHandler) {
 
     override fun initializeFirebase() {
         // Nothing to do here

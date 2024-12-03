@@ -13,19 +13,23 @@ import com.tweener.passage.mapper.toEntrant
 import com.tweener.passage.model.AppleGatekeeperConfiguration
 import com.tweener.passage.model.EmailPasswordGatekeeperConfiguration
 import com.tweener.passage.model.Entrant
+import com.tweener.passage.model.GatekeeperType
 import com.tweener.passage.model.GoogleGatekeeperConfiguration
 import com.tweener.passage.model.PassageServiceConfiguration
+import com.tweener.passage.universallink.FirebaseUniversalLink
+import com.tweener.passage.universallink.PassageUniversalLinkHandler
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.FirebaseAuth
 import dev.gitlive.firebase.auth.auth
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.map
 
 /**
  * Creates and [remember] the [PassageService].
  */
 @Composable
-expect fun rememberPassageService(): PassageService
+expect fun rememberPassageService(universalLinkHandler: PassageUniversalLinkHandler = PassageUniversalLinkHandler()): PassageService
 
 /**
  * Handles Firebase authentication operations.
@@ -47,7 +51,10 @@ expect fun rememberPassageService(): PassageService
  * @author Vivien Mahe
  * @since 30/11/2024
  */
-abstract class PassageService {
+abstract class PassageService(
+    private val universalLinkHandler: PassageUniversalLinkHandler,
+) {
+    val universalLinkToHandle: SharedFlow<FirebaseUniversalLink?> = universalLinkHandler.linkToHandle
 
     protected lateinit var firebaseAuth: FirebaseAuth
 
@@ -127,7 +134,7 @@ abstract class PassageService {
     suspend fun authenticateWithGoogle(): Result<Entrant> =
         googleGatekeeper
             ?.signIn(Unit)
-            ?: Result.failure(PassageGatekeeperNotConfiguredException(gatekeeper = "Google"))
+            ?: Result.failure(PassageGatekeeperNotConfiguredException(gatekeeper = GatekeeperType.GOOGLE))
 
     /**
      * Re-authenticates the currently authenticated user with Google.
@@ -137,7 +144,7 @@ abstract class PassageService {
     suspend fun reauthenticateWithGoogle(): Result<Unit> =
         googleGatekeeper
             ?.reauthenticate()
-            ?: Result.failure(PassageGatekeeperNotConfiguredException(gatekeeper = "Google"))
+            ?: Result.failure(PassageGatekeeperNotConfiguredException(gatekeeper = GatekeeperType.GOOGLE))
 
     /**
      * Creates the Google Gatekeeper for handling authentication.
@@ -160,7 +167,7 @@ abstract class PassageService {
     suspend fun authenticateWithApple(): Result<Entrant> =
         appleGatekeeper
             ?.signIn(Unit)
-            ?: Result.failure(PassageGatekeeperNotConfiguredException(gatekeeper = "Apple"))
+            ?: Result.failure(PassageGatekeeperNotConfiguredException(gatekeeper = GatekeeperType.APPLE))
 
     /**
      * Creates the Apple Gatekeeper for handling authentication.
@@ -191,7 +198,7 @@ abstract class PassageService {
     suspend fun authenticateWithEmailAndPassword(params: PassageEmailAuthParams): Result<Entrant> =
         emailGatekeeper
             ?.signIn(params = params)
-            ?: Result.failure(PassageGatekeeperNotConfiguredException(gatekeeper = "Email/Password"))
+            ?: Result.failure(PassageGatekeeperNotConfiguredException(gatekeeper = GatekeeperType.EMAIL_PASSWORD))
 
     /**
      * Creates a new user with the given email and password.
@@ -202,7 +209,7 @@ abstract class PassageService {
     suspend fun createUserWithEmailAndPassword(params: PassageEmailAuthParams): Result<Entrant> =
         emailGatekeeper
             ?.signUp(params = params)
-            ?: Result.failure(PassageGatekeeperNotConfiguredException(gatekeeper = "Email/Password"))
+            ?: Result.failure(PassageGatekeeperNotConfiguredException(gatekeeper = GatekeeperType.EMAIL_PASSWORD))
 
     /**
      * Re-authenticates the currently logged-in user using email and password credentials.
@@ -212,7 +219,7 @@ abstract class PassageService {
     suspend fun reauthenticateWithEmailAndPassword(params: PassageEmailAuthParams): Result<Unit> =
         emailGatekeeper
             ?.reauthenticate(params = params)
-            ?: Result.failure(PassageGatekeeperNotConfiguredException(gatekeeper = "Email/Password"))
+            ?: Result.failure(PassageGatekeeperNotConfiguredException(gatekeeper = GatekeeperType.EMAIL_PASSWORD))
 
     /**
      * Sends a password reset email with specified settings.
@@ -222,7 +229,7 @@ abstract class PassageService {
     suspend fun sendPasswordResetEmail(params: PassageForgotPasswordParams): Result<Unit> =
         emailGatekeeper
             ?.sendPasswordResetEmail(params = params)
-            ?: Result.failure(PassageGatekeeperNotConfiguredException(gatekeeper = "Email/Password"))
+            ?: Result.failure(PassageGatekeeperNotConfiguredException(gatekeeper = GatekeeperType.EMAIL_PASSWORD))
 
     /**
      * Handles the password reset process using the provided out-of-band (OOB) code.
@@ -236,7 +243,7 @@ abstract class PassageService {
     suspend fun handlePasswordResetCode(oobCode: String): Result<Unit> =
         emailGatekeeper
             ?.handlePasswordResetCode(oobCode = oobCode)
-            ?: Result.failure(PassageGatekeeperNotConfiguredException(gatekeeper = "Email/Password"))
+            ?: Result.failure(PassageGatekeeperNotConfiguredException(gatekeeper = GatekeeperType.EMAIL_PASSWORD))
 
     /**
      * Sends an email address verification email with specified settings.
@@ -246,7 +253,7 @@ abstract class PassageService {
     suspend fun sendEmailVerification(params: PassageEmailVerificationParams): Result<Unit> =
         emailGatekeeper
             ?.sendEmailVerification(params = params)
-            ?: Result.failure(PassageGatekeeperNotConfiguredException(gatekeeper = "Email/Password"))
+            ?: Result.failure(PassageGatekeeperNotConfiguredException(gatekeeper = GatekeeperType.EMAIL_PASSWORD))
 
     /**
      * Handles the email verification process using the provided out-of-band (OOB) code.
@@ -261,7 +268,7 @@ abstract class PassageService {
     suspend fun handleEmailVerificationCode(oobCode: String): Result<Unit> =
         emailGatekeeper
             ?.handleEmailVerificationCode(oobCode = oobCode)
-            ?: Result.failure(PassageGatekeeperNotConfiguredException(gatekeeper = "Email/Password"))
+            ?: Result.failure(PassageGatekeeperNotConfiguredException(gatekeeper = GatekeeperType.EMAIL_PASSWORD))
 
     // endregion Email & Password gatekeeper
 }

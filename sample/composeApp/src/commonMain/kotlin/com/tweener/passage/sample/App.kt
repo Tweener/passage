@@ -28,6 +28,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
 import com.tweener.passage.gatekeeper.email.model.PassageEmailAuthParams
 import com.tweener.passage.gatekeeper.email.model.PassageEmailVerificationAndroidParams
 import com.tweener.passage.gatekeeper.email.model.PassageEmailVerificationIosParams
@@ -47,23 +50,30 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun App() {
+    val buttonsScope = rememberCoroutineScope()
     val snackbarScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
-    val passageService = rememberPassageService()
+    val passageService = rememberPassageService(universalLinkHandler = providePassageUniversalLinkHandler())
     var entrant by remember { mutableStateOf<Entrant?>(null) }
+    val lifecycleOwner = LocalLifecycleOwner.current
 
     LaunchedEffect(passageService) {
-        passageService.initialize(
-            configuration = PassageServiceConfiguration(
-                google = GoogleGatekeeperConfiguration(
-                    serverClientId = "669986017952-72t1qil6sanreihoeumpb88junr9r8jt.apps.googleusercontent.com",
-                    android = GoogleGatekeeperAndroidConfiguration(),
-                ),
-                apple = AppleGatekeeperConfiguration(),
-                emailPassword = EmailPasswordGatekeeperConfiguration,
+        lifecycleOwner.repeatOnLifecycle(state = Lifecycle.State.STARTED) {
+            // Initialize Passage
+            passageService.initialize(
+                configuration = PassageServiceConfiguration(
+                    google = GoogleGatekeeperConfiguration(
+                        serverClientId = "669986017952-72t1qil6sanreihoeumpb88junr9r8jt.apps.googleusercontent.com",
+                        android = GoogleGatekeeperAndroidConfiguration(),
+                    ),
+                    apple = AppleGatekeeperConfiguration(),
+                    emailPassword = EmailPasswordGatekeeperConfiguration,
+                )
             )
-        )
+
+            // Listen to universal links to be handled
+            passageService.universalLinkToHandle.collect { link -> snackbarScope.launch { snackbarHostState.showSnackbar(message = "Universal link handled: $link") } }
+        }
     }
 
     PassageTheme {
@@ -84,7 +94,7 @@ fun App() {
 
                 if (entrant == null) {
                     Button(onClick = {
-                        scope.launch {
+                        buttonsScope.launch {
                             passageService.authenticateWithGoogle()
                                 .onSuccess { entrant = it }
                                 .onFailure {
@@ -99,7 +109,7 @@ fun App() {
                     HorizontalDivider(modifier = Modifier.width(50.dp), thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
 
                     Button(onClick = {
-                        scope.launch {
+                        buttonsScope.launch {
                             passageService.authenticateWithApple()
                                 .onSuccess { entrant = it }
                                 .onFailure {
@@ -114,7 +124,7 @@ fun App() {
                     HorizontalDivider(modifier = Modifier.width(50.dp), thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
 
                     Button(onClick = {
-                        scope.launch {
+                        buttonsScope.launch {
                             passageService
                                 .createUserWithEmailAndPassword(params = PassageEmailAuthParams(email = "vivien.mahe@gmail.com", password = "testest1!"))
                                 .onSuccess { entrant = it }
@@ -128,7 +138,7 @@ fun App() {
                     }
 
                     Button(onClick = {
-                        scope.launch {
+                        buttonsScope.launch {
                             passageService
                                 .authenticateWithEmailAndPassword(params = PassageEmailAuthParams(email = "vivien.mahe@gmail.com", password = "testest1!"))
                                 .onSuccess { entrant = it }
@@ -142,7 +152,7 @@ fun App() {
                     }
                 } else {
                     Button(onClick = {
-                        scope.launch {
+                        buttonsScope.launch {
                             passageService
                                 .sendEmailVerification(
                                     params = PassageEmailVerificationParams(
@@ -171,7 +181,7 @@ fun App() {
                     HorizontalDivider(modifier = Modifier.width(50.dp), thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
 
                     Button(onClick = {
-                        scope.launch {
+                        buttonsScope.launch {
                             passageService
                                 .sendPasswordResetEmail(
                                     params = PassageForgotPasswordParams(
@@ -201,7 +211,7 @@ fun App() {
                     HorizontalDivider(modifier = Modifier.width(250.dp), thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
 
                     Button(onClick = {
-                        scope.launch {
+                        buttonsScope.launch {
                             passageService.signOut()
                             entrant = passageService.getCurrentUser()
                         }

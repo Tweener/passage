@@ -4,19 +4,18 @@ import com.tweener.common._internal.Platform
 import com.tweener.common._internal.thread.suspendCatching
 import com.tweener.passage.error.PassageGatekeeperNotImplementedException
 import com.tweener.passage.model.Entrant
+import com.tweener.passage.model.GatekeeperType
 
 /**
  * An Android-specific implementation of the [PassageAppleGatekeeper].
  *
  * This class provides a placeholder implementation for Apple Sign-In on the Android platform.
- * As Apple Sign-In is not yet implemented on Android, both the `signIn` and `signOut` methods
- * throw a [PassageGatekeeperNotImplementedException] to indicate that this functionality is unavailable.
+ * As Apple Sign-In is not yet implemented on Android, the `signIn` method throws a
+ * [PassageGatekeeperNotImplementedException] to indicate the lack of support.
  *
  * Responsibilities:
- * - Throws exceptions for both `signIn` and `signOut` to indicate lack of support on Android.
- *
- * @see PassageAppleGatekeeper
- * @see PassageGatekeeperNotImplementedException
+ * - Indicating that Apple Sign-In is unsupported on Android.
+ * - Providing a no-op implementation for the `signOut` method.
  *
  * @author Vivien Mahe
  * @since 30/11/2024
@@ -26,7 +25,7 @@ internal class PassageAppleGatekeeperAndroid : PassageAppleGatekeeper() {
     /**
      * Attempts to authenticate a user using Apple Sign-In on Android.
      *
-     * As Apple Sign-In is not eyt implemented on Android, this method always throws
+     * As Apple Sign-In is not yet implemented on Android, this method always throws
      * a [PassageGatekeeperNotImplementedException].
      *
      * @param params The parameters for signing in (unused, as Apple Sign-In is not implemented).
@@ -34,19 +33,15 @@ internal class PassageAppleGatekeeperAndroid : PassageAppleGatekeeper() {
      * @throws PassageGatekeeperNotImplementedException Always thrown to indicate lack of support.
      */
     override suspend fun signIn(params: Unit): Result<Entrant> = suspendCatching {
-        throw PassageGatekeeperNotImplementedException(gatekeeper = "Apple", platform = Platform.ANDROID)
+        throw PassageGatekeeperNotImplementedException(gatekeeper = GatekeeperType.APPLE, platform = Platform.ANDROID)
     }
 
-
     /**
-     * Attempts to sign out a user authenticated with Apple Sign-In on Android.
+     * Signs out the current user for Apple Sign-In on Android.
      *
-     * As Apple Sign-In is not yet implemented on Android, this method always throws
-     * a [PassageGatekeeperNotImplementedException].
-     *
-     * @throws PassageGatekeeperNotImplementedException Always thrown to indicate lack of support.
+     * As no session is managed for Apple Sign-In on Android, this method performs no actions.
      */
     override suspend fun signOut() {
-        throw PassageGatekeeperNotImplementedException(gatekeeper = "Apple", platform = Platform.ANDROID)
+        // Nothing to do here
     }
 }

@@ -44,6 +44,8 @@ kotlin {
             implementation(compose.material)
             implementation(compose.ui)
             implementation(libs.compose.multiplatform.material3)
+
+            implementation(libs.jetbrains.lifecycle.runtime.compose)
         }
 
         androidMain.dependencies {

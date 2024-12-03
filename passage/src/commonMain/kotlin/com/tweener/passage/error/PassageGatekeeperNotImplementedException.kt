@@ -1,10 +1,11 @@
 package com.tweener.passage.error
 
 import com.tweener.common._internal.Platform
+import com.tweener.passage.model.GatekeeperType
 
 /**
  * @author Vivien Mahe
  * @since 30/11/2024
  */
-class PassageGatekeeperNotImplementedException(gatekeeper: String, platform: Platform) :
+class PassageGatekeeperNotImplementedException(gatekeeper: GatekeeperType, platform: Platform) :
     UnsupportedOperationException("Passage does not yet handle gatekeeper $gatekeeper on platform $platform")

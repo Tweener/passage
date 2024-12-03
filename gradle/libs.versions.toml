@@ -11,6 +11,7 @@ composeMultiplatform = "1.7.0"
 firebaseGitLiveApp = "2.1.0" # Firebase for KMP https://firebaseopensource.com/projects/gitliveapp/firebase-kotlin-sdk/
 googleServicesPlugin = "4.4.2"
 crashlyticsPlugin = "3.0.2"
+jetbrainsLifecycle = "2.8.4"
 
 # Tweener
 tweenerBom = "2.1.4"
@@ -26,6 +27,7 @@ androidDesugarJdkLibs = "2.1.3"
 [libraries]
 napier = { group = "io.github.aakira", name = "napier", version.ref = "napier" }
 compose-multiplatform-material3 = { group = "org.jetbrains.compose.material3", name = "material3", version.ref = "composeMultiplatform" }
+jetbrains-lifecycle-runtime-compose = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "jetbrainsLifecycle" }
 
 # Tweener
 tweener-bom = { group = "io.github.tweener", name = "kmp-bom", version.ref = "tweenerBom" }
