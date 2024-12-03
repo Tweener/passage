@@ -18,7 +18,7 @@
 
 **Passage** is a Kotlin Multiplatform library designed to simplify authentication flows across Android and iOS platforms. Built on **Firebase Authentication**, Passage abstracts common operations and provides composable APIs to manage authentication using popular providers like Google, Apple, and Email/Password.
 
-<br>
+<br/>
 Be sure to show your support by starring ⭐️ this repository, and feel free to [contribute](#-contributing) if you're interested!
 
 ---
