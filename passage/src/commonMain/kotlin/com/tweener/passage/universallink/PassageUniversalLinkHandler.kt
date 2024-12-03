@@ -1,14 +1,13 @@
 package com.tweener.passage.universallink
 
 import com.tweener.common._internal.codec.UrlCodec
-import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 /**
@@ -21,10 +20,11 @@ class PassageUniversalLinkHandler {
         private const val LINK_QUERY_PARAMETER_LINK = "link"
         private const val LINK_QUERY_PARAMETER_MODE = "mode"
         private const val LINK_QUERY_PARAMETER_OOB_CODE = "oobCode"
+        private const val LINK_QUERY_PARAMETER_CONTINUE_URL = "continueUrl"
     }
 
-    private val _linkToHandle = MutableSharedFlow<FirebaseUniversalLink>()
-    val linkToHandle: SharedFlow<FirebaseUniversalLink?> = _linkToHandle.asSharedFlow()
+    private val _linkToHandle = MutableStateFlow<FirebaseUniversalLink?>(null)
+    val linkToHandle: StateFlow<FirebaseUniversalLink?> = _linkToHandle.asStateFlow()
 
     private val urlCodec = UrlCodec()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -41,24 +41,21 @@ class PassageUniversalLinkHandler {
         // From this link parameter, we need to check for if "mode" and "oobCode" query params are present. It means it comes from a Firebase Dynamic Link.
         val modeParam = extractQueryParameter(url = validLink, parameter = LINK_QUERY_PARAMETER_MODE)
         val oobCodeParam = extractQueryParameter(url = validLink, parameter = LINK_QUERY_PARAMETER_OOB_CODE)
+        val continueUrlParam = extractQueryParameter(url = validLink, parameter = LINK_QUERY_PARAMETER_CONTINUE_URL)
 
-        val isUrlHandled = modeParam != null && oobCodeParam != null
+        val isUrlHandled = modeParam != null && oobCodeParam != null && continueUrlParam != null
         if (isUrlHandled) {
-            Napier.d { "Universal Link is handled! $validLink" }
+            println("Universal Link is handled! $validLink")
 
             scope.launch {
-                val firebaseUniversalLink = FirebaseUniversalLink(link = validLink, mode = modeParam!!, oobCode = oobCodeParam!!)
+                val firebaseUniversalLink = FirebaseUniversalLink(link = validLink, mode = modeParam!!, oobCode = oobCodeParam!!, continueUrl = continueUrlParam!!)
                 _linkToHandle.emit(firebaseUniversalLink)
             }
         } else {
-            Napier.w { "Universal Link not handled. At least one of these query params is null: $LINK_QUERY_PARAMETER_MODE: $modeParam / $LINK_QUERY_PARAMETER_OOB_CODE: $oobCodeParam" }
+            println("Universal Link not handled. At least one of these query params is null: $LINK_QUERY_PARAMETER_MODE: $modeParam / $LINK_QUERY_PARAMETER_OOB_CODE: $oobCodeParam / $LINK_QUERY_PARAMETER_CONTINUE_URL: $continueUrlParam")
         }
 
         return isUrlHandled
-    }
-
-    suspend fun onLinkHandled() {
-//        _linkToHandle.emit(null)
     }
 
     private fun extractQueryParameter(url: String, parameter: String): String? {

@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import com.tweener.passage.gatekeeper.email.model.PassageEmailAuthParams
 import com.tweener.passage.gatekeeper.email.model.PassageEmailVerificationAndroidParams
@@ -71,8 +72,16 @@ fun App() {
                 )
             )
 
-            // Listen to universal links to be handled
-            passageService.universalLinkToHandle.collect { link -> snackbarScope.launch { snackbarHostState.showSnackbar(message = "Universal link handled: $link") } }
+            // Check if an Entrant already exists
+            entrant = passageService.getCurrentUser()
+        }
+    }
+
+    // Listen to universal links to be handled
+    val link = passageService.universalLinkToHandle.collectAsStateWithLifecycle()
+    LaunchedEffect(link) {
+        link.value?.let {
+            snackbarScope.launch { snackbarHostState.showSnackbar(message = "Universal link handled for mode: ${it.mode} with continueUrl: ${it.continueUrl}") }
         }
     }
 
@@ -156,10 +165,10 @@ fun App() {
                             passageService
                                 .sendEmailVerification(
                                     params = PassageEmailVerificationParams(
-                                        url = "https://passagesample.com/action/email_verified",
-                                        iosParams = PassageEmailVerificationIosParams(bundleId = "com.tweener.passage"),
+                                        url = "https://passage.page.link/action/email_verified",
+                                        iosParams = PassageEmailVerificationIosParams(bundleId = "com.tweener.passage.sample"),
                                         androidParams = PassageEmailVerificationAndroidParams(
-                                            packageName = "com.tweener.passage",
+                                            packageName = "com.tweener.passage.sample",
                                             installIfNotAvailable = true,
                                             minimumVersion = "1.0",
                                         ),
@@ -186,10 +195,10 @@ fun App() {
                                 .sendPasswordResetEmail(
                                     params = PassageForgotPasswordParams(
                                         email = entrant?.email!!,
-                                        url = "https://passagesample.com/action/email_verified",
-                                        iosParams = PassageForgotPasswordIosParams(bundleId = "com.tweener.passage"),
+                                        url = "https://passage.page.link/action/password_reset",
+                                        iosParams = PassageForgotPasswordIosParams(bundleId = "com.tweener.passage.sample"),
                                         androidParams = PassageForgotPasswordAndroidParams(
-                                            packageName = "com.tweener.passage",
+                                            packageName = "com.tweener.passage.sample",
                                             installIfNotAvailable = true,
                                             minimumVersion = "1.0",
                                         ),
@@ -197,7 +206,7 @@ fun App() {
                                     )
                                 )
                                 .onSuccess {
-                                    entrant?.email?.let { snackbarScope.launch { snackbarHostState.showSnackbar(message = "An email has been sent to $it to verify this address.") } }
+                                    entrant?.email?.let { snackbarScope.launch { snackbarHostState.showSnackbar(message = "An email has been sent to $it to reset the password.") } }
                                 }
                                 .onFailure {
                                     println(it)

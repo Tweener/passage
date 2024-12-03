@@ -8,4 +8,5 @@ data class FirebaseUniversalLink(
     val link: String,
     val mode: String,
     val oobCode: String,
+    val continueUrl: String,
 )

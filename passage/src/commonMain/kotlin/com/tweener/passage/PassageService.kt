@@ -22,7 +22,7 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.FirebaseAuth
 import dev.gitlive.firebase.auth.auth
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 
 /**
@@ -54,7 +54,7 @@ expect fun rememberPassageService(universalLinkHandler: PassageUniversalLinkHand
 abstract class PassageService(
     private val universalLinkHandler: PassageUniversalLinkHandler,
 ) {
-    val universalLinkToHandle: SharedFlow<FirebaseUniversalLink?> = universalLinkHandler.linkToHandle
+    val universalLinkToHandle: StateFlow<FirebaseUniversalLink?> = universalLinkHandler.linkToHandle
 
     protected lateinit var firebaseAuth: FirebaseAuth
 
