@@ -15,7 +15,7 @@ import com.tweener.passage.model.EmailPasswordGatekeeperConfiguration
 import com.tweener.passage.model.Entrant
 import com.tweener.passage.model.GatekeeperType
 import com.tweener.passage.model.GoogleGatekeeperConfiguration
-import com.tweener.passage.model.PassageServiceConfiguration
+import com.tweener.passage.model.PassageConfiguration
 import com.tweener.passage.universallink.FirebaseUniversalLink
 import com.tweener.passage.universallink.PassageUniversalLinkHandler
 import dev.gitlive.firebase.Firebase
@@ -26,10 +26,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 
 /**
- * Creates and [remember] the [PassageService].
+ * Creates and [remember] the [Passage].
  */
 @Composable
-expect fun rememberPassageService(universalLinkHandler: PassageUniversalLinkHandler = PassageUniversalLinkHandler()): PassageService
+expect fun rememberPassage(universalLinkHandler: PassageUniversalLinkHandler = PassageUniversalLinkHandler()): Passage
 
 /**
  * Handles Firebase authentication operations.
@@ -51,7 +51,7 @@ expect fun rememberPassageService(universalLinkHandler: PassageUniversalLinkHand
  * @author Vivien Mahe
  * @since 30/11/2024
  */
-abstract class PassageService(
+abstract class Passage(
     universalLinkHandler: PassageUniversalLinkHandler,
 ) {
     val universalLinkToHandle: StateFlow<FirebaseUniversalLink?> = universalLinkHandler.linkToHandle
@@ -67,7 +67,7 @@ abstract class PassageService(
      *
      * @param configuration The configuration for setting up Gatekeepers (Google, Apple, Email/Password).
      */
-    fun initialize(configuration: PassageServiceConfiguration) {
+    fun initialize(configuration: PassageConfiguration) {
         initializeFirebase()
 
         firebaseAuth = Firebase.auth

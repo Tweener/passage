@@ -1,9 +1,9 @@
 package com.tweener.passage.model
 
-import com.tweener.passage.PassageService
+import com.tweener.passage.Passage
 
 /**
- * Configuration for the [PassageService].
+ * Configuration for the [Passage].
  *
  * This class encapsulates platform-specific configurations for different Gatekeepers,
  * including Google, Apple, and Email/Password authentication providers. Each Gatekeeper's
@@ -16,7 +16,7 @@ import com.tweener.passage.PassageService
  * @author Vivien Mahe
  * @since 02/12/2024
  */
-data class PassageServiceConfiguration(
+data class PassageConfiguration(
     val google: GoogleGatekeeperConfiguration? = null,
     val apple: AppleGatekeeperConfiguration? = null,
     val emailPassword: EmailPasswordGatekeeperConfiguration? = null,

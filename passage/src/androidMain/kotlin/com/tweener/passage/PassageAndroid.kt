@@ -14,11 +14,11 @@ import com.tweener.passage.universallink.PassageUniversalLinkHandler
 import dev.gitlive.firebase.auth.FirebaseAuth
 
 @Composable
-actual fun rememberPassageService(universalLinkHandler: PassageUniversalLinkHandler): PassageService {
+actual fun rememberPassage(universalLinkHandler: PassageUniversalLinkHandler): Passage {
     val context = LocalContext.current
 
     return remember {
-        PassageServiceAndroid(
+        PassageAndroid(
             universalLinkHandler = universalLinkHandler,
             context = context,
         )
@@ -26,7 +26,7 @@ actual fun rememberPassageService(universalLinkHandler: PassageUniversalLinkHand
 }
 
 /**
- * An Android-specific implementation of the [PassageService].
+ * An Android-specific implementation of the [Passage].
  *
  * This class provides platform-specific configurations and implementations for authentication on Android.
  * It creates Android-specific Gatekeepers for Google and Apple authentication,
@@ -40,10 +40,10 @@ actual fun rememberPassageService(universalLinkHandler: PassageUniversalLinkHand
  * @author Vivien Mahe
  * @since 02/12/2024
  */
-class PassageServiceAndroid(
-    universalLinkHandler: PassageUniversalLinkHandler,
+class PassageAndroid(
+    universalLinkHandler: PassageUniversalLinkHandler = PassageUniversalLinkHandler(),
     private val context: Context,
-) : PassageService(universalLinkHandler = universalLinkHandler) {
+) : Passage(universalLinkHandler = universalLinkHandler) {
 
     override fun initializeFirebase() {
         // Nothing to do here

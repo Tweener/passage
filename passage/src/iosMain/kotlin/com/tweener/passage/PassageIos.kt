@@ -14,12 +14,12 @@ import dev.gitlive.firebase.auth.FirebaseAuth
 import dev.gitlive.firebase.initialize
 
 @Composable
-actual fun rememberPassageService(universalLinkHandler: PassageUniversalLinkHandler): PassageService {
-    return remember { PassageServiceIos(universalLinkHandler = universalLinkHandler) }
+actual fun rememberPassage(universalLinkHandler: PassageUniversalLinkHandler): Passage {
+    return remember { PassageIos(universalLinkHandler = universalLinkHandler) }
 }
 
 /**
- * An iOS-specific implementation of the [PassageService].
+ * An iOS-specific implementation of the [Passage].
  *
  * This class provides platform-specific configurations and implementations for authentication on iOS.
  * It initializes Firebase and creates iOS-specific Gatekeepers for Google and Apple authentication,
@@ -29,14 +29,14 @@ actual fun rememberPassageService(universalLinkHandler: PassageUniversalLinkHand
  * - Initializing Firebase for iOS.
  * - Creating iOS-specific Gatekeepers for Google and Apple authentication.
  *
- * @see PassageService
+ * @see Passage
  *
  * @author Vivien Mahe
  * @since 02/12/2024
  */
-class PassageServiceIos(
-    universalLinkHandler: PassageUniversalLinkHandler,
-) : PassageService(universalLinkHandler = universalLinkHandler) {
+class PassageIos(
+    universalLinkHandler: PassageUniversalLinkHandler = PassageUniversalLinkHandler(),
+) : Passage(universalLinkHandler = universalLinkHandler) {
 
     /**
      * Initializes Firebase for the iOS platform.

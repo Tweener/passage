@@ -44,8 +44,8 @@ import com.tweener.passage.model.EmailPasswordGatekeeperConfiguration
 import com.tweener.passage.model.Entrant
 import com.tweener.passage.model.GoogleGatekeeperAndroidConfiguration
 import com.tweener.passage.model.GoogleGatekeeperConfiguration
-import com.tweener.passage.model.PassageServiceConfiguration
-import com.tweener.passage.rememberPassageService
+import com.tweener.passage.model.PassageConfiguration
+import com.tweener.passage.rememberPassage
 import com.tweener.passage.sample.ui.theme.PassageTheme
 import kotlinx.coroutines.launch
 
@@ -54,15 +54,15 @@ fun App() {
     val buttonsScope = rememberCoroutineScope()
     val snackbarScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
-    val passageService = rememberPassageService(universalLinkHandler = providePassageUniversalLinkHandler())
+    val passage = rememberPassage(universalLinkHandler = providePassageUniversalLinkHandler())
     var entrant by remember { mutableStateOf<Entrant?>(null) }
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    LaunchedEffect(passageService) {
+    LaunchedEffect(passage) {
         lifecycleOwner.repeatOnLifecycle(state = Lifecycle.State.CREATED) {
             // Initialize Passage
-            passageService.initialize(
-                configuration = PassageServiceConfiguration(
+            passage.initialize(
+                configuration = PassageConfiguration(
                     google = GoogleGatekeeperConfiguration(
                         serverClientId = "669986017952-72t1qil6sanreihoeumpb88junr9r8jt.apps.googleusercontent.com",
                         android = GoogleGatekeeperAndroidConfiguration(),
@@ -73,14 +73,13 @@ fun App() {
             )
 
             // Check if an Entrant already exists
-            entrant = passageService.getCurrentUser()
+            entrant = passage.getCurrentUser()
         }
     }
 
     // Listen to universal links to be handled
-    val link = passageService.universalLinkToHandle.collectAsStateWithLifecycle()
+    val link = passage.universalLinkToHandle.collectAsStateWithLifecycle()
     LaunchedEffect(link.value) {
-        println("New link: ${link.value}")
         link.value?.let {
             snackbarScope.launch { snackbarHostState.showSnackbar(message = "Universal link handled for mode: ${it.mode} with continueUrl: ${it.continueUrl}") }
         }
@@ -105,7 +104,7 @@ fun App() {
                 if (entrant == null) {
                     Button(onClick = {
                         buttonsScope.launch {
-                            passageService.authenticateWithGoogle()
+                            passage.authenticateWithGoogle()
                                 .onSuccess { entrant = it }
                                 .onFailure {
                                     println(it)
@@ -120,7 +119,7 @@ fun App() {
 
                     Button(onClick = {
                         buttonsScope.launch {
-                            passageService.authenticateWithApple()
+                            passage.authenticateWithApple()
                                 .onSuccess { entrant = it }
                                 .onFailure {
                                     println(it)
@@ -135,7 +134,7 @@ fun App() {
 
                     Button(onClick = {
                         buttonsScope.launch {
-                            passageService
+                            passage
                                 .createUserWithEmailAndPassword(params = PassageEmailAuthParams(email = "vivien.mahe@gmail.com", password = "testest1!"))
                                 .onSuccess { entrant = it }
                                 .onFailure {
@@ -149,7 +148,7 @@ fun App() {
 
                     Button(onClick = {
                         buttonsScope.launch {
-                            passageService
+                            passage
                                 .authenticateWithEmailAndPassword(params = PassageEmailAuthParams(email = "vivien.mahe@gmail.com", password = "testest1!"))
                                 .onSuccess { entrant = it }
                                 .onFailure {
@@ -163,7 +162,7 @@ fun App() {
                 } else {
                     Button(onClick = {
                         buttonsScope.launch {
-                            passageService
+                            passage
                                 .sendEmailVerification(
                                     params = PassageEmailVerificationParams(
                                         url = "https://passagesample.page.link/action/email_verified",
@@ -192,7 +191,7 @@ fun App() {
 
                     Button(onClick = {
                         buttonsScope.launch {
-                            passageService
+                            passage
                                 .sendPasswordResetEmail(
                                     params = PassageForgotPasswordParams(
                                         email = entrant?.email!!,
@@ -222,8 +221,8 @@ fun App() {
 
                     Button(onClick = {
                         buttonsScope.launch {
-                            passageService.signOut()
-                            entrant = passageService.getCurrentUser()
+                            passage.signOut()
+                            entrant = passage.getCurrentUser()
                         }
                     }) {
                         Text("Sign out")
