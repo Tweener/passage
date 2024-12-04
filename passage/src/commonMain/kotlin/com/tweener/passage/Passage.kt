@@ -15,7 +15,7 @@ import com.tweener.passage.model.EmailPasswordGatekeeperConfiguration
 import com.tweener.passage.model.Entrant
 import com.tweener.passage.model.GatekeeperType
 import com.tweener.passage.model.GoogleGatekeeperConfiguration
-import com.tweener.passage.model.PassageConfiguration
+import com.tweener.passage.model.PassageGatekeepersConfiguration
 import com.tweener.passage.universallink.FirebaseUniversalLink
 import com.tweener.passage.universallink.PassageUniversalLinkHandler
 import dev.gitlive.firebase.Firebase
@@ -52,7 +52,7 @@ expect fun rememberPassage(universalLinkHandler: PassageUniversalLinkHandler = P
  * @since 30/11/2024
  */
 abstract class Passage(
-    universalLinkHandler: PassageUniversalLinkHandler,
+    private val universalLinkHandler: PassageUniversalLinkHandler,
 ) {
     val universalLinkToHandle: StateFlow<FirebaseUniversalLink?> = universalLinkHandler.linkToHandle
 
@@ -65,16 +65,16 @@ abstract class Passage(
     /**
      * Initializes the Passage with the provided configuration.
      *
-     * @param configuration The configuration for setting up Gatekeepers (Google, Apple, Email/Password).
+     * @param gatekeepersConfiguration The configuration for setting up Gatekeepers (Google, Apple, Email/Password).
      */
-    fun initialize(configuration: PassageConfiguration) {
+    fun initialize(gatekeepersConfiguration: PassageGatekeepersConfiguration) {
         initializeFirebase()
 
         firebaseAuth = Firebase.auth
 
-        configuration.google?.let { googleGatekeeper = createGoogleGatekeeper(configuration = it, firebaseAuth = firebaseAuth) }
-        configuration.apple?.let { appleGatekeeper = createAppleGatekeeper(configuration = it) }
-        configuration.emailPassword?.let { emailGatekeeper = createEmailGatekeeper(configuration = it) }
+        gatekeepersConfiguration.google?.let { googleGatekeeper = createGoogleGatekeeper(configuration = it, firebaseAuth = firebaseAuth) }
+        gatekeepersConfiguration.apple?.let { appleGatekeeper = createAppleGatekeeper(configuration = it) }
+        gatekeepersConfiguration.emailPassword?.let { emailGatekeeper = createEmailGatekeeper(configuration = it) }
     }
 
     /**
@@ -271,4 +271,15 @@ abstract class Passage(
             ?: Result.failure(PassageGatekeeperNotConfiguredException(gatekeeper = GatekeeperType.EMAIL_PASSWORD))
 
     // endregion Email & Password gatekeeper
+
+    /**
+     * Notifies Passage that a universal link has been handled.
+     *
+     * Call this method whenever a universal link or App Link is successfully handled in your app.
+     * This ensures that Passage processes the link appropriately, allowing it to update the
+     * authentication state or perform other related tasks.
+     */
+    fun onLinkHandled() {
+        universalLinkHandler.onLinkHandled()
+    }
 }

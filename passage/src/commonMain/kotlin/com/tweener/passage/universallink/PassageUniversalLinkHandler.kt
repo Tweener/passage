@@ -58,6 +58,12 @@ class PassageUniversalLinkHandler {
         return isUrlHandled
     }
 
+    fun onLinkHandled() {
+        scope.launch {
+            _linkToHandle.emit(null)
+        }
+    }
+
     private fun extractQueryParameter(url: String, parameter: String): String? {
         val queryStartIndex = url.indexOf("?")
         if (queryStartIndex == -1) return null

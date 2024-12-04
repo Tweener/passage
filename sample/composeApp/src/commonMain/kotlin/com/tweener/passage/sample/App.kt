@@ -44,7 +44,7 @@ import com.tweener.passage.model.EmailPasswordGatekeeperConfiguration
 import com.tweener.passage.model.Entrant
 import com.tweener.passage.model.GoogleGatekeeperAndroidConfiguration
 import com.tweener.passage.model.GoogleGatekeeperConfiguration
-import com.tweener.passage.model.PassageConfiguration
+import com.tweener.passage.model.PassageGatekeepersConfiguration
 import com.tweener.passage.rememberPassage
 import com.tweener.passage.sample.ui.theme.PassageTheme
 import kotlinx.coroutines.launch
@@ -62,7 +62,7 @@ fun App() {
         lifecycleOwner.repeatOnLifecycle(state = Lifecycle.State.CREATED) {
             // Initialize Passage
             passage.initialize(
-                configuration = PassageConfiguration(
+                gatekeepersConfiguration = PassageGatekeepersConfiguration(
                     google = GoogleGatekeeperConfiguration(
                         serverClientId = "669986017952-72t1qil6sanreihoeumpb88junr9r8jt.apps.googleusercontent.com",
                         android = GoogleGatekeeperAndroidConfiguration(),
@@ -82,6 +82,7 @@ fun App() {
     LaunchedEffect(link.value) {
         link.value?.let {
             snackbarScope.launch { snackbarHostState.showSnackbar(message = "Universal link handled for mode: ${it.mode} with continueUrl: ${it.continueUrl}") }
+            passage.onLinkHandled()
         }
     }
 
