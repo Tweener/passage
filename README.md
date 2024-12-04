@@ -63,7 +63,7 @@ Then add Passage dependency to your module:
 - With version catalog, open `libs.versions.toml`:
 ```Groovy
 [versions]
-passage = "1.2.0" // Check latest version
+passage = "1.0.0" // Check latest version
 
 [libraries]
 passage = { group = "io.github.tweener", name = "passage", version.ref = "passage" }
@@ -79,7 +79,7 @@ dependencies {
 - Without version catalog, in your module `build.gradle.kts` add:
 ```Groovy
 dependencies {
-    val passage_version = "1.2.0" // Check latest version
+    val passage_version = "1.0.0" // Check latest version
 
     implementation("io.github.tweener:passage:$passage_version")
 }
@@ -99,10 +99,10 @@ val passage: Passage = rememberPassage()
 ```
 
 ### 2. Configure Passage
-Set up your `PassageConfiguration` with the desired gatekeepers (authentication providers):
+Set up your `PassageGatekeepersConfiguration` with the desired gatekeepers (authentication providers):
 
 ```kotlin
-val passageConfiguration = PassageConfiguration(
+val gatekeepersConfiguration = PassageGatekeepersConfiguration(
     google = GoogleGatekeeperConfiguration(
         serverClientId = "your-google-server-client-id",
         android = GoogleGatekeeperAndroidConfiguration(
@@ -116,10 +116,10 @@ val passageConfiguration = PassageConfiguration(
 )
 ```
 
-If you only want to use Google gatekeeper, create a `PassageConfiguration`  like this:
+If you only want to use Google gatekeeper, create a `PassageGatekeepersConfiguration`  like this:
 
 ```kotlin
-val passageConfiguration = PassageConfiguration(
+val gatekeepersConfiguration = PassageGatekeepersConfiguration(
     google = GoogleGatekeeperConfiguration(
         serverClientId = "your-google-server-client-id",
         android = GoogleGatekeeperAndroidConfiguration(
@@ -138,8 +138,18 @@ _Note: Replace `your-google-server-client-id` with your actual [Google serverCli
 Initialize Passage in your common module entry point:
 
 ```kotlin
-passage.initialize(passageConfiguration)
+passage.initialize(gatekeepersConfiguration = gatekeepersConfiguration)
 ```
+
+> [!NOTE]  
+> If your app already uses Firebase, you can pass the existing Firebase instance to Passage to reuse it and prevent reinitializing Firebase unnecessarily:
+```kotlin
+passage.initialize(
+    gatekeepersConfiguration = gatekeepersConfiguration,
+    firebaseAuth = Firebase.Auth,
+)
+```
+
 
 ---
 
