@@ -15,7 +15,7 @@ import com.tweener.passage.model.EmailPasswordGatekeeperConfiguration
 import com.tweener.passage.model.Entrant
 import com.tweener.passage.model.GatekeeperType
 import com.tweener.passage.model.GoogleGatekeeperConfiguration
-import com.tweener.passage.model.PassageGatekeepersConfiguration
+import com.tweener.passage.model.PassageGatekeeperConfiguration
 import com.tweener.passage.model.PassageUniversalLink
 import com.tweener.passage.universallink.PassageUniversalLinkHandler
 import dev.gitlive.firebase.Firebase
@@ -63,35 +63,43 @@ abstract class Passage {
     private var emailGatekeeper: PassageEmailGatekeeper? = null
 
     /**
-     * Initializes the Passage library with the specified Gatekeepers configuration .
+     * Initializes the Passage library with the specified list of Gatekeeper configurations.
      *
-     * This method sets up the required Gatekeepers (e.g., Google, Apple, Email/Password) using the provided configuration.
+     * This method sets up the required Gatekeepers by initializing Firebase and passing the
+     * configurations along with the default Firebase instance.
      *
-     * @param gatekeepersConfiguration The configuration object containing settings for each Gatekeeper.
+     * Use this method if your app already uses a Firebase instance.
+     *
+     * @param gatekeeperConfigurations A list of Gatekeeper configurations implementing [PassageGatekeeperConfiguration].
+     *
+     * @see PassageGatekeeperConfiguration
      */
-    fun initialize(gatekeepersConfiguration: PassageGatekeepersConfiguration) {
+    fun initialize(gatekeeperConfigurations: List<PassageGatekeeperConfiguration>) {
         initializeFirebase()
-        initialize(gatekeepersConfiguration = gatekeepersConfiguration, firebase = Firebase)
+        initialize(gatekeeperConfigurations = gatekeeperConfigurations, firebase = Firebase)
     }
 
     /**
-     * Initializes the Passage library with the specified Gatekeepers configuration and Firebase instance.
+     * Initializes the Passage library with the specified list of Gatekeeper configurations and Firebase instance.
      *
-     * This method sets up the required Gatekeepers (e.g., Google, Apple, Email/Password) using the provided configuration
-     * and initializes Firebase Authentication. It ensures that Passage is properly configured to handle authentication
-     * flows for the specified providers.
+     * This method sets up the required Gatekeepers (e.g., Google, Apple, Email/Password) using the provided configurations
+     * and the specified Firebase instance.
      *
-     * @param gatekeepersConfiguration The configuration object containing settings for each Gatekeeper.
+     * Use this method if your app does not already use a Firebase instance.
+     *
+     * @param gatekeeperConfigurations A list of Gatekeeper configurations implementing [PassageGatekeeperConfiguration].
      * @param firebase The Firebase instance used to initialize Firebase Authentication.
      *
-     * @see PassageGatekeepersConfiguration
+     * @see PassageGatekeeperConfiguration
      */
-    fun initialize(gatekeepersConfiguration: PassageGatekeepersConfiguration, firebase: Firebase) {
+    fun initialize(gatekeeperConfigurations: List<PassageGatekeeperConfiguration>, firebase: Firebase) {
         firebaseAuth = firebase.auth
 
-        gatekeepersConfiguration.google?.let { googleGatekeeper = createGoogleGatekeeper(configuration = it, firebaseAuth = firebaseAuth) }
-        gatekeepersConfiguration.apple?.let { appleGatekeeper = createAppleGatekeeper(configuration = it) }
-        gatekeepersConfiguration.emailPassword?.let { emailGatekeeper = createEmailGatekeeper(configuration = it) }
+        gatekeeperConfigurations.forEach { configuration ->
+            if (configuration is GoogleGatekeeperConfiguration) googleGatekeeper = createGoogleGatekeeper(configuration = configuration, firebaseAuth = firebaseAuth)
+            if (configuration is AppleGatekeeperConfiguration) appleGatekeeper = createAppleGatekeeper(configuration = configuration)
+            if (configuration is EmailPasswordGatekeeperConfiguration) emailGatekeeper = createEmailGatekeeper(configuration = configuration)
+        }
 
         println("Passage is initialized.")
     }

@@ -1,26 +1,19 @@
 package com.tweener.passage.model
 
-import com.tweener.passage.gatekeeper.PassageGatekeeper
-
 /**
- * Configuration for [PassageGatekeeper]s.
+ * Defines the configuration of a Gatekeeper in the Passage library.
  *
- * This class encapsulates platform-specific configurations for different Gatekeepers,
- * including Google, Apple, and Email/Password authentication providers. Each Gatekeeper's
- * configuration is optional, allowing developers to specify only the ones they need.
+ * This interface ensures that each Gatekeeper (e.g., Google, Apple, Email/Password) provides its
+ * specific configuration details required for proper initialization and operation.
  *
- * @property google Configuration for the Google Gatekeeper, if applicable.
- * @property apple Configuration for the Apple Gatekeeper, if applicable.
- * @property emailPassword Configuration for the Email/Password Gatekeeper, if applicable.
+ * Responsibilities:
+ * - Define the required configuration for a specific Gatekeeper.
+ * - Ensure consistency in how Gatekeeper configurations are handled within Passage.
  *
  * @author Vivien Mahe
  * @since 02/12/2024
  */
-data class PassageGatekeepersConfiguration(
-    val google: GoogleGatekeeperConfiguration? = null,
-    val apple: AppleGatekeeperConfiguration? = null,
-    val emailPassword: EmailPasswordGatekeeperConfiguration? = null,
-)
+interface PassageGatekeeperConfiguration
 
 // region Google
 
@@ -38,7 +31,7 @@ data class GoogleGatekeeperConfiguration(
     val serverClientId: String,
     val android: GoogleGatekeeperAndroidConfiguration,
     val ios: GoogleGatekeeperIosConfiguration = GoogleGatekeeperIosConfiguration,
-)
+) : PassageGatekeeperConfiguration
 
 /**
  * Android-specific configuration for the Google Gatekeeper.
@@ -78,7 +71,7 @@ data object GoogleGatekeeperIosConfiguration
 data class AppleGatekeeperConfiguration(
     val android: AppleGatekeeperAndroidConfiguration = AppleGatekeeperAndroidConfiguration,
     val ios: AppleGatekeeperIosConfiguration = AppleGatekeeperIosConfiguration,
-)
+) : PassageGatekeeperConfiguration
 
 /**
  * Android-specific configuration for the Apple Gatekeeper.
@@ -103,6 +96,6 @@ data object AppleGatekeeperIosConfiguration
  *
  * This object serves as a placeholder for future configurations related to Email/Password authentication.
  */
-data object EmailPasswordGatekeeperConfiguration
+data object EmailPasswordGatekeeperConfiguration : PassageGatekeeperConfiguration
 
 // endregion Email/password
