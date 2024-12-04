@@ -120,11 +120,11 @@ val passage: Passage = rememberPassage()
 </details>
 
 ### 2. Configure Passage
-Set up your `PassageGatekeepersConfiguration` with the desired gatekeepers (authentication providers):
+Provide a list of the desired gatekeepers (authentication providers) to configure:
 
 ```kotlin
-val gatekeepersConfiguration = PassageGatekeepersConfiguration(
-    google = GoogleGatekeeperConfiguration(
+val gatekeeperConfigurations = listOf(
+    GoogleGatekeeperConfiguration(
         serverClientId = "your-google-server-client-id",
         android = GoogleGatekeeperAndroidConfiguration(
             filterByAuthorizedAccounts = false,
@@ -132,16 +132,16 @@ val gatekeepersConfiguration = PassageGatekeepersConfiguration(
             maxRetries = 3
         )
     ),
-    apple = AppleGatekeeperConfiguration(),
-    emailPassword = EmailPasswordGatekeeperConfiguration()
+    AppleGatekeeperConfiguration(),
+    EmailPasswordGatekeeperConfiguration()
 )
 ```
 
-If you only want to use Google gatekeeper, create a `PassageGatekeepersConfiguration`  like this:
+For example, if you only want to use the Google Gatekeeper, simply provide the `GoogleGatekeeperConfiguration` like this:
 
 ```kotlin
-val gatekeepersConfiguration = PassageGatekeepersConfiguration(
-    google = GoogleGatekeeperConfiguration(
+val gatekeeperConfigurations = listOf(
+    GoogleGatekeeperConfiguration(
         serverClientId = "your-google-server-client-id",
         android = GoogleGatekeeperAndroidConfiguration(
             filterByAuthorizedAccounts = false,
