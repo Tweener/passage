@@ -63,7 +63,7 @@ Then add Passage dependency to your module:
 - With version catalog, open `libs.versions.toml`:
 ```Groovy
 [versions]
-passage = "1.2.0" // Check latest version
+passage = "1.0.0" // Check latest version
 
 [libraries]
 passage = { group = "io.github.tweener", name = "passage", version.ref = "passage" }
@@ -79,7 +79,7 @@ dependencies {
 - Without version catalog, in your module `build.gradle.kts` add:
 ```Groovy
 dependencies {
-    val passage_version = "1.2.0" // Check latest version
+    val passage_version = "1.0.0" // Check latest version
 
     implementation("io.github.tweener:passage:$passage_version")
 }
@@ -92,17 +92,47 @@ The latest version is: [![Maven Central Version](https://img.shields.io/maven-ce
 ## 🔧 Configuration
 
 ### 1. Create a Passage
-Create an instance of `PassageConfiguration` using `rememberPassage()`:
+Depending on your project configuration, you can create an instance of `` in two different ways:
+
+
+<details>
+	<summary>➡️ Kotlin Multplatform (without Compose)</summary>
+
+- 🤖 Android
+
+  Create an instance of `PassageAndroid` passing a `Context`:
+```Kotlin
+val passage: Passage = PassageAndroid(context = context)
+```
+
+- 🍎 iOS
+
+  Create an instance of `PassageIos`:
+```Kotlin
+val passage: Passage = PassageIos()
+```
+
+</details>
+
+<details>
+	<summary>➡️ Compose Multplatform</summary>
+
+Create an instance of `Passage` using `rememberPassage()`:
 
 ```Kotlin
 val passage: Passage = rememberPassage()
 ```
+</details>
+
+
+
+
 
 ### 2. Configure Passage
-Set up your `PassageConfiguration` with the desired gatekeepers (authentication providers):
+Set up your `PassageGatekeepersConfiguration` with the desired gatekeepers (authentication providers):
 
 ```kotlin
-val passageConfiguration = PassageConfiguration(
+val gatekeepersConfiguration = PassageGatekeepersConfiguration(
     google = GoogleGatekeeperConfiguration(
         serverClientId = "your-google-server-client-id",
         android = GoogleGatekeeperAndroidConfiguration(
@@ -116,10 +146,10 @@ val passageConfiguration = PassageConfiguration(
 )
 ```
 
-If you only want to use Google gatekeeper, create a `PassageConfiguration`  like this:
+If you only want to use Google gatekeeper, create a `PassageGatekeepersConfiguration`  like this:
 
 ```kotlin
-val passageConfiguration = PassageConfiguration(
+val gatekeepersConfiguration = PassageGatekeepersConfiguration(
     google = GoogleGatekeeperConfiguration(
         serverClientId = "your-google-server-client-id",
         android = GoogleGatekeeperAndroidConfiguration(
@@ -131,21 +161,32 @@ val passageConfiguration = PassageConfiguration(
 )
 ```
 
-_Note: Replace `your-google-server-client-id` with your actual [Google serverClientId](https://firebase.google.com/docs/auth/android/google-signin#authenticate_with_firebase)._
+> [!IMPORTANT]  
+> Replace `your-google-server-client-id` with your actual [Google serverClientId](https://firebase.google.com/docs/auth/android/google-signin#authenticate_with_firebase).
 
 
 ### 3. Initialize Passage
 Initialize Passage in your common module entry point:
 
 ```kotlin
-passage.initialize(passageConfiguration)
+passage.initialize(gatekeepersConfiguration = gatekeepersConfiguration)
 ```
+
+> [!NOTE]  
+> If your app already uses Firebase, you can pass the existing Firebase instance to Passage to reuse it and prevent reinitializing Firebase unnecessarily:
+```kotlin
+passage.initialize(
+    gatekeepersConfiguration = gatekeepersConfiguration,
+    firebaseAuth = Firebase.Auth,
+)
+```
+
 
 ---
 
 ## 🧑‍💻 Usage
 
-### 1. Authenticate a User
+### 1. Authenticate a user
 Use the provider-specific methods to authenticate users.
 
 #### Google Authentication
@@ -195,7 +236,9 @@ passage.reauthenticateWithEmailAndPassword(params)
 ### 3. Email actions
 You may need to [send emails](https://firebase.google.com/docs/auth/android/passing-state-in-email-actions) to the user for a password reset if the user forgot its password, or for verifying the user's email address when creating an account.
 
-Passage uses [Firebase Dynamic Links](https://firebase.google.com/docs/dynamic-links) to send emails containing universal links. Follow the documentation to configure your app with Firebase Dynamic Links (you don't need to add Firebase Dynamic Links SDK to your app).
+> [!IMPORTANT]
+> Passage uses [Firebase Dynamic Links](https://firebase.google.com/docs/dynamic-links) to send emails containing universal links.
+> Follow the documentation to configure your app with Firebase Dynamic Links (you don't need to add Firebase Dynamic Links SDK to your app).
 
 To handle universal links, you need to create a unique instance of `PassageUniversalLinkHandler` and configure Passage with it:
 ```Kotlin
