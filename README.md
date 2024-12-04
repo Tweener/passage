@@ -26,13 +26,8 @@ Be sure to show your support by starring ⭐️ this repository, and feel free t
 
 ## 🌟 Features
 
-- **Kotlin Multiplatform**: Shared logic for Android and iOS.
 - **Firebase Authentication**: Powered by Firebase for robust and secure authentication.
-- **Composables for Compose Multiplatform**: Seamless integration with Compose-based UIs.
-- **Provider Support**:
-  - Google
-  - Apple
-  - Email/Password
+- **Gatekeeper (Provider) Support**: Google, Apple, Email/Password.
 - **Extensible Configuration**: Customize authentication flows with platform-specific settings.
 - **Email actions**: Send email actions for password resets or verifying a user's email. 
 
@@ -95,7 +90,6 @@ The latest version is: [![Maven Central Version](https://img.shields.io/maven-ce
 ### 1. Create a Passage
 Depending on your project configuration, you can create an instance of `` in two different ways:
 
-
 <details>
 	<summary>➡️ Kotlin Multplatform (without Compose)</summary>
 
@@ -124,10 +118,6 @@ Create an instance of `Passage` using `rememberPassage()`:
 val passage: Passage = rememberPassage()
 ```
 </details>
-
-
-
-
 
 ### 2. Configure Passage
 Set up your `PassageGatekeepersConfiguration` with the desired gatekeepers (authentication providers):
@@ -181,7 +171,6 @@ passage.initialize(
     firebaseAuth = Firebase.Auth,
 )
 ```
-
 
 ---
 
