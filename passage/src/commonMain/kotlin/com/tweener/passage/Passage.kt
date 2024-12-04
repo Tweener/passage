@@ -63,18 +63,28 @@ abstract class Passage(
     private var emailGatekeeper: PassageEmailGatekeeper? = null
 
     /**
-     * Initializes the Passage with the provided configuration.
+     * Initializes the Passage library with the specified Gatekeepers configuration and optional Firebase instance.
      *
-     * @param gatekeepersConfiguration The configuration for setting up Gatekeepers (Google, Apple, Email/Password).
+     * This method sets up the required Gatekeepers (e.g., Google, Apple, Email/Password) using the provided configuration.
+     * Optionally, a custom Firebase instance can be passed if you already use one in your project.
+     *
+     * @param gatekeepersConfiguration The configuration object containing settings for each Gatekeeper.
+     * @param firebase An optional Firebase instance. Defaults to the default Firebase instance if not specified.
      */
-    fun initialize(gatekeepersConfiguration: PassageGatekeepersConfiguration) {
-        initializeFirebase()
-
-        firebaseAuth = Firebase.auth
+    fun initialize(gatekeepersConfiguration: PassageGatekeepersConfiguration, firebase: Firebase? = null) {
+        firebase
+            ?.let { firebaseAuth = it.auth }
+            ?: run {
+                // If no Firebase instance is passed, use the default one and initialize it
+                firebaseAuth = Firebase.auth
+                initializeFirebase()
+            }
 
         gatekeepersConfiguration.google?.let { googleGatekeeper = createGoogleGatekeeper(configuration = it, firebaseAuth = firebaseAuth) }
         gatekeepersConfiguration.apple?.let { appleGatekeeper = createAppleGatekeeper(configuration = it) }
         gatekeepersConfiguration.emailPassword?.let { emailGatekeeper = createEmailGatekeeper(configuration = it) }
+
+        println("Passage is initialized.")
     }
 
     /**
