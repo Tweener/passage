@@ -18,7 +18,8 @@
 
 **Passage** is a Kotlin Multiplatform library designed to simplify authentication flows across Android and iOS platforms. Built on **Firebase Authentication**, Passage abstracts common operations and provides composable APIs to manage authentication using popular providers like Google, Apple, and Email/Password.
 
-<br/>
+<br>
+
 Be sure to show your support by starring ⭐️ this repository, and feel free to [contribute](#-contributing) if you're interested!
 
 ---
@@ -240,12 +241,7 @@ You may need to [send emails](https://firebase.google.com/docs/auth/android/pass
 > Passage uses [Firebase Dynamic Links](https://firebase.google.com/docs/dynamic-links) to send emails containing universal links.
 > Follow the documentation to configure your app with Firebase Dynamic Links (you don't need to add Firebase Dynamic Links SDK to your app).
 
-To handle universal links, you need to create a unique instance of `PassageUniversalLinkHandler` and configure Passage with it:
-```Kotlin
-val passage: Passage = rememberPassage(universalLinkHandler = providePassageUniversalLinkHandler())
-```
-
-Additional configuration is required for each platform:
+To handle universal links, additional configuration is required for each platform:
 
 <details>
 	<summary>🤖 Android</summary>
@@ -254,7 +250,7 @@ In your activity configured to be open when a universal link is clicked:
 ```Kotlin
 class MainActivity : ComponentActivity() {
 
-    private val universalLinkHandler = providePassageUniversalLinkHandler()
+    private val passage = providePassage()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -274,7 +270,7 @@ class MainActivity : ComponentActivity() {
 
     private fun handleUniversalLink(intent: Intent) {
         intent.data?.let {
-            universalLinkHandler.handle(url = it.toString())
+            passage.handleUrl(url = it.toString())
         }
     }
 }
@@ -285,14 +281,14 @@ class MainActivity : ComponentActivity() {
 <details>
 	<summary>🍎 iOS</summary>
 
-Create a class `PassageUniversalLinkHandlerHelper` in your `iosMain` module:
+Create a class `PassageHelper` in your `iosMain` module:
 ```Kotlin
-class PassageUniversalLinkHandlerHelper {
+class PassageHelper {
 
-    private val universalLinkHandler = providePassageUniversalLinkHandler()
+    private val passage = providePassage()
 
     fun handle(url: String): Boolean =
-        universalLinkHandler.handle(url = url)
+        passage.handleUrl(url = url)
 
 }
 ```
@@ -306,26 +302,15 @@ class AppDelegate : NSObject, UIApplicationDelegate, UNUserNotificationCenterDel
     func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
         if userActivity.activityType == NSUserActivityTypeBrowsingWeb,
            let url = userActivity.webpageURL {
-            handleIncomingURL(url)
+            if (PassageHelper().handle(url: url.absoluteString)) {
+                print("Handled by Passage")
+            }
+
             return true
         }
         
         print("No valid URL in user activity.")
         return false
-    }
-    
-    func handleIncomingURL(_ url: URL) {
-        print("handleIncomingURL", url)
-        
-        // Check if the URL is handled by Google Sign In
-        if (GIDSignIn.sharedInstance.handle(url)) {
-            print("Handled by GIDSignIn")
-        }
-
-        // Then check if the URL is handled by Passage (Firebase Dynamic Links)
-        else if (PassageUniversalLinkHandlerHelper().handle(url: url.absoluteString)) {
-            print("Handled by Passage")
-        }
     }
 }
 ```
