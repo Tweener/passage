@@ -88,7 +88,7 @@ The latest version is: [![Maven Central Version](https://img.shields.io/maven-ce
 ## 🔧 Configuration
 
 ### 1. Create a Passage
-Depending on your project configuration, you can create an instance of `` in two different ways:
+Depending on your project configuration, you can create an instance of `Passage` in two different ways:
 
 <details>
 	<summary>➡️ Kotlin Multplatform (without Compose)</summary>
@@ -204,7 +204,7 @@ val result = passage.authenticateWithApple()
 Creating a user with email & password will automatically authenticate the user upon successful account creation.
 
 ```kotlin
-val result = passage.authenticateWithEmailAndPassword(PassageEmailAuthParams(email, password))
+val result = passage.createUserWithEmailAndPassword(PassageEmailAuthParams(email, password))
 // Handle result similarly
 ```
 
@@ -224,7 +224,7 @@ passage.reauthenticateWithEmailAndPassword(params)
 ```
 
 ### 3. Email actions
-You may need to [send emails](https://firebase.google.com/docs/auth/android/passing-state-in-email-actions) to the user for a password reset if the user forgot its password, or for verifying the user's email address when creating an account.
+You may need to [send emails](https://firebase.google.com/docs/auth/android/passing-state-in-email-actions) to the user for a password reset if the user forgot its password for instance, or for verifying the user's email address when creating an account.
 
 > [!IMPORTANT]
 > Passage uses [Firebase Dynamic Links](https://firebase.google.com/docs/dynamic-links) to send emails containing universal links.
@@ -314,6 +314,7 @@ val link = passage.universalLinkToHandle.collectAsStateWithLifecycle()
 LaunchedEffect(link.value) {
     link.value?.let {
         println("Universal link handled for mode: ${it.mode} with continueUrl: ${it.continueUrl}")
+        passage.onLinkHandled() // Important: call 'onLinkHandled()' to let Passage know the link has been handled and can update the authentication state
     }
 }
 ```
@@ -348,8 +349,8 @@ val result = passage.sendPasswordResetEmail(
     params = PassageForgotPasswordParams(
         email = passage.getCurrentUser()!!.email,
         url = "https://passagesample.page.link/action/password_reset",
-        iosParams = PassageEmailVerificationIosParams(bundleId = "com.tweener.passage.sample"),
-        androidParams = PassageEmailVerificationAndroidParams(
+        iosParams = PassageForgotPasswordIosParams(bundleId = "com.tweener.passage.sample"),
+        androidParams = PassageForgotPasswordAndroidParams(
             packageName = "com.tweener.passage.sample",
             installIfNotAvailable = true,
             minimumVersion = "1.0",
