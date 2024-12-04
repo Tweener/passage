@@ -122,7 +122,7 @@ internal class PassageEmailGatekeeper(
      * @return A [Result] containing the success or failure of the email verification process.
      */
     suspend fun handleEmailVerificationCode(oobCode: String) =
-        handleOobCode<ActionCodeResult.PasswordReset>(oobCode = oobCode).onFailure { throwable ->
+        handleOobCode<ActionCodeResult.VerifyEmail>(oobCode = oobCode).onFailure { throwable ->
             Napier.e(throwable) { "Couldn't verify the oobCode ($oobCode) from the email verification email." }
         }
 
