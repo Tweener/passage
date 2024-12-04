@@ -32,6 +32,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
+import com.tweener.passage.Passage
 import com.tweener.passage.gatekeeper.email.model.PassageEmailAuthParams
 import com.tweener.passage.gatekeeper.email.model.PassageEmailVerificationAndroidParams
 import com.tweener.passage.gatekeeper.email.model.PassageEmailVerificationIosParams
@@ -45,7 +46,6 @@ import com.tweener.passage.model.Entrant
 import com.tweener.passage.model.GoogleGatekeeperAndroidConfiguration
 import com.tweener.passage.model.GoogleGatekeeperConfiguration
 import com.tweener.passage.model.PassageGatekeepersConfiguration
-import com.tweener.passage.rememberPassage
 import com.tweener.passage.sample.ui.theme.PassageTheme
 import kotlinx.coroutines.launch
 
@@ -54,7 +54,7 @@ fun App() {
     val buttonsScope = rememberCoroutineScope()
     val snackbarScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
-    val passage = rememberPassage(universalLinkHandler = providePassageUniversalLinkHandler())
+    val passage: Passage = providePassage()
     var entrant by remember { mutableStateOf<Entrant?>(null) }
     val lifecycleOwner = LocalLifecycleOwner.current
 

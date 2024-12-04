@@ -8,7 +8,7 @@ import androidx.activity.enableEdgeToEdge
 
 class MainActivity : ComponentActivity() {
 
-    private val universalLinkHandler = providePassageUniversalLinkHandler()
+    private val passage = providePassage()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,7 +29,7 @@ class MainActivity : ComponentActivity() {
 
     private fun handleUniversalLink(intent: Intent) {
         intent.data?.let {
-            universalLinkHandler.handle(url = it.toString())
+            passage.handleLink(url = it.toString())
         }
     }
 }

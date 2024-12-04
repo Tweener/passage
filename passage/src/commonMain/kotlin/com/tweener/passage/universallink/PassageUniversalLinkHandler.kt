@@ -1,6 +1,7 @@
 package com.tweener.passage.universallink
 
 import com.tweener.common._internal.codec.UrlCodec
+import com.tweener.passage.model.PassageUniversalLink
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -14,7 +15,7 @@ import kotlinx.coroutines.launch
  * @author Vivien Mahe
  * @since 03/12/2024
  */
-class PassageUniversalLinkHandler {
+internal class PassageUniversalLinkHandler {
 
     companion object {
         private const val LINK_QUERY_PARAMETER_LINK = "link"
@@ -23,8 +24,8 @@ class PassageUniversalLinkHandler {
         private const val LINK_QUERY_PARAMETER_CONTINUE_URL = "continueUrl"
     }
 
-    private val _linkToHandle = MutableStateFlow<FirebaseUniversalLink?>(null)
-    val linkToHandle: StateFlow<FirebaseUniversalLink?> = _linkToHandle.asStateFlow()
+    private val _linkToHandle = MutableStateFlow<PassageUniversalLink?>(null)
+    val linkToHandle: StateFlow<PassageUniversalLink?> = _linkToHandle.asStateFlow()
 
     private val urlCodec = UrlCodec()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -48,8 +49,8 @@ class PassageUniversalLinkHandler {
             println("Universal Link is handled! $validLink")
 
             scope.launch {
-                val firebaseUniversalLink = FirebaseUniversalLink(link = validLink, mode = modeParam!!, oobCode = oobCodeParam!!, continueUrl = continueUrlParam!!)
-                _linkToHandle.emit(firebaseUniversalLink)
+                val passageUniversalLink = PassageUniversalLink(link = validLink, mode = modeParam!!, oobCode = oobCodeParam!!, continueUrl = continueUrlParam!!)
+                _linkToHandle.emit(passageUniversalLink)
             }
         } else {
             println("Universal Link not handled. At least one of these query params is null: $LINK_QUERY_PARAMETER_MODE: $modeParam / $LINK_QUERY_PARAMETER_OOB_CODE: $oobCodeParam / $LINK_QUERY_PARAMETER_CONTINUE_URL: $continueUrlParam")

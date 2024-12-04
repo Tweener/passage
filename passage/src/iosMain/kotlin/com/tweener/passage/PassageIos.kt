@@ -8,14 +8,13 @@ import com.tweener.passage.gatekeeper.google.PassageGoogleGatekeeper
 import com.tweener.passage.gatekeeper.google.PassageGoogleGatekeeperIos
 import com.tweener.passage.model.AppleGatekeeperConfiguration
 import com.tweener.passage.model.GoogleGatekeeperConfiguration
-import com.tweener.passage.universallink.PassageUniversalLinkHandler
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.FirebaseAuth
 import dev.gitlive.firebase.initialize
 
 @Composable
-actual fun rememberPassage(universalLinkHandler: PassageUniversalLinkHandler): Passage {
-    return remember { PassageIos(universalLinkHandler = universalLinkHandler) }
+actual fun rememberPassage(): Passage {
+    return remember { PassageIos() }
 }
 
 /**
@@ -34,9 +33,7 @@ actual fun rememberPassage(universalLinkHandler: PassageUniversalLinkHandler): P
  * @author Vivien Mahe
  * @since 02/12/2024
  */
-class PassageIos(
-    universalLinkHandler: PassageUniversalLinkHandler = PassageUniversalLinkHandler(),
-) : Passage(universalLinkHandler = universalLinkHandler) {
+class PassageIos : Passage() {
 
     /**
      * Initializes Firebase for the iOS platform.

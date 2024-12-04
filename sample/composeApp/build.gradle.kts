@@ -87,5 +87,6 @@ android {
 
     dependencies {
         coreLibraryDesugaring(libs.android.desugarjdklibs)
+        implementation(libs.android.startup)
     }
 }

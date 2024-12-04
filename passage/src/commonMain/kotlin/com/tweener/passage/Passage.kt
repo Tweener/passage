@@ -16,7 +16,7 @@ import com.tweener.passage.model.Entrant
 import com.tweener.passage.model.GatekeeperType
 import com.tweener.passage.model.GoogleGatekeeperConfiguration
 import com.tweener.passage.model.PassageGatekeepersConfiguration
-import com.tweener.passage.universallink.FirebaseUniversalLink
+import com.tweener.passage.model.PassageUniversalLink
 import com.tweener.passage.universallink.PassageUniversalLinkHandler
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.FirebaseAuth
@@ -29,7 +29,7 @@ import kotlinx.coroutines.flow.map
  * Creates and [remember] the [Passage].
  */
 @Composable
-expect fun rememberPassage(universalLinkHandler: PassageUniversalLinkHandler = PassageUniversalLinkHandler()): Passage
+expect fun rememberPassage(): Passage
 
 /**
  * Handles Firebase authentication operations.
@@ -51,10 +51,10 @@ expect fun rememberPassage(universalLinkHandler: PassageUniversalLinkHandler = P
  * @author Vivien Mahe
  * @since 30/11/2024
  */
-abstract class Passage(
-    private val universalLinkHandler: PassageUniversalLinkHandler,
-) {
-    val universalLinkToHandle: StateFlow<FirebaseUniversalLink?> = universalLinkHandler.linkToHandle
+abstract class Passage {
+    private val universalLinkHandler = PassageUniversalLinkHandler()
+
+    val universalLinkToHandle: StateFlow<PassageUniversalLink?> = universalLinkHandler.linkToHandle
 
     protected lateinit var firebaseAuth: FirebaseAuth
 
@@ -63,22 +63,31 @@ abstract class Passage(
     private var emailGatekeeper: PassageEmailGatekeeper? = null
 
     /**
-     * Initializes the Passage library with the specified Gatekeepers configuration and optional Firebase instance.
+     * Initializes the Passage library with the specified Gatekeepers configuration .
      *
      * This method sets up the required Gatekeepers (e.g., Google, Apple, Email/Password) using the provided configuration.
-     * Optionally, a custom Firebase instance can be passed if you already use one in your project.
      *
      * @param gatekeepersConfiguration The configuration object containing settings for each Gatekeeper.
-     * @param firebase An optional Firebase instance. Defaults to the default Firebase instance if not specified.
      */
-    fun initialize(gatekeepersConfiguration: PassageGatekeepersConfiguration, firebase: Firebase? = null) {
-        firebase
-            ?.let { firebaseAuth = it.auth }
-            ?: run {
-                // If no Firebase instance is passed, use the default one and initialize it
-                firebaseAuth = Firebase.auth
-                initializeFirebase()
-            }
+    fun initialize(gatekeepersConfiguration: PassageGatekeepersConfiguration) {
+        initializeFirebase()
+        initialize(gatekeepersConfiguration = gatekeepersConfiguration, firebase = Firebase)
+    }
+
+    /**
+     * Initializes the Passage library with the specified Gatekeepers configuration and Firebase instance.
+     *
+     * This method sets up the required Gatekeepers (e.g., Google, Apple, Email/Password) using the provided configuration
+     * and initializes Firebase Authentication. It ensures that Passage is properly configured to handle authentication
+     * flows for the specified providers.
+     *
+     * @param gatekeepersConfiguration The configuration object containing settings for each Gatekeeper.
+     * @param firebase The Firebase instance used to initialize Firebase Authentication.
+     *
+     * @see PassageGatekeepersConfiguration
+     */
+    fun initialize(gatekeepersConfiguration: PassageGatekeepersConfiguration, firebase: Firebase) {
+        firebaseAuth = firebase.auth
 
         gatekeepersConfiguration.google?.let { googleGatekeeper = createGoogleGatekeeper(configuration = it, firebaseAuth = firebaseAuth) }
         gatekeepersConfiguration.apple?.let { appleGatekeeper = createAppleGatekeeper(configuration = it) }
@@ -282,6 +291,19 @@ abstract class Passage(
 
     // endregion Email & Password gatekeeper
 
+    // region Universal Links
+
+    /**
+     * Handles a Universal Link by passing the provided URL to the link handler.
+     *
+     * Call this method whenever your app receives a universal link (iOS) or App Link (Android) to allow Passage to process it.
+     * This is typically used to handle deep linking for authentication flows, such as email verification or password reset links.
+     *
+     * @param url The URL from the universal or App Link.
+     */
+    fun handleLink(url: String): Boolean =
+        universalLinkHandler.handle(url = url)
+
     /**
      * Notifies Passage that a universal link has been handled.
      *
@@ -292,4 +314,6 @@ abstract class Passage(
     fun onLinkHandled() {
         universalLinkHandler.onLinkHandled()
     }
+
+    // endregion Universal Links
 }

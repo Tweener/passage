@@ -45,7 +45,7 @@ class AppDelegate : NSObject, UIApplicationDelegate, UNUserNotificationCenterDel
         }
 
         // Then check if the URL is handled by Passage (Firebase Dynamic Links)
-        else if (PassageUniversalLinkHandlerHelper().handle(url: url.absoluteString)) {
+        else if (PassageHelper().handle(url: url.absoluteString)) {
             print("Handled by Passage")
         }
     }

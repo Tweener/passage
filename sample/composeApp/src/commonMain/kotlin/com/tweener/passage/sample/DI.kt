@@ -1,13 +1,15 @@
 package com.tweener.passage.sample
 
-import com.tweener.passage.universallink.PassageUniversalLinkHandler
+import com.tweener.passage.Passage
 
 /**
  * @author Vivien Mahe
- * @since 03/12/2024
+ * @since 04/12/2024
  */
 
-private val universalLinkHandler = PassageUniversalLinkHandler()
+private val passage: Passage = createPassage()
 
-fun providePassageUniversalLinkHandler() = universalLinkHandler
+expect fun createPassage(): Passage
+
+fun providePassage(): Passage = passage
 
