@@ -71,7 +71,7 @@ kotlin {
     cocoapods {
         ios.deploymentTarget = ProjectConfiguration.iOS.deploymentTarget
 
-        pod("GoogleSignIn")
+        pod("GoogleSignIn", "~> 8.0.0")
     }
 
     sourceSets {
