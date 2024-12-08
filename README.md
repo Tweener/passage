@@ -47,7 +47,7 @@ Passage abstracts the authentication flow into three main components:
 
 ## 🛠️ Installation
 
-In your `build.gradle.kts` file, add Maven Central to your repositories:
+In your `settings.gradle.kts` file, add Maven Central to your repositories:
 ```Groovy
 repositories {
     mavenCentral()
