@@ -224,7 +224,7 @@ passage.reauthenticateWithEmailAndPassword(params)
 ```
 
 ### 3. Email actions
-You may need to [send emails](https://firebase.google.com/docs/auth/android/passing-state-in-email-actions) to the user for a password reset if the user forgot its password for instance, or for verifying the user's email address when creating an account.
+You may need to [send emails](https://firebase.google.com/docs/auth/android/passing-state-in-email-actions) to the user for a password reset if the user forgot their password for instance, or for verifying the user's email address when creating an account.
 
 > [!IMPORTANT]
 > Passage uses [Firebase Dynamic Links](https://firebase.google.com/docs/dynamic-links) to send emails containing universal links.
