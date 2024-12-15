@@ -135,7 +135,7 @@ fun App() {
                     Button(onClick = {
                         buttonsScope.launch {
                             passage
-                                .createUserWithEmailAndPassword(params = PassageEmailAuthParams(email = "vivien.mahe@gmail.com", password = "testest1!"))
+                                .createUserWithEmailAndPassword(params = PassageEmailAuthParams(email = "{Your email address}", password = "{Some valid password}"))
                                 .onSuccess { entrant = it }
                                 .onFailure {
                                     println(it)
@@ -149,7 +149,7 @@ fun App() {
                     Button(onClick = {
                         buttonsScope.launch {
                             passage
-                                .authenticateWithEmailAndPassword(params = PassageEmailAuthParams(email = "vivien.mahe@gmail.com", password = "testest1!"))
+                                .authenticateWithEmailAndPassword(params = PassageEmailAuthParams(email = "{Your email address}", password = "{Some valid password}"))
                                 .onSuccess { entrant = it }
                                 .onFailure {
                                     println(it)
