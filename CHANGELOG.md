@@ -1,6 +1,12 @@
 
 # Changelog
 
+## [1.1.0] - December 16, 2024
+
+- Added new method `Passage#confirmResetPassword(params: PassageResetPasswordParams)` to confirm the reset password and set the Entrant account's new password.
+- **[BREAKING]** Method `Passage#handlePasswordResetCode(oobCode: String)` now returns `Result<EmailAddress>`, instead of `Result<Unit>`, where `EmailAddress` is a the Entrant account's email address.
+- **[BREAKING]** `PassageUniversalLink.mode` property is now an enum class `PassageUniversalLinkMode` instead of a String.
+
 ## [1.0.0] - December 4, 2024
 
 ### 🚀 Initial Release
