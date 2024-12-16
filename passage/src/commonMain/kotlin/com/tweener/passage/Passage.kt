@@ -4,10 +4,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import com.tweener.passage.error.PassageGatekeeperNotConfiguredException
 import com.tweener.passage.gatekeeper.apple.PassageAppleGatekeeper
+import com.tweener.passage.gatekeeper.email.EmailAddress
 import com.tweener.passage.gatekeeper.email.PassageEmailGatekeeper
 import com.tweener.passage.gatekeeper.email.model.PassageEmailAuthParams
 import com.tweener.passage.gatekeeper.email.model.PassageEmailVerificationParams
 import com.tweener.passage.gatekeeper.email.model.PassageForgotPasswordParams
+import com.tweener.passage.gatekeeper.email.model.PassageResetPasswordParams
 import com.tweener.passage.gatekeeper.google.PassageGoogleGatekeeper
 import com.tweener.passage.mapper.toEntrant
 import com.tweener.passage.model.AppleGatekeeperConfiguration
@@ -220,7 +222,7 @@ abstract class Passage {
      * Authenticates a user with an email and password.
      *
      * @param params TThe parameters required for authentication.
-     * @return The authenticated entrant, or null if authentication fails.
+     * @return The authenticated entrant.
      */
     suspend fun authenticateWithEmailAndPassword(params: PassageEmailAuthParams): Result<Entrant> =
         emailGatekeeper
@@ -231,7 +233,7 @@ abstract class Passage {
      * Creates a new user with the given email and password.
      *
      * @param params TThe parameters required for authentication.
-     * @return The created entrant, or null if creation fails.
+     * @return The created entrant.
      */
     suspend fun createUserWithEmailAndPassword(params: PassageEmailAuthParams): Result<Entrant> =
         emailGatekeeper
@@ -265,11 +267,24 @@ abstract class Passage {
      * and reloads the current user to reflect the updated password.
      *
      * @param oobCode The out-of-band code received from the password reset link.
-     * @return A [Result] containing the success or failure of the password reset process.
+     * @return The user's [EmailAddress] for the password reset process.
      */
-    suspend fun handlePasswordResetCode(oobCode: String): Result<Unit> =
+    suspend fun handlePasswordResetCode(oobCode: String): Result<EmailAddress> =
         emailGatekeeper
             ?.handlePasswordResetCode(oobCode = oobCode)
+            ?: Result.failure(PassageGatekeeperNotConfiguredException(gatekeeper = GatekeeperType.EMAIL_PASSWORD))
+
+    /**
+     * Confirms a password reset operation using the provided reset parameters.
+     *
+     * This method completes the password reset flow by validating the provided parameters
+     * and updating the user's password to the specified value.
+     *
+     * @param params The parameters required for resetting the password.
+     */
+    suspend fun confirmResetPassword(params: PassageResetPasswordParams): Result<Unit> =
+        emailGatekeeper
+            ?.confirmResetPassword(oobCode = params.oobCode, newPassword = params.newPassword)
             ?: Result.failure(PassageGatekeeperNotConfiguredException(gatekeeper = GatekeeperType.EMAIL_PASSWORD))
 
     /**

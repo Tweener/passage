@@ -16,6 +16,10 @@ import dev.gitlive.firebase.auth.EmailAuthProvider
 import dev.gitlive.firebase.auth.FirebaseAuth
 import dev.gitlive.firebase.auth.auth
 import io.github.aakira.napier.Napier
+import kotlin.jvm.JvmInline
+
+@JvmInline
+value class EmailAddress(val email: String)
 
 /**
  * Handles authentication with Firebase via email.
@@ -85,10 +89,28 @@ internal class PassageEmailGatekeeper(
      * @param oobCode The out-of-band code received from the password reset link.
      * @return A [Result] containing the success or failure of the password reset process.
      */
-    suspend fun handlePasswordResetCode(oobCode: String): Result<Unit> =
-        handleOobCode<ActionCodeResult.PasswordReset>(oobCode = oobCode).onFailure { throwable ->
-            Napier.e(throwable) { "Couldn't verify the oobCode ($oobCode) from the password reset email." }
-        }
+    suspend fun handlePasswordResetCode(oobCode: String): Result<EmailAddress> = suspendCatching {
+        val email = firebaseAuth.verifyPasswordResetCode(code = oobCode)
+        EmailAddress(email = email)
+    }.onFailure { throwable ->
+        Napier.e(throwable) { "Couldn't verify the oobCode ($oobCode) from the password reset email." }
+    }
+
+    /**
+     * Confirms a password reset operation using the provided out-of-band code and new password.
+     *
+     * This method completes the password reset flow by validating the provided `oobCode`
+     * (out-of-band code) and updating the user's password to the specified `newPassword`.
+     *
+     * @param oobCode The out-of-band code sent to the user's email for password reset.
+     * @param newPassword The new password to set for the user.
+     * @return A [Result] indicating the success or failure of the operation.
+     */
+    suspend fun confirmResetPassword(oobCode: String, newPassword: String): Result<Unit> = suspendCatching {
+        firebaseAuth.confirmPasswordReset(code = oobCode, newPassword = newPassword)
+    }.onFailure { throwable ->
+        Napier.e(throwable) { "Couldn't confirm the password reset." }
+    }
 
     /**
      * Sends an email address verification email with specified parameters.

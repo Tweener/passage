@@ -9,7 +9,7 @@ package com.tweener.passage.model
  * or password resets.
  *
  * @property link The original universal link as a string.
- * @property mode The operation mode, indicating the type of email action (e.g., "verifyEmail", "resetPassword").
+ * @property mode The operation mode, represented by [PassageUniversalLinkMode], indicating the type of action (e.g., VERIFY_EMAIL, RESET_PASSWORD).
  * @property oobCode The one-time-use code (oobCode) included in the link.
  * @property continueUrl The continue URL included in the link for redirection.
  *
@@ -18,7 +18,7 @@ package com.tweener.passage.model
  */
 data class PassageUniversalLink(
     val link: String,
-    val mode: String,
+    val mode: PassageUniversalLinkMode,
     val oobCode: String,
     val continueUrl: String,
 )

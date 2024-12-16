@@ -1,6 +1,7 @@
 package com.tweener.passage.universallink
 
 import com.tweener.common._internal.codec.UrlCodec
+import com.tweener.passage.mapper.toPassageUniversalLinkMode
 import com.tweener.passage.model.PassageUniversalLink
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -44,12 +45,14 @@ internal class PassageUniversalLinkHandler {
         val oobCodeParam = extractQueryParameter(url = validLink, parameter = LINK_QUERY_PARAMETER_OOB_CODE)
         val continueUrlParam = extractQueryParameter(url = validLink, parameter = LINK_QUERY_PARAMETER_CONTINUE_URL)
 
-        val isUrlHandled = modeParam != null && oobCodeParam != null && continueUrlParam != null
+        val linkMode = modeParam.toPassageUniversalLinkMode()
+
+        val isUrlHandled = linkMode != null && oobCodeParam != null && continueUrlParam != null
         if (isUrlHandled) {
             println("Universal Link is handled! $validLink")
 
             scope.launch {
-                val passageUniversalLink = PassageUniversalLink(link = validLink, mode = modeParam!!, oobCode = oobCodeParam!!, continueUrl = continueUrlParam!!)
+                val passageUniversalLink = PassageUniversalLink(link = validLink, mode = linkMode!!, oobCode = oobCodeParam!!, continueUrl = continueUrlParam!!)
                 _linkToHandle.emit(passageUniversalLink)
             }
         } else {
