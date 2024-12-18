@@ -14,7 +14,7 @@ crashlyticsPlugin = "3.0.2"
 jetbrainsLifecycle = "2.8.4"
 
 # Tweener
-tweenerKmpKit = "1.0.1"
+tweenerKmpKit = "0.1.1"
 
 # Android
 androidCore = "1.15.0"
