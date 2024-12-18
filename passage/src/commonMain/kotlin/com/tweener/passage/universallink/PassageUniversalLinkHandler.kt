@@ -1,6 +1,6 @@
 package com.tweener.passage.universallink
 
-import com.tweener.common._internal.codec.UrlCodec
+import com.tweener.kmpkit.codec.UrlCodec
 import com.tweener.passage.mapper.toPassageUniversalLinkMode
 import com.tweener.passage.model.PassageUniversalLink
 import kotlinx.coroutines.CoroutineScope

@@ -14,7 +14,7 @@ crashlyticsPlugin = "3.0.2"
 jetbrainsLifecycle = "2.8.4"
 
 # Tweener
-tweenerBom = "2.2.2"
+tweenerKmpKit = "1.0.1"
 
 # Android
 androidCore = "1.15.0"
@@ -31,8 +31,7 @@ compose-multiplatform-material3 = { group = "org.jetbrains.compose.material3", n
 jetbrains-lifecycle-runtime-compose = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "jetbrainsLifecycle" }
 
 # Tweener
-tweener-bom = { group = "io.github.tweener", name = "kmp-bom", version.ref = "tweenerBom" }
-tweener-common = { group = "io.github.tweener", name = "kmp-common" }
+tweener-kmpkit = { group = "io.github.tweener", name = "kmpkit", version.ref = "tweenerKmpKit" }
 
 # Coroutines
 kotlin-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }

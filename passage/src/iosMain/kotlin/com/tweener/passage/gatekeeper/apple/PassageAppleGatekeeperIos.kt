@@ -2,9 +2,9 @@ package com.tweener.passage.gatekeeper.apple
 
 import cocoapods.FirebaseAuth.FIRAuth
 import cocoapods.FirebaseAuth.FIROAuthProvider
-import com.tweener.common._internal.contract.requireNotNullOrThrow
-import com.tweener.common._internal.thread.resumeIfActive
-import com.tweener.common._internal.thread.resumeWithExceptionIfActive
+import com.tweener.kmpkit.contract.requireNotNullOrThrow
+import com.tweener.kmpkit.thread.resumeIfActive
+import com.tweener.kmpkit.thread.resumeWithExceptionIfActive
 import com.tweener.passage.error.PassageGatekeeperUnknownEntrantException
 import com.tweener.passage.gatekeeper.apple.error.PassageAppleGatekeeperException
 import com.tweener.passage.mapper.toEntrant

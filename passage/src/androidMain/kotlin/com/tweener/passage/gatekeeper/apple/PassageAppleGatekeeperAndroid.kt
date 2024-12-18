@@ -1,7 +1,7 @@
 package com.tweener.passage.gatekeeper.apple
 
-import com.tweener.common._internal.Platform
-import com.tweener.common._internal.thread.suspendCatching
+import com.tweener.kmpkit.Platform
+import com.tweener.kmpkit.thread.suspendCatching
 import com.tweener.passage.error.PassageGatekeeperNotImplementedException
 import com.tweener.passage.model.Entrant
 import com.tweener.passage.model.GatekeeperType

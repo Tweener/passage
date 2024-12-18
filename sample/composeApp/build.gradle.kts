@@ -35,8 +35,7 @@ kotlin {
             api(project(":passage"))
 
             // Tweener
-            implementation(project.dependencies.platform(libs.tweener.bom))
-            implementation(libs.tweener.common)
+            implementation(libs.tweener.kmpkit)
 
             // Compose
             implementation(compose.runtime)

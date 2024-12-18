@@ -1,6 +1,6 @@
 package com.tweener.passage.gatekeeper.email
 
-import com.tweener.common._internal.thread.suspendCatching
+import com.tweener.kmpkit.thread.suspendCatching
 import com.tweener.passage.error.PassageGatekeeperUnknownEntrantException
 import com.tweener.passage.gatekeeper.PassageGatekeeper
 import com.tweener.passage.gatekeeper.email.model.PassageEmailAuthParams

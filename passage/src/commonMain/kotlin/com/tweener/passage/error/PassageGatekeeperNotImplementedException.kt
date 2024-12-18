@@ -1,6 +1,6 @@
 package com.tweener.passage.error
 
-import com.tweener.common._internal.Platform
+import com.tweener.kmpkit.Platform
 import com.tweener.passage.model.GatekeeperType
 
 /**
