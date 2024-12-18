@@ -9,7 +9,7 @@ object ProjectConfiguration {
 
     object Passage {
         const val packageName = "com.tweener.passage"
-        const val versionName = "1.1.0"
+        const val versionName = "1.1.1"
         const val namespace = "$packageName.android"
         const val compileSDK = 35
         const val minSDK = 24

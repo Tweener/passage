@@ -11,12 +11,13 @@ jobs:
     name: Check for new versions of dependencies
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Set up JDK 21
-        uses: actions/setup-java@v3
+      - name: Set up Java JDK ${{ vars.JAVA_JDK_VERSION }}"
+        uses: actions/setup-java@v4
         with:
-          java-version: '21'
+          java-version: '${{ vars.JAVA_JDK_VERSION }}'
           distribution: 'zulu'
           cache: gradle
 
