@@ -1,8 +1,7 @@
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import java.net.URL
+import java.net.URI
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
@@ -129,7 +128,7 @@ tasks.withType<DokkaTask>().configureEach {
 
         sourceLink {
             localDirectory.set(rootProject.projectDir)
-            remoteUrl.set(URL(ProjectConfiguration.Passage.Maven.packageUrl + "/tree/main"))
+            remoteUrl.set(URI(ProjectConfiguration.Passage.Maven.packageUrl + "/tree/main").toURL())
             remoteLineSuffix.set("#L")
         }
     }

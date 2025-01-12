@@ -1,20 +1,18 @@
 [versions]
-kotlin = "2.0.21"
-gradle = "8.5.2"
+kotlin = "2.1.0"
+gradle = "8.7.3"
 dependencyVersionsPlugin = "0.51.0"
 nexusSonatype = "2.0.0"
 dokka = "1.9.20"
 androidAnnotations = "1.9.1"
 coroutines = "1.9.0"
 napier = "2.7.1"
-composeMultiplatform = "1.7.1"
+composeMultiplatform = "1.7.3"
 firebaseGitLiveApp = "2.1.0" # Firebase for KMP https://firebaseopensource.com/projects/gitliveapp/firebase-kotlin-sdk/
 googleServicesPlugin = "4.4.2"
 crashlyticsPlugin = "3.0.2"
 jetbrainsLifecycle = "2.8.4"
-
-# Tweener
-tweenerKmpKit = "0.1.1"
+kmpKit = "1.0.1"
 
 # Android
 androidCore = "1.15.0"
@@ -22,7 +20,7 @@ androidActivity = "1.9.3"
 playServices = "21.3.0"
 googleIdIdentity = "1.1.1"
 androidCredentials = "1.3.0"
-androidDesugarJdkLibs = "2.1.3"
+androidDesugarJdkLibs = "2.1.4"
 androidStartup = "1.2.0"
 
 [libraries]
@@ -31,7 +29,7 @@ compose-multiplatform-material3 = { group = "org.jetbrains.compose.material3", n
 jetbrains-lifecycle-runtime-compose = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "jetbrainsLifecycle" }
 
 # Tweener
-tweener-kmpkit = { group = "io.github.tweener", name = "kmpkit", version.ref = "tweenerKmpKit" }
+tweener-kmpkit = { group = "io.github.tweener", name = "kmpkit", version.ref = "kmpKit" }
 
 # Coroutines
 kotlin-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
