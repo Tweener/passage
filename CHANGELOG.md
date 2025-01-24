@@ -1,8 +1,15 @@
 
 # Changelog
 
-## [1.1.0] - December 16, 2024
+## [1.1.1] - January 24, 2025
+- `Passage` now provides two separate methods to check if the user is logged in:
+  - [`isUserLoggedIn`](https://github.com/Tweener/passage/blob/main/passage/src/commonMain/kotlin/com/tweener/passage/Passage.kt#L128): Returns instantly.
+  - [`isUserLoggedInAsFlow`](https://github.com/Tweener/passage/blob/main/passage/src/commonMain/kotlin/com/tweener/passage/Passage.kt#L136): Allows observing changes over time.
+- Update Kotlin to 2.1.0.
+- Update Compose Multiplatform to 1.7.3.
+- Update Gradle to 8.11.1.
 
+## [1.1.0] - December 16, 2024
 - Added new method `Passage#confirmResetPassword(params: PassageResetPasswordParams)` to confirm the reset password and set the Entrant account's new password.
 - **[BREAKING]** Method `Passage#handlePasswordResetCode(oobCode: String)` now returns `Result<EmailAddress>`, instead of `Result<Unit>`, where `EmailAddress` is a the Entrant account's email address.
 - **[BREAKING]** `PassageUniversalLink.mode` property is now an enum class `PassageUniversalLinkMode` instead of a String.
