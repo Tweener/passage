@@ -123,11 +123,17 @@ abstract class Passage {
         firebaseAuth.authStateChanged.map { it?.toEntrant() }
 
     /**
+     * Indicates whether a user is currently logged in.
+     */
+    fun isUserLoggedIn(): Boolean =
+        getCurrentUser() != null
+
+    /**
      * Observes whether a user is logged in as a [Flow] of [Boolean].
      *
      * @return A [Flow] that emits `true` if a user is logged in, or `false` otherwise.
      */
-    fun isUserLoggedIn(): Flow<Boolean> =
+    fun isUserLoggedInAsFlow(): Flow<Boolean> =
         getCurrentUserAsFlow().map { it != null }
 
     /**
