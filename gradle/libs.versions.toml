@@ -27,9 +27,7 @@ androidStartup = "1.2.0"
 napier = { group = "io.github.aakira", name = "napier", version.ref = "napier" }
 compose-multiplatform-material3 = { group = "org.jetbrains.compose.material3", name = "material3", version.ref = "composeMultiplatform" }
 jetbrains-lifecycle-runtime-compose = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "jetbrainsLifecycle" }
-
-# Tweener
-tweener-kmpkit = { group = "io.github.tweener", name = "kmpkit", version.ref = "kmpKit" }
+kmpkit = { group = "io.github.tweener", name = "kmpkit", version.ref = "kmpKit" }
 
 # Coroutines
 kotlin-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
