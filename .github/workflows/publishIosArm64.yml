@@ -1,4 +1,4 @@
-name: Publish to Maven Central
+name: Publish IosArm64 to Maven Central
 
 permissions:
   contents: read
