@@ -1,6 +1,6 @@
 import org.jetbrains.dokka.gradle.DokkaTask
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 import java.net.URI
 
 plugins {
@@ -50,7 +50,6 @@ kotlin {
     androidTarget {
         publishLibraryVariants("release")
 
-        @OptIn(ExperimentalKotlinGradlePluginApi::class)
         compilerOptions {
             jvmTarget.set(JvmTarget.fromTarget(ProjectConfiguration.Compiler.jvmTarget))
         }
@@ -70,7 +69,7 @@ kotlin {
     cocoapods {
         ios.deploymentTarget = ProjectConfiguration.iOS.deploymentTarget
 
-        pod("GoogleSignIn", "~> 8.0.0")
+        pod("GoogleSignIn")
     }
 
     sourceSets {

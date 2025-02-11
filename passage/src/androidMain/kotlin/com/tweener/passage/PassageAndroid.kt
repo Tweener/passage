@@ -2,7 +2,7 @@ package com.tweener.passage
 
 import android.content.Context
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import com.tweener.passage.gatekeeper.apple.PassageAppleGatekeeper
 import com.tweener.passage.gatekeeper.apple.PassageAppleGatekeeperAndroid
 import com.tweener.passage.gatekeeper.google.PassageGoogleGatekeeper
@@ -10,12 +10,6 @@ import com.tweener.passage.gatekeeper.google.PassageGoogleGatekeeperAndroid
 import com.tweener.passage.model.AppleGatekeeperConfiguration
 import com.tweener.passage.model.GoogleGatekeeperConfiguration
 import dev.gitlive.firebase.auth.FirebaseAuth
-
-@Composable
-actual fun rememberPassage(): Passage {
-    val context = LocalActivity.current
-    return remember { PassageAndroid(context = context) }
-}
 
 /**
  * An Android-specific implementation of the [Passage].
@@ -27,12 +21,19 @@ actual fun rememberPassage(): Passage {
  * Responsibilities:
  * - Creating Android-specific Gatekeepers for Google and Apple authentication.
  *
- * @param context The Android [Context] required for accessing platform resources.
+ * @param applicationContext The Android [Context] required for accessing platform resources.
  *
  * @author Vivien Mahe
  * @since 02/12/2024
  */
-class PassageAndroid(private val context: Context) : Passage() {
+class PassageAndroid(private val applicationContext: Context) : Passage() {
+
+    private var activityContext: Context? = null
+
+    @Composable
+    override fun bindToView() {
+        activityContext = LocalContext.current
+    }
 
     override fun initializeFirebase() {
         // Nothing to do here
@@ -55,7 +56,8 @@ class PassageAndroid(private val context: Context) : Passage() {
         PassageGoogleGatekeeperAndroid(
             serverClientId = configuration.serverClientId,
             firebaseAuth = firebaseAuth,
-            context = context,
+            applicationContext = applicationContext,
+            activityContext = { activityContext },
             filterByAuthorizedAccounts = configuration.android.filterByAuthorizedAccounts,
             autoSelectEnabled = configuration.android.autoSelectEnabled,
             maxRetries = configuration.android.maxRetries,

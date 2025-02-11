@@ -5,8 +5,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.runtime.CompositionLocalProvider
-import com.tweener.passage.LocalActivity
 
 class MainActivity : ComponentActivity() {
 
@@ -19,9 +17,7 @@ class MainActivity : ComponentActivity() {
         handleUniversalLink(intent = intent)
 
         setContent {
-            CompositionLocalProvider(LocalActivity provides this) {
-                App()
-            }
+            App()
         }
     }
 

@@ -1,7 +1,6 @@
 package com.tweener.passage
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import com.tweener.passage.error.PassageGatekeeperNotConfiguredException
 import com.tweener.passage.gatekeeper.apple.PassageAppleGatekeeper
 import com.tweener.passage.gatekeeper.email.EmailAddress
@@ -26,12 +25,6 @@ import dev.gitlive.firebase.auth.auth
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
-
-/**
- * Creates and [remember] the [Passage].
- */
-@Composable
-expect fun rememberPassage(): Passage
 
 /**
  * Handles Firebase authentication operations.
@@ -105,6 +98,13 @@ abstract class Passage {
 
         println("Passage is initialized.")
     }
+
+    /**
+     * Binds Passage to the current view associated with this Composable.
+     * This method is necessary when using the Google gatekeeper on Android, as Google Sign-In requires access to the current Activity-based context.
+     */
+    @Composable
+    abstract fun bindToView()
 
     /**
      * Retrieves the currently authenticated user as an [Entrant], or `null` if no user is authenticated.

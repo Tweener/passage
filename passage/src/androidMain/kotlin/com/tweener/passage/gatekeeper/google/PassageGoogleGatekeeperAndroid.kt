@@ -12,6 +12,7 @@ import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
 import com.tweener.kmpkit.thread.suspendCatching
 import com.tweener.passage.error.PassageGatekeeperUnknownEntrantException
+import com.tweener.passage.gatekeeper.google.error.PassageActivityContextNotInitializedException
 import com.tweener.passage.gatekeeper.google.error.PassageGoogleGatekeeperUnknownCredentialException
 import com.tweener.passage.gatekeeper.google.model.GoogleTokens
 import com.tweener.passage.mapper.toEntrant
@@ -34,7 +35,7 @@ import io.github.aakira.napier.Napier
  *
  * @param serverClientId The server client ID associated with the Google Sign-In configuration.
  * @param firebaseAuth The Firebase authentication instance used for managing authenticated users.
- * @param context The Android [Context] required for accessing system resources and APIs.
+ * @param applicationContext The Android [Context] required for accessing system resources and APIs.
  * @param filterByAuthorizedAccounts If true, filters credentials by authorized accounts for the app.
  * @param autoSelectEnabled If true, enables automatic credential selection when possible.
  * @param maxRetries The maximum number of retries for authentication attempts.
@@ -45,13 +46,14 @@ import io.github.aakira.napier.Napier
 internal class PassageGoogleGatekeeperAndroid(
     serverClientId: String,
     private val firebaseAuth: FirebaseAuth,
-    private val context: Context,
+    private val applicationContext: Context,
+    private val activityContext: () -> Context?,
     private val filterByAuthorizedAccounts: Boolean,
     private val autoSelectEnabled: Boolean,
     private val maxRetries: Int,
 ) : PassageGoogleGatekeeper(serverClientId = serverClientId) {
 
-    private val credentialManager = CredentialManager.create(context)
+    private val credentialManager = CredentialManager.create(applicationContext)
     private var retryAttempts = 0
 
     /**
@@ -154,6 +156,8 @@ internal class PassageGoogleGatekeeperAndroid(
     }
 
     private suspend fun createCredentials(): Credential {
+        activityContext.invoke() ?: throw PassageActivityContextNotInitializedException()
+
         val googleIdOption = GetGoogleIdOption.Builder()
             .setFilterByAuthorizedAccounts(filterByAuthorizedAccounts)
             .setServerClientId(serverClientId)
@@ -164,6 +168,6 @@ internal class PassageGoogleGatekeeperAndroid(
             .addCredentialOption(googleIdOption)
             .build()
 
-        return credentialManager.getCredential(request = request, context = context).credential
+        return credentialManager.getCredential(request = request, context = activityContext.invoke()!!).credential
     }
 }

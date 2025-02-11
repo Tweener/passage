@@ -45,7 +45,6 @@ import com.tweener.passage.model.EmailPasswordGatekeeperConfiguration
 import com.tweener.passage.model.Entrant
 import com.tweener.passage.model.GoogleGatekeeperAndroidConfiguration
 import com.tweener.passage.model.GoogleGatekeeperConfiguration
-import com.tweener.passage.rememberPassage
 import com.tweener.passage.sample.ui.theme.PassageTheme
 import kotlinx.coroutines.launch
 
@@ -54,7 +53,7 @@ fun App() {
     val buttonsScope = rememberCoroutineScope()
     val snackbarScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
-    val passage: Passage = rememberPassage()
+    val passage: Passage = providePassage()
     var entrant by remember { mutableStateOf<Entrant?>(null) }
     val lifecycleOwner = LocalLifecycleOwner.current
 
@@ -76,6 +75,8 @@ fun App() {
             entrant = passage.getCurrentUser()
         }
     }
+
+    passage.bindToView()
 
     // Listen to universal links to be handled
     val link = passage.universalLinkToHandle.collectAsStateWithLifecycle()
@@ -107,10 +108,7 @@ fun App() {
                         buttonsScope.launch {
                             passage.authenticateWithGoogle()
                                 .onSuccess { entrant = it }
-                                .onFailure {
-                                    println(it)
-                                    it.message?.let { message -> snackbarScope.launch { snackbarHostState.showSnackbar(message = message) } }
-                                }
+                                .onFailure { it.message?.let { message -> snackbarScope.launch { snackbarHostState.showSnackbar(message = message) } } }
                         }
                     }) {
                         Text("Sign in with Google")
@@ -122,10 +120,7 @@ fun App() {
                         buttonsScope.launch {
                             passage.authenticateWithApple()
                                 .onSuccess { entrant = it }
-                                .onFailure {
-                                    println(it)
-                                    it.message?.let { message -> snackbarScope.launch { snackbarHostState.showSnackbar(message = message) } }
-                                }
+                                .onFailure { it.message?.let { message -> snackbarScope.launch { snackbarHostState.showSnackbar(message = message) } } }
                         }
                     }) {
                         Text("Sign in with Apple")
@@ -138,10 +133,7 @@ fun App() {
                             passage
                                 .createUserWithEmailAndPassword(params = PassageEmailAuthParams(email = "{Your email address}", password = "{Some valid password}"))
                                 .onSuccess { entrant = it }
-                                .onFailure {
-                                    println(it)
-                                    it.message?.let { message -> snackbarScope.launch { snackbarHostState.showSnackbar(message = message) } }
-                                }
+                                .onFailure { it.message?.let { message -> snackbarScope.launch { snackbarHostState.showSnackbar(message = message) } } }
                         }
                     }) {
                         Text("Sign up with Email/Password")
@@ -152,10 +144,7 @@ fun App() {
                             passage
                                 .authenticateWithEmailAndPassword(params = PassageEmailAuthParams(email = "{Your email address}", password = "{Some valid password}"))
                                 .onSuccess { entrant = it }
-                                .onFailure {
-                                    println(it)
-                                    it.message?.let { message -> snackbarScope.launch { snackbarHostState.showSnackbar(message = message) } }
-                                }
+                                .onFailure { it.message?.let { message -> snackbarScope.launch { snackbarHostState.showSnackbar(message = message) } } }
                         }
                     }) {
                         Text("Sign in with Email/Password")
@@ -179,10 +168,7 @@ fun App() {
                                 .onSuccess {
                                     entrant?.email?.let { snackbarScope.launch { snackbarHostState.showSnackbar(message = "An email has been sent to $it to verify this address.") } }
                                 }
-                                .onFailure {
-                                    println(it)
-                                    it.message?.let { message -> snackbarScope.launch { snackbarHostState.showSnackbar(message = message) } }
-                                }
+                                .onFailure { it.message?.let { message -> snackbarScope.launch { snackbarHostState.showSnackbar(message = message) } } }
                         }
                     }) {
                         Text("Send email address verification email")
@@ -209,10 +195,7 @@ fun App() {
                                 .onSuccess {
                                     entrant?.email?.let { snackbarScope.launch { snackbarHostState.showSnackbar(message = "An email has been sent to $it to reset the password.") } }
                                 }
-                                .onFailure {
-                                    println(it)
-                                    it.message?.let { message -> snackbarScope.launch { snackbarHostState.showSnackbar(message = message) } }
-                                }
+                                .onFailure { it.message?.let { message -> snackbarScope.launch { snackbarHostState.showSnackbar(message = message) } } }
                         }
                     }) {
                         Text("Send password reset email")

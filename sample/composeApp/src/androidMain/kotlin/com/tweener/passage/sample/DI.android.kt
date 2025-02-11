@@ -8,4 +8,4 @@ import com.tweener.passage.PassageAndroid
  * @since 04/12/2024
  */
 
-actual fun createPassage(): Passage = PassageAndroid(context = applicationContext)
+actual fun createPassage(): Passage = PassageAndroid(applicationContext = applicationContext)

@@ -1,7 +1,6 @@
 package com.tweener.passage
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import com.tweener.passage.gatekeeper.apple.PassageAppleGatekeeper
 import com.tweener.passage.gatekeeper.apple.PassageAppleGatekeeperIos
 import com.tweener.passage.gatekeeper.google.PassageGoogleGatekeeper
@@ -11,11 +10,6 @@ import com.tweener.passage.model.GoogleGatekeeperConfiguration
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.FirebaseAuth
 import dev.gitlive.firebase.initialize
-
-@Composable
-actual fun rememberPassage(): Passage {
-    return remember { PassageIos() }
-}
 
 /**
  * An iOS-specific implementation of the [Passage].
@@ -34,6 +28,11 @@ actual fun rememberPassage(): Passage {
  * @since 02/12/2024
  */
 class PassageIos : Passage() {
+
+    @Composable
+    override fun bindToView() {
+        // Nothing to do here
+    }
 
     /**
      * Initializes Firebase for the iOS platform.
