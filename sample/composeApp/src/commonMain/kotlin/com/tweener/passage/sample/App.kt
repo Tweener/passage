@@ -45,6 +45,7 @@ import com.tweener.passage.model.EmailPasswordGatekeeperConfiguration
 import com.tweener.passage.model.Entrant
 import com.tweener.passage.model.GoogleGatekeeperAndroidConfiguration
 import com.tweener.passage.model.GoogleGatekeeperConfiguration
+import com.tweener.passage.rememberPassage
 import com.tweener.passage.sample.ui.theme.PassageTheme
 import kotlinx.coroutines.launch
 
@@ -53,7 +54,7 @@ fun App() {
     val buttonsScope = rememberCoroutineScope()
     val snackbarScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
-    val passage: Passage = providePassage()
+    val passage: Passage = rememberPassage()
     var entrant by remember { mutableStateOf<Entrant?>(null) }
     val lifecycleOwner = LocalLifecycleOwner.current
 

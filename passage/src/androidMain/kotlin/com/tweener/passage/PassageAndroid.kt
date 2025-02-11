@@ -3,7 +3,6 @@ package com.tweener.passage
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
 import com.tweener.passage.gatekeeper.apple.PassageAppleGatekeeper
 import com.tweener.passage.gatekeeper.apple.PassageAppleGatekeeperAndroid
 import com.tweener.passage.gatekeeper.google.PassageGoogleGatekeeper
@@ -14,7 +13,7 @@ import dev.gitlive.firebase.auth.FirebaseAuth
 
 @Composable
 actual fun rememberPassage(): Passage {
-    val context = LocalContext.current
+    val context = LocalActivity.current
     return remember { PassageAndroid(context = context) }
 }
 
