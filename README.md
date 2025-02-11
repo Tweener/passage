@@ -97,6 +97,26 @@ fun MyApp() {
 }
 ```
 
+<details>
+	<summary>🤖 Android</summary>
+
+If you are using Google gatekeeper, Passage needs to retrieve the Activity-based context to initialize Google Sign-In.
+Add the following `CompositionLocalProvider` to your `MainActivity`:
+```Kotlin
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            CompositionLocalProvider(LocalActivity provides this) { // <- Wrap your roo Composable with this CompositionLocalProvider
+                MyApp()
+            }
+        }
+    }
+}
+```
+
+</details>
+
 ### 2. Configure Passage
 Provide a list of the desired gatekeepers (authentication providers) to configure:
 
