@@ -88,34 +88,21 @@ The latest version is: [![Maven Central Version](https://img.shields.io/maven-ce
 ## 🔧 Configuration
 
 ### 1. Create a Passage
-Create an instance of `Passage` using `rememberPassage()` from a Composable:
+First, you need to create an instance of `Passage` for each platform:
 
+- 🤖 Android
+
+  Create an instance of `PassageAndroid` passing an Application-based `Context`:
 ```Kotlin
-@Composable
-fun MyApp() {
-    val passage: Passage = rememberPassage()
-}
+val passage: Passage = PassageAndroid(applicationContext = context)
 ```
 
-<details>
-	<summary>🤖 Android</summary>
+- 🍎 iOS
 
-If you are using Google gatekeeper, Passage needs to retrieve the Activity-based context to initialize Google Sign-In.
-Add the following `CompositionLocalProvider` to your `MainActivity`:
+  Create an instance of `PassageIos`:
 ```Kotlin
-class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            CompositionLocalProvider(LocalActivity provides this) { // <- Wrap your roo Composable with this CompositionLocalProvider
-                MyApp()
-            }
-        }
-    }
-}
+val passage: Passage = PassageIos()
 ```
-
-</details>
 
 ### 2. Configure Passage
 Provide a list of the desired gatekeepers (authentication providers) to configure:
@@ -169,6 +156,20 @@ passage.initialize(
     firebaseAuth = Firebase.Auth,
 )
 ```
+
+### 4. Bind Passage to the current view
+When using Google gatekeeper on Android, you must now call `bindToView()` in Passage before performing any authentication operations. This ensures that Passage can access the Activity-based context needed to display the Google Sign-In UI.
+```Kotlin
+@Composable
+fun MyApp() {
+    val passage = { inject Passage }
+
+    passage.initialize(...)
+
+    passage.bindtoView() // <- Add this line when using Google gatekeeper on Android
+}
+```
+
 
 ---
 
