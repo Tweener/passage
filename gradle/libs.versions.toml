@@ -28,16 +28,11 @@ napier = { group = "io.github.aakira", name = "napier", version.ref = "napier" }
 compose-multiplatform-material3 = { group = "org.jetbrains.compose.material3", name = "material3", version.ref = "composeMultiplatform" }
 jetbrains-lifecycle-runtime-compose = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "jetbrainsLifecycle" }
 kmpkit = { group = "io.github.tweener", name = "kmpkit", version.ref = "kmpKit" }
+firebase-auth = { group = "dev.gitlive", name = "firebase-auth", version.ref = "firebaseGitLiveApp" }
 
 # Coroutines
 kotlin-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlin-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
-
-# Firebase GitLive
-firebase-firestore = { group = "dev.gitlive", name = "firebase-firestore", version.ref = "firebaseGitLiveApp" }
-firebase-config = { group = "dev.gitlive", name = "firebase-config", version.ref = "firebaseGitLiveApp" }
-firebase-auth = { group = "dev.gitlive", name = "firebase-auth", version.ref = "firebaseGitLiveApp" }
-firebase-crashlytics = { group = "dev.gitlive", name = "firebase-crashlytics", version.ref = "firebaseGitLiveApp" }
 
 # Android
 android-core = { group = "androidx.core", name = "core-ktx", version.ref = "androidCore" }
@@ -54,7 +49,6 @@ googleSignIn-credentials = { module = "androidx.credentials:credentials", versio
 googleSignIn-credentials-playServicesAuth = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "androidCredentials" }
 
 [bundles]
-firebase = ["firebase-auth", "firebase-config", "firebase-crashlytics", "firebase-firestore"] # TODO check which dep to remove
 googleSignIn = ["googleSignIn-credentials", "googleSignIn-credentials-playServicesAuth", "googleSignIn-identity", "googleSignIn-playServicesAuth"]
 
 [plugins]

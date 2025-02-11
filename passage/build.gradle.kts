@@ -1,6 +1,5 @@
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 import java.net.URI
 
 plugins {
@@ -84,7 +83,7 @@ kotlin {
             implementation(libs.kotlin.coroutines.core)
 
             // Firebase
-            implementation(libs.bundles.firebase)
+            implementation(libs.firebase.auth)
 
             // Compose
             implementation(compose.foundation)
