@@ -88,35 +88,33 @@ The latest version is: [![Maven Central Version](https://img.shields.io/maven-ce
 ## 🔧 Configuration
 
 ### 1. Create a Passage
-Depending on your project configuration, you can create an instance of `Passage` in two different ways:
+Create an instance of `Passage` using `rememberPassage()` from a Composable:
+
+```Kotlin
+@Composable
+fun MyApp() {
+    val passage: Passage = rememberPassage()
+}
+```
 
 <details>
-	<summary>➡️ Kotlin Multplatform (without Compose)</summary>
+	<summary>🤖 Android</summary>
 
-- 🤖 Android
-
-  Create an instance of `PassageAndroid` passing a `Context`:
+If you are using Google gatekeeper, Passage needs to retrieve the Activity-based context to initialize Google Sign-In.
+Add the following `CompositionLocalProvider` to your `MainActivity`:
 ```Kotlin
-val passage: Passage = PassageAndroid(context = context)
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            CompositionLocalProvider(LocalActivity provides this) { // <- Wrap your roo Composable with this CompositionLocalProvider
+                MyApp()
+            }
+        }
+    }
+}
 ```
 
-- 🍎 iOS
-
-  Create an instance of `PassageIos`:
-```Kotlin
-val passage: Passage = PassageIos()
-```
-
-</details>
-
-<details>
-	<summary>➡️ Compose Multplatform</summary>
-
-Create an instance of `Passage` using `rememberPassage()`:
-
-```Kotlin
-val passage: Passage = rememberPassage()
-```
 </details>
 
 ### 2. Configure Passage
