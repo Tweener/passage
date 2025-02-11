@@ -6,6 +6,7 @@ import androidx.credentials.Credential
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
+import androidx.credentials.exceptions.NoCredentialException
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
@@ -77,19 +78,17 @@ internal class PassageGoogleGatekeeperAndroid(
     }.onFailure { throwable ->
         Napier.e(throwable) { "Couldn't sign in the user." }
 
-//        when (throwable) {
-//            is NoCredentialException -> {
-//                onSignOut()
-//
-//                if (retryAttempts < maxRetries) {
-//                    signIn()
-//                    retryAttempts++
-//                }
-//            }
-//        }
+        when (throwable) {
+            is NoCredentialException -> {
+                signOut()
 
-        // TODO Handle NoCredentialException: attempt another sign in, or clear credential (in case the user changed its password), sign out then sign in again, etc.
-        // https://developer.android.com/identity/sign-in/credential-manager#handle-exceptions
+                if (++retryAttempts <= maxRetries) {
+                    println("Retrying sign in, attempt $retryAttempts")
+
+                    signIn(params)
+                }
+            }
+        }
     }
 
     /**
