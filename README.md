@@ -88,36 +88,14 @@ The latest version is: [![Maven Central Version](https://img.shields.io/maven-ce
 ## 🔧 Configuration
 
 ### 1. Create a Passage
-Depending on your project configuration, you can create an instance of `Passage` in two different ways:
-
-<details>
-	<summary>➡️ Kotlin Multplatform (without Compose)</summary>
-
-- 🤖 Android
-
-  Create an instance of `PassageAndroid` passing a `Context`:
-```Kotlin
-val passage: Passage = PassageAndroid(context = context)
-```
-
-- 🍎 iOS
-
-  Create an instance of `PassageIos`:
-```Kotlin
-val passage: Passage = PassageIos()
-```
-
-</details>
-
-<details>
-	<summary>➡️ Compose Multplatform</summary>
-
-Create an instance of `Passage` using `rememberPassage()`:
+Create an instance of `Passage` using `rememberPassage()` from a Composable:
 
 ```Kotlin
-val passage: Passage = rememberPassage()
+@Composable
+fun MyApp() {
+    val passage: Passage = rememberPassage()
+}
 ```
-</details>
 
 ### 2. Configure Passage
 Provide a list of the desired gatekeepers (authentication providers) to configure:
