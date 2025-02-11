@@ -2,6 +2,7 @@
 # Changelog
 
 ## [1.2.0] - February 11, 2025
+- **[BREAKING]** 🤖 `PassageAndroid` parameter `context` has been renamed `applicationContext` to avoid confusion with the Activity-based context required for the Google Sign-In UI: `PassageAndroid(applicationContext: Context)`.
 - 🤖 When using the Google gatekeeper on Android, you must now call [`bindToView()`](https://github.com/Tweener/passage/blob/main/passage/src/commonMain/kotlin/com/tweener/passage/Passage.kt#L107) in Passage before performing any authentication operations. This ensures that Passage can access the Activity-based context needed to display the Google Sign-In UI.
 - Remove some GitLive Firebase dependencies that were not used.
 
