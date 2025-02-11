@@ -1,6 +1,11 @@
 
 # Changelog
 
+## [1.1.2] - February 11, 2025
+- **[FIX]** 🤖 On Android, use Activity-based context instead of Application-based context to prevent a crash on some Android devices.
+- **[FIX]** 🤖 On Android, the sign-in retry mechanism now works as expected.
+- Update Kotlin to 2.1.10.
+
 ## [1.1.1] - January 24, 2025
 - `Passage` now provides two separate methods to check if the user is logged in:
   - [`isUserLoggedIn`](https://github.com/Tweener/passage/blob/main/passage/src/commonMain/kotlin/com/tweener/passage/Passage.kt#L128): Returns instantly.
