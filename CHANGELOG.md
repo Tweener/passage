@@ -1,6 +1,9 @@
 
 # Changelog
 
+## [1.3.0] - February 18, 2025
+- 🤖 Enhanced Google Authentication on Android: When authentication with the Google Gatekeeper fails, the library now automatically falls back to Google Legacy Sign-In.
+
 ## [1.2.0] - February 12, 2025
 - **[BREAKING]** 🤖 `PassageAndroid` parameter `context` has been renamed `applicationContext` to avoid confusion with the Activity-based context required for the Google Sign-In UI: `PassageAndroid(applicationContext: Context)`.
 - 🤖 When using the Google gatekeeper on Android, you must now call [`bindToView()`](https://github.com/Tweener/passage/blob/main/passage/src/commonMain/kotlin/com/tweener/passage/Passage.kt#L107) in Passage before performing any authentication operations. This ensures that Passage can access the Activity-based context needed to display the Google Sign-In UI.
