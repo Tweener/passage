@@ -1,11 +1,15 @@
 package com.tweener.passage.gatekeeper.google
 
 import android.content.Context
+import android.content.Intent
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.result.ActivityResult
 import androidx.credentials.ClearCredentialStateRequest
 import androidx.credentials.Credential
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
+import androidx.credentials.exceptions.GetCredentialCancellationException
 import androidx.credentials.exceptions.NoCredentialException
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
@@ -19,7 +23,6 @@ import com.tweener.passage.mapper.toEntrant
 import com.tweener.passage.model.Entrant
 import dev.gitlive.firebase.auth.FirebaseAuth
 import dev.gitlive.firebase.auth.GoogleAuthProvider
-import io.github.aakira.napier.Napier
 
 /**
  * An Android-specific implementation of the [PassageGoogleGatekeeper].
@@ -48,13 +51,21 @@ internal class PassageGoogleGatekeeperAndroid(
     private val firebaseAuth: FirebaseAuth,
     private val applicationContext: Context,
     private val activityContext: () -> Context?,
+    activityResultLauncher: () -> ManagedActivityResultLauncher<Intent, ActivityResult>?,
+    activityResult: () -> ActivityResult?,
     private val filterByAuthorizedAccounts: Boolean,
     private val autoSelectEnabled: Boolean,
     private val maxRetries: Int,
 ) : PassageGoogleGatekeeper(serverClientId = serverClientId) {
 
     private val credentialManager = CredentialManager.create(applicationContext)
-    private var retryAttempts = 0
+    private val legacyGatekeeper = PassageGoogleLegacyGatekeeperAndroid(
+        serverClientId = serverClientId,
+        firebaseAuth = firebaseAuth,
+        activityContext = activityContext,
+        activityResultLauncher = activityResultLauncher,
+        activityResult = activityResult,
+    )
 
     /**
      * Signs in a user using Google Sign-In.
@@ -67,30 +78,45 @@ internal class PassageGoogleGatekeeperAndroid(
      * @return A [Result] containing the authenticated [Entrant] if successful, or an error if the process fails.
      */
     override suspend fun signIn(params: Unit): Result<Entrant> = suspendCatching {
-        retrieveGoogleTokens(credential = createCredentials()).fold(
-            onSuccess = { googleTokens ->
-                retryAttempts = 0
+        var attempts = 0
+        var lastThrowable: Throwable?
 
-                val firebaseCredential = GoogleAuthProvider.credential(idToken = googleTokens.idToken, accessToken = googleTokens.accessToken)
-                firebaseAuth.signInWithCredential(authCredential = firebaseCredential).user?.toEntrant()
-                    ?: throw PassageGatekeeperUnknownEntrantException()
-            },
-            onFailure = { throwable -> throw throwable },
-        )
-    }.onFailure { throwable ->
-        Napier.e(throwable) { "Couldn't sign in the user." }
+        while (attempts <= maxRetries) {
+            retrieveGoogleTokens().fold(
+                onSuccess = { googleTokens ->
+                    val firebaseCredential = GoogleAuthProvider.credential(idToken = googleTokens.idToken, accessToken = googleTokens.accessToken)
 
-        when (throwable) {
-            is NoCredentialException -> {
-                signOut()
+                    return@suspendCatching firebaseAuth.signInWithCredential(authCredential = firebaseCredential).user?.toEntrant()
+                        ?: throw PassageGatekeeperUnknownEntrantException()
+                },
+                onFailure = { throwable ->
+                    lastThrowable = throwable
 
-                if (++retryAttempts <= maxRetries) {
-                    println("Retrying sign in, attempt $retryAttempts")
+                    println("Couldn't sign in the user. Attempt ${++attempts} of $maxRetries. Error:\n$throwable")
 
-                    signIn(params)
-                }
-            }
+                    if (throwable is NoCredentialException) {
+                        signOut()
+                    }
+
+                    if (throwable !is GetCredentialCancellationException) {
+                        // Try with the legacy gatekeeper, only if the user didn't intentionally cancel the sign in
+                        println("Attempt to sign in with Google Legacy provider.")
+
+                        legacyGatekeeper.signIn(Unit).fold(
+                            onSuccess = { return@suspendCatching it },
+                            onFailure = { legacyThrowable -> println("Couldn't sign in the user with Google Legacy provider. Error:\n$legacyThrowable") }
+                        )
+                    }
+
+                    if (attempts >= maxRetries) {
+                        throw lastThrowable!! // Only throw on the final attempt
+                    }
+                },
+            )
         }
+
+        // Fallback error (should not be reached but just in case)
+        throw PassageGatekeeperUnknownEntrantException()
     }
 
     /**
@@ -98,6 +124,7 @@ internal class PassageGoogleGatekeeperAndroid(
      */
     override suspend fun signOut() {
         credentialManager.clearCredentialState(ClearCredentialStateRequest())
+        legacyGatekeeper.signOut()
     }
 
     /**
@@ -109,21 +136,37 @@ internal class PassageGoogleGatekeeperAndroid(
      * @return A [Result] indicating the success or failure of the re-authentication process.
      */
     override suspend fun reauthenticate(): Result<Unit> = suspendCatching {
-        retrieveGoogleTokens(createCredentials()).fold(
+        retrieveGoogleTokens().fold(
             onSuccess = { googleTokens ->
-                retryAttempts = 0
-
                 val firebaseCredential = GoogleAuthProvider.credential(idToken = googleTokens.idToken, accessToken = googleTokens.accessToken)
                 firebaseAuth.currentUser?.reauthenticate(credential = firebaseCredential)
                     ?: throw PassageGatekeeperUnknownEntrantException()
             },
-            onFailure = { throwable -> throw throwable },
+            onFailure = { throwable ->
+                println("Couldn't re-authenticate the user. Error:\n$throwable")
+
+                if (throwable is NoCredentialException) {
+                    signOut()
+                }
+
+                if (throwable !is GetCredentialCancellationException) {
+                    // Try with the legacy gatekeeper, only if the user didn't intentionally cancel the sign in
+                    println("Attempt to re-authenticate with Google Legacy provider.")
+
+                    legacyGatekeeper.reauthenticate().fold(
+                        onSuccess = { return@suspendCatching it },
+                        onFailure = { legacyThrowable -> println("Couldn't re-authenticate the user with Google Legacy provider. Error:\n$legacyThrowable") }
+                    )
+                }
+
+                throw throwable
+            },
         )
-    }.onFailure { throwable ->
-        Napier.e(throwable) { "Couldn't re-authenticate the user." }
     }
 
-    private suspend fun retrieveGoogleTokens(credential: Credential): Result<GoogleTokens> = suspendCatching {
+    private suspend fun retrieveGoogleTokens(): Result<GoogleTokens> = suspendCatching {
+        val credential = createCredentials()
+
         when (credential) {
             is CustomCredential -> {
                 when (credential.type) {
@@ -131,27 +174,27 @@ internal class PassageGoogleGatekeeperAndroid(
                         val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
 
                         val idToken = googleIdTokenCredential.idToken
-                        Napier.d { "Successful Google Sin In flow with idToken: $idToken" }
+                        println("Successful Google Sin In flow with idToken: $idToken")
 
                         GoogleTokens(idToken = idToken)
                     }
 
                     else -> {
-                        Napier.d { "Unexpected type of credential" }
+                        println("Unexpected type of credential")
                         throw PassageGoogleGatekeeperUnknownCredentialException()
                     }
                 }
             }
 
             else -> {
-                Napier.d { "Unexpected type of credential" }
+                println("Unexpected type of credential")
                 throw PassageGoogleGatekeeperUnknownCredentialException()
             }
         }
     }.onFailure { throwable ->
         when (throwable) {
-            is GoogleIdTokenParsingException -> Napier.e(throwable) { "Received an invalid google id token response." }
-            else -> Napier.e(throwable) { "Couldn't handle sign in response with Google gatekeeper" }
+            is GoogleIdTokenParsingException -> println("Received an invalid google id token response. Error:\n$throwable")
+            else -> println("Couldn't handle sign in response with Google gatekeeper. Error:\n$throwable")
         }
     }
 

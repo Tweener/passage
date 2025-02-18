@@ -99,6 +99,7 @@ kotlin {
 
             // Google Sign In
             implementation(libs.bundles.googleSignIn)
+            implementation(libs.android.activity.compose)
         }
 
         iosMain.dependencies {

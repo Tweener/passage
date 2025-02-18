@@ -1,6 +1,11 @@
 package com.tweener.passage
 
 import android.content.Context
+import android.content.Intent
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import com.tweener.passage.gatekeeper.apple.PassageAppleGatekeeper
@@ -29,10 +34,16 @@ import dev.gitlive.firebase.auth.FirebaseAuth
 class PassageAndroid(private val applicationContext: Context) : Passage() {
 
     private var activityContext: Context? = null
+    private var activityResultLauncher: ManagedActivityResultLauncher<Intent, ActivityResult>? = null
+    private var activityResult: ActivityResult? = null
 
     @Composable
     override fun bindToView() {
         activityContext = LocalContext.current
+
+        activityResultLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            activityResult =  result
+        }
     }
 
     override fun initializeFirebase() {
@@ -58,6 +69,8 @@ class PassageAndroid(private val applicationContext: Context) : Passage() {
             firebaseAuth = firebaseAuth,
             applicationContext = applicationContext,
             activityContext = { activityContext },
+            activityResultLauncher = { activityResultLauncher },
+            activityResult = { activityResult },
             filterByAuthorizedAccounts = configuration.android.filterByAuthorizedAccounts,
             autoSelectEnabled = configuration.android.autoSelectEnabled,
             maxRetries = configuration.android.maxRetries,
