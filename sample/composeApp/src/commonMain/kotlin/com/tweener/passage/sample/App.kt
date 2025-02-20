@@ -64,7 +64,7 @@ fun App() {
                 gatekeeperConfigurations = listOf(
                     GoogleGatekeeperConfiguration(
                         serverClientId = "669986017952-72t1qil6sanreihoeumpb88junr9r8jt.apps.googleusercontent.com",
-                        android = GoogleGatekeeperAndroidConfiguration(),
+                        android = GoogleGatekeeperAndroidConfiguration(maxRetries = 2, useSignInWithGoogle = true),
                     ),
                     AppleGatekeeperConfiguration(),
                     EmailPasswordGatekeeperConfiguration,

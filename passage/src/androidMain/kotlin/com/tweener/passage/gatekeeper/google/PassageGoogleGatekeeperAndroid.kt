@@ -12,6 +12,7 @@ import androidx.credentials.GetCredentialRequest
 import androidx.credentials.exceptions.GetCredentialCancellationException
 import androidx.credentials.exceptions.NoCredentialException
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
 import com.tweener.kmpkit.thread.suspendCatching
@@ -39,6 +40,10 @@ import dev.gitlive.firebase.auth.GoogleAuthProvider
  * @param serverClientId The server client ID associated with the Google Sign-In configuration.
  * @param firebaseAuth The Firebase authentication instance used for managing authenticated users.
  * @param applicationContext The Android [Context] required for accessing system resources and APIs.
+ * @param activityContext A lambda that provides the current Android [Context] for activity-related operations.
+ * @param activityResultLauncher A lambda that provides the [ManagedActivityResultLauncher] for activity results.
+ * @param activityResult A lambda that provides the current [ActivityResult] for activity results.
+ * @param useSignInWithGoogle If true, uses the `signInWithGoogle` method for authentication.
  * @param filterByAuthorizedAccounts If true, filters credentials by authorized accounts for the app.
  * @param autoSelectEnabled If true, enables automatic credential selection when possible.
  * @param maxRetries The maximum number of retries for authentication attempts.
@@ -53,6 +58,7 @@ internal class PassageGoogleGatekeeperAndroid(
     private val activityContext: () -> Context?,
     activityResultLauncher: () -> ManagedActivityResultLauncher<Intent, ActivityResult>?,
     activityResult: () -> ActivityResult?,
+    private val useSignInWithGoogle: Boolean,
     private val filterByAuthorizedAccounts: Boolean,
     private val autoSelectEnabled: Boolean,
     private val maxRetries: Int,
@@ -81,8 +87,10 @@ internal class PassageGoogleGatekeeperAndroid(
         var attempts = 0
         var lastThrowable: Throwable?
 
+        var useGoogle = useSignInWithGoogle
+
         while (attempts <= maxRetries) {
-            retrieveGoogleTokens().fold(
+            retrieveGoogleTokens(useSignInWithGoogle = useGoogle).fold(
                 onSuccess = { googleTokens ->
                     val firebaseCredential = GoogleAuthProvider.credential(idToken = googleTokens.idToken, accessToken = googleTokens.accessToken)
 
@@ -107,6 +115,9 @@ internal class PassageGoogleGatekeeperAndroid(
                             onFailure = { legacyThrowable -> println("Couldn't sign in the user with Google Legacy provider. Error:\n$legacyThrowable") }
                         )
                     }
+
+                    // Toggle the use of Google Sign-In method for the next attempt
+                    useGoogle = useGoogle.not()
 
                     if (attempts >= maxRetries) {
                         throw lastThrowable!! // Only throw on the final attempt
@@ -136,7 +147,7 @@ internal class PassageGoogleGatekeeperAndroid(
      * @return A [Result] indicating the success or failure of the re-authentication process.
      */
     override suspend fun reauthenticate(): Result<Unit> = suspendCatching {
-        retrieveGoogleTokens().fold(
+        retrieveGoogleTokens(useSignInWithGoogle = useSignInWithGoogle).fold(
             onSuccess = { googleTokens ->
                 val firebaseCredential = GoogleAuthProvider.credential(idToken = googleTokens.idToken, accessToken = googleTokens.accessToken)
                 firebaseAuth.currentUser?.reauthenticate(credential = firebaseCredential)
@@ -164,10 +175,8 @@ internal class PassageGoogleGatekeeperAndroid(
         )
     }
 
-    private suspend fun retrieveGoogleTokens(): Result<GoogleTokens> = suspendCatching {
-        val credential = createCredentials()
-
-        when (credential) {
+    private suspend fun retrieveGoogleTokens(useSignInWithGoogle: Boolean): Result<GoogleTokens> = suspendCatching {
+        when (val credential = createCredentials(useSignInWithGoogle = useSignInWithGoogle)) {
             is CustomCredential -> {
                 when (credential.type) {
                     GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL -> {
@@ -198,17 +207,21 @@ internal class PassageGoogleGatekeeperAndroid(
         }
     }
 
-    private suspend fun createCredentials(): Credential {
+    private suspend fun createCredentials(useSignInWithGoogle: Boolean): Credential {
         activityContext.invoke() ?: throw PassageActivityContextNotInitializedException()
 
-        val googleIdOption = GetGoogleIdOption.Builder()
-            .setFilterByAuthorizedAccounts(filterByAuthorizedAccounts)
-            .setServerClientId(serverClientId)
-            .setAutoSelectEnabled(autoSelectEnabled)
-            .build()
+        val credentialOption = when (useSignInWithGoogle) {
+            true -> GetSignInWithGoogleOption.Builder(serverClientId).build()
+
+            false -> GetGoogleIdOption.Builder()
+                .setFilterByAuthorizedAccounts(filterByAuthorizedAccounts)
+                .setServerClientId(serverClientId)
+                .setAutoSelectEnabled(autoSelectEnabled)
+                .build()
+        }
 
         val request: GetCredentialRequest = GetCredentialRequest.Builder()
-            .addCredentialOption(googleIdOption)
+            .addCredentialOption(credentialOption)
             .build()
 
         return credentialManager.getCredential(request = request, context = activityContext.invoke()!!).credential
