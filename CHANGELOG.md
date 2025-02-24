@@ -1,6 +1,9 @@
 
 # Changelog
 
+## [1.3.1] - February 24, 2025
+- 🤖 Add a thrid way to authenticate with Google on Android: Sign-In with Google UI button flow.
+
 ## [1.3.0] - February 18, 2025
 - 🤖 Enhanced Google Authentication on Android: When authentication with the Google Gatekeeper fails, the library now automatically falls back to Google Legacy Sign-In.
 
