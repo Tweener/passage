@@ -1,7 +1,12 @@
 package com.tweener.passage.gatekeeper.email
 
 import com.tweener.kmpkit.thread.suspendCatching
+import com.tweener.passage.error.PassageEmailAddressAlreadyExistsException
 import com.tweener.passage.error.PassageGatekeeperUnknownEntrantException
+import com.tweener.passage.error.PassageInvalidCredentialsException
+import com.tweener.passage.error.PassageNoUserMatchingEmailException
+import com.tweener.passage.error.PassageTooManyRequestsException
+import com.tweener.passage.error.PassageWeakPasswordException
 import com.tweener.passage.gatekeeper.PassageGatekeeper
 import com.tweener.passage.gatekeeper.email.model.PassageEmailAuthParams
 import com.tweener.passage.gatekeeper.email.model.PassageEmailVerificationParams
@@ -9,11 +14,16 @@ import com.tweener.passage.gatekeeper.email.model.PassageForgotPasswordParams
 import com.tweener.passage.mapper.toEntrant
 import com.tweener.passage.model.Entrant
 import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.FirebaseTooManyRequestsException
 import dev.gitlive.firebase.auth.ActionCodeResult
 import dev.gitlive.firebase.auth.ActionCodeSettings
 import dev.gitlive.firebase.auth.AndroidPackageName
 import dev.gitlive.firebase.auth.EmailAuthProvider
 import dev.gitlive.firebase.auth.FirebaseAuth
+import dev.gitlive.firebase.auth.FirebaseAuthInvalidCredentialsException
+import dev.gitlive.firebase.auth.FirebaseAuthInvalidUserException
+import dev.gitlive.firebase.auth.FirebaseAuthUserCollisionException
+import dev.gitlive.firebase.auth.FirebaseAuthWeakPasswordException
 import dev.gitlive.firebase.auth.auth
 import io.github.aakira.napier.Napier
 import kotlin.jvm.JvmInline
@@ -39,6 +49,7 @@ internal class PassageEmailGatekeeper(
             ?: throw PassageGatekeeperUnknownEntrantException()
     }.onFailure { throwable ->
         Napier.e(throwable) { "Couldn't sign in the user." }
+        handleError(throwable)
     }
 
     override suspend fun signOut() {
@@ -50,6 +61,7 @@ internal class PassageEmailGatekeeper(
             ?: throw PassageGatekeeperUnknownEntrantException()
     }.onFailure { throwable ->
         Napier.e(throwable) { "Couldn't sign in the user." }
+        handleError(throwable)
     }
 
     suspend fun reauthenticate(params: PassageEmailAuthParams): Result<Unit> = suspendCatching {
@@ -58,6 +70,7 @@ internal class PassageEmailGatekeeper(
             ?: throw PassageGatekeeperUnknownEntrantException()
     }.onFailure { throwable ->
         Napier.e(throwable) { "Couldn't sign in the user." }
+        handleError(throwable)
     }
 
     /**
@@ -78,6 +91,7 @@ internal class PassageEmailGatekeeper(
         firebaseAuth.sendPasswordResetEmail(email = params.email, actionCodeSettings = actionCodeSettings)
     }.onFailure { throwable ->
         Napier.e(throwable) { "Couldn't send reset password email." }
+        handleError(throwable)
     }
 
     /**
@@ -94,6 +108,7 @@ internal class PassageEmailGatekeeper(
         EmailAddress(email = email)
     }.onFailure { throwable ->
         Napier.e(throwable) { "Couldn't verify the oobCode ($oobCode) from the password reset email." }
+        handleError(throwable)
     }
 
     /**
@@ -110,6 +125,7 @@ internal class PassageEmailGatekeeper(
         firebaseAuth.confirmPasswordReset(code = oobCode, newPassword = newPassword)
     }.onFailure { throwable ->
         Napier.e(throwable) { "Couldn't confirm the password reset." }
+        handleError(throwable)
     }
 
     /**
@@ -131,6 +147,7 @@ internal class PassageEmailGatekeeper(
             ?: throw PassageGatekeeperUnknownEntrantException()
     }.onFailure { throwable ->
         Napier.e(throwable) { "Couldn't send email address verification email." }
+        handleError(throwable)
     }
 
     /**
@@ -167,5 +184,18 @@ internal class PassageEmailGatekeeper(
         Firebase.auth.checkActionCode<T>(code = oobCode)
         Firebase.auth.applyActionCode(code = oobCode)
         Firebase.auth.currentUser?.reload() ?: Unit
+    }
+
+    private fun handleError(throwable: Throwable) {
+        val exception = when (throwable) {
+            is FirebaseAuthInvalidUserException -> PassageNoUserMatchingEmailException()
+            is FirebaseAuthInvalidCredentialsException -> PassageInvalidCredentialsException()
+            is FirebaseAuthUserCollisionException -> PassageEmailAddressAlreadyExistsException()
+            is FirebaseAuthWeakPasswordException -> PassageWeakPasswordException()
+            is FirebaseTooManyRequestsException -> PassageTooManyRequestsException()
+            else -> throwable
+        }
+
+        throw exception
     }
 }
