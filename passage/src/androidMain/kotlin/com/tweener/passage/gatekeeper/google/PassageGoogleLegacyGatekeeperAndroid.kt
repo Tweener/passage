@@ -44,7 +44,11 @@ internal class PassageGoogleLegacyGatekeeperAndroid(
     }
 
     override suspend fun signOut() {
-        getGoogleSignInClient().signOut()
+        try {
+            getGoogleSignInClient().signOut()
+        } catch (throwable: Throwable) {
+            println("Google Legacy sign out failed with an unknown error: $throwable")
+        }
     }
 
     override suspend fun reauthenticate(): Result<Unit> = suspendCatching {
