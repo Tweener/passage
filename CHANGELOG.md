@@ -1,6 +1,9 @@
 
 # Changelog
 
+## [1.3.2] - February 27, 2025
+- **[FIX]** 🤖 Fixed sign-out issue on Android with the Google Legacy Gatekeeper when the binding activity was null.
+
 ## [1.3.1] - February 24, 2025
 - 🤖 Add a thrid way to authenticate with Google on Android: Sign-In with Google UI button flow.
 
