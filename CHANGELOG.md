@@ -1,6 +1,9 @@
 
 # Changelog
 
+## [1.3.3] - February 28, 2025
+- Remove Napier library from Passage and use basic `println` to display log messages.
+
 ## [1.3.2] - February 27, 2025
 - **[FIX]** 🤖 Fixed sign-out issue on Android with the Google Legacy Gatekeeper when the binding activity was null.
 
