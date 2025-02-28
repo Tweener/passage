@@ -10,7 +10,6 @@ import com.tweener.passage.gatekeeper.apple.error.PassageAppleGatekeeperExceptio
 import com.tweener.passage.mapper.toEntrant
 import com.tweener.passage.model.Entrant
 import dev.gitlive.firebase.auth.FirebaseAuth
-import io.github.aakira.napier.Napier
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -72,7 +71,7 @@ internal class PassageAppleGatekeeperIos(
             delegate = AuthorizationControllerDelegate(firebaseAuth = firebaseAuth, nonce = rawNonce) { result -> continuation.resumeIfActive(result) }
 
             continuation.invokeOnCancellation {
-                Napier.d { "Canceled Apple Sign In on iOS" }
+                println("Canceled Apple Sign In on iOS")
 
                 delegate.onResponse = {}
 
@@ -90,7 +89,7 @@ internal class PassageAppleGatekeeperIos(
                 performRequests()
             }
         } catch (throwable: Throwable) {
-            Napier.e(throwable) { "An error occurred while signing in with Apple provider" }
+            println("An error occurred while signing in with Apple provider: $throwable")
             continuation.resumeWithExceptionIfActive(throwable)
         }
     }
@@ -125,7 +124,7 @@ private class AuthorizationControllerDelegate(
             val credential = FIROAuthProvider.appleCredentialWithIDToken(idToken = idTokenString, rawNonce = nonce, fullName = appleIDCredential.fullName)
 
             FIRAuth.auth().signInWithCredential(credential) { authResult, error ->
-                error?.let { Napier.e { "Couldn't sign in with Apple on iOS! $error" } }
+                error?.let { println("Couldn't sign in with Apple on iOS! $error") }
 
                 when {
                     error != null || authResult == null -> onResponse(Result.failure(PassageAppleGatekeeperException(message = "FIRAuthDataResult is null")))
@@ -143,7 +142,7 @@ private class AuthorizationControllerDelegate(
     }
 
     override fun authorizationController(controller: ASAuthorizationController, didCompleteWithError: NSError) {
-        Napier.e { "Didn't get authorization to sign in with Apple: $didCompleteWithError" }
+        println("Didn't get authorization to sign in with Apple: $didCompleteWithError")
         onResponse(Result.failure(PassageAppleGatekeeperException(message = didCompleteWithError.localizedFailureReason)))
     }
 }

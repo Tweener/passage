@@ -10,7 +10,6 @@ import com.tweener.passage.mapper.toEntrant
 import com.tweener.passage.model.Entrant
 import dev.gitlive.firebase.auth.FirebaseAuth
 import dev.gitlive.firebase.auth.GoogleAuthProvider
-import io.github.aakira.napier.Napier
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.UIKit.UIApplication
 import kotlin.coroutines.resume
@@ -60,7 +59,7 @@ internal class PassageGoogleGatekeeperIos(
             onFailure = { throwable -> throw throwable },
         )
     }.onFailure { throwable ->
-        Napier.e(throwable) { "Couldn't sign in the user." }
+        println("Couldn't sign up the user: $throwable")
     }
 
     /**
@@ -90,7 +89,7 @@ internal class PassageGoogleGatekeeperIos(
             onFailure = { throwable -> throw throwable },
         )
     }.onFailure { throwable ->
-        Napier.e(throwable) { "Couldn't sign in the user." }
+        println("Couldn't sign in the user: $throwable")
     }
 
     @OptIn(ExperimentalForeignApi::class)
@@ -98,7 +97,7 @@ internal class PassageGoogleGatekeeperIos(
         UIApplication.sharedApplication.keyWindow?.rootViewController
             ?.let { rootViewController ->
                 GIDSignIn.sharedInstance.signInWithPresentingViewController(rootViewController) { authResult, error ->
-                    error?.let { Napier.e { "Couldn't sign in with Google on iOS! $error" } }
+                    error?.let { println("Couldn't sign in with Google on iOS! $error") }
 
                     when {
                         error != null -> continuation.resumeWithException(PassageGoogleGatekeeperException())

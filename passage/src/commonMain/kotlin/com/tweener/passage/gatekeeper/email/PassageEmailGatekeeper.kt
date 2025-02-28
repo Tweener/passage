@@ -25,7 +25,6 @@ import dev.gitlive.firebase.auth.FirebaseAuthInvalidUserException
 import dev.gitlive.firebase.auth.FirebaseAuthUserCollisionException
 import dev.gitlive.firebase.auth.FirebaseAuthWeakPasswordException
 import dev.gitlive.firebase.auth.auth
-import io.github.aakira.napier.Napier
 import kotlin.jvm.JvmInline
 
 @JvmInline
@@ -47,10 +46,13 @@ internal class PassageEmailGatekeeper(
     override suspend fun signIn(params: PassageEmailAuthParams): Result<Entrant> = suspendCatching {
         firebaseAuth.signInWithEmailAndPassword(email = params.email, password = params.password).user?.toEntrant()
             ?: throw PassageGatekeeperUnknownEntrantException()
-    }.onFailure { throwable ->
-        Napier.e(throwable) { "Couldn't sign in the user." }
-        handleError(throwable)
-    }
+    }.fold(
+        onSuccess = { Result.success(it) },
+        onFailure = { throwable ->
+            println("Couldn't sign in the user: $throwable")
+            Result.failure(mapFirebaseAuthError(throwable))
+        }
+    )
 
     override suspend fun signOut() {
         // Nothing to do here
@@ -59,19 +61,25 @@ internal class PassageEmailGatekeeper(
     suspend fun signUp(params: PassageEmailAuthParams): Result<Entrant> = suspendCatching {
         firebaseAuth.createUserWithEmailAndPassword(email = params.email, password = params.password).user?.toEntrant()
             ?: throw PassageGatekeeperUnknownEntrantException()
-    }.onFailure { throwable ->
-        Napier.e(throwable) { "Couldn't sign in the user." }
-        handleError(throwable)
-    }
+    }.fold(
+        onSuccess = { Result.success(it) },
+        onFailure = { throwable ->
+            println("Couldn't sign up the user: $throwable")
+            Result.failure(mapFirebaseAuthError(throwable))
+        }
+    )
 
     suspend fun reauthenticate(params: PassageEmailAuthParams): Result<Unit> = suspendCatching {
         val firebaseCredential = EmailAuthProvider.credential(email = params.email, password = params.password)
         firebaseAuth.currentUser?.reauthenticate(credential = firebaseCredential)
             ?: throw PassageGatekeeperUnknownEntrantException()
-    }.onFailure { throwable ->
-        Napier.e(throwable) { "Couldn't sign in the user." }
-        handleError(throwable)
-    }
+    }.fold(
+        onSuccess = { Result.success(it) },
+        onFailure = { throwable ->
+            println("Couldn't reauthenticate the user: $throwable")
+            Result.failure(mapFirebaseAuthError(throwable))
+        }
+    )
 
     /**
      * Sends a password reset email with specified parameters.
@@ -89,10 +97,13 @@ internal class PassageEmailGatekeeper(
         )
 
         firebaseAuth.sendPasswordResetEmail(email = params.email, actionCodeSettings = actionCodeSettings)
-    }.onFailure { throwable ->
-        Napier.e(throwable) { "Couldn't send reset password email." }
-        handleError(throwable)
-    }
+    }.fold(
+        onSuccess = { Result.success(it) },
+        onFailure = { throwable ->
+            println("Couldn't send reset password email: $throwable")
+            Result.failure(mapFirebaseAuthError(throwable))
+        }
+    )
 
     /**
      * Handles the password reset process using the provided out-of-band (OOB) code.
@@ -106,10 +117,13 @@ internal class PassageEmailGatekeeper(
     suspend fun handlePasswordResetCode(oobCode: String): Result<EmailAddress> = suspendCatching {
         val email = firebaseAuth.verifyPasswordResetCode(code = oobCode)
         EmailAddress(email = email)
-    }.onFailure { throwable ->
-        Napier.e(throwable) { "Couldn't verify the oobCode ($oobCode) from the password reset email." }
-        handleError(throwable)
-    }
+    }.fold(
+        onSuccess = { Result.success(it) },
+        onFailure = { throwable ->
+            println("Couldn't verify the oobCode ($oobCode) from the password reset email: $throwable")
+            Result.failure(mapFirebaseAuthError(throwable))
+        }
+    )
 
     /**
      * Confirms a password reset operation using the provided out-of-band code and new password.
@@ -123,10 +137,13 @@ internal class PassageEmailGatekeeper(
      */
     suspend fun confirmResetPassword(oobCode: String, newPassword: String): Result<Unit> = suspendCatching {
         firebaseAuth.confirmPasswordReset(code = oobCode, newPassword = newPassword)
-    }.onFailure { throwable ->
-        Napier.e(throwable) { "Couldn't confirm the password reset." }
-        handleError(throwable)
-    }
+    }.fold(
+        onSuccess = { Result.success(it) },
+        onFailure = { throwable ->
+            println("Couldn't confirm the password reset: $throwable")
+            Result.failure(mapFirebaseAuthError(throwable))
+        }
+    )
 
     /**
      * Sends an email address verification email with specified parameters.
@@ -145,10 +162,13 @@ internal class PassageEmailGatekeeper(
 
         firebaseAuth.currentUser?.sendEmailVerification(actionCodeSettings = actionCodeSettings)
             ?: throw PassageGatekeeperUnknownEntrantException()
-    }.onFailure { throwable ->
-        Napier.e(throwable) { "Couldn't send email address verification email." }
-        handleError(throwable)
-    }
+    }.fold(
+        onSuccess = { Result.success(it) },
+        onFailure = { throwable ->
+            println("Couldn't send email address verification email: $throwable")
+            Result.failure(mapFirebaseAuthError(throwable))
+        }
+    )
 
     /**
      * Handles the email verification process using the provided out-of-band (OOB) code.
@@ -161,9 +181,13 @@ internal class PassageEmailGatekeeper(
      * @return A [Result] containing the success or failure of the email verification process.
      */
     suspend fun handleEmailVerificationCode(oobCode: String) =
-        handleOobCode<ActionCodeResult.VerifyEmail>(oobCode = oobCode).onFailure { throwable ->
-            Napier.e(throwable) { "Couldn't verify the oobCode ($oobCode) from the email verification email." }
-        }
+        handleOobCode<ActionCodeResult.VerifyEmail>(oobCode = oobCode).fold(
+            onSuccess = { Result.success(it) },
+            onFailure = { throwable ->
+                println("Couldn't verify the oobCode ($oobCode) from the email verification email: $throwable")
+                Result.failure(mapFirebaseAuthError(throwable))
+            }
+        )
 
     private fun buildActionCodeSettings(
         url: String,
@@ -186,8 +210,8 @@ internal class PassageEmailGatekeeper(
         Firebase.auth.currentUser?.reload() ?: Unit
     }
 
-    private fun handleError(throwable: Throwable) {
-        val exception = when (throwable) {
+    private fun mapFirebaseAuthError(throwable: Throwable): Throwable =
+        when (throwable) {
             is FirebaseAuthInvalidUserException -> PassageNoUserMatchingEmailException()
             is FirebaseAuthInvalidCredentialsException -> PassageInvalidCredentialsException()
             is FirebaseAuthUserCollisionException -> PassageEmailAddressAlreadyExistsException()
@@ -195,7 +219,4 @@ internal class PassageEmailGatekeeper(
             is FirebaseTooManyRequestsException -> PassageTooManyRequestsException()
             else -> throwable
         }
-
-        throw exception
-    }
 }
