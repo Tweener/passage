@@ -1,6 +1,0 @@
-<resources>
-    <string name="app_name">Passage Sample</string>
-
-    <string name="firebase_google_sign_in_server_id"></string>
-
-</resources>
