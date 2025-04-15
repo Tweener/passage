@@ -1,6 +1,9 @@
 
 # Changelog
 
+## [1.3.4] - April 15, 2025
+- Update Kotlin to 2.1.20.
+
 ## [1.3.3] - February 28, 2025
 - Remove Napier library from Passage and use basic `println` to display log messages.
 
