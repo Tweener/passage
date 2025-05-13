@@ -1,17 +1,17 @@
 [versions]
-kotlin = "2.1.20"
+kotlin = "2.1.21"
 gradle = "8.8.2"
 dependencyVersionsPlugin = "0.51.0"
 nexusSonatype = "2.0.0"
 dokka = "1.9.20"
 androidAnnotations = "1.9.1"
 coroutines = "1.10.1"
-composeMultiplatform = "1.7.3"
+composeMultiplatform = "1.8.0"
 firebaseGitLiveApp = "2.1.0" # Firebase for KMP https://firebaseopensource.com/projects/gitliveapp/firebase-kotlin-sdk/
 googleServicesPlugin = "4.4.2"
 crashlyticsPlugin = "3.0.3"
 jetbrainsLifecycle = "2.8.4"
-kmpKit = "1.0.6"
+kmpKit = "1.0.7"
 
 # Android
 androidCore = "1.16.0"
