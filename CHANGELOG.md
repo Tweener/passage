@@ -6,7 +6,7 @@
 - Update Compose Multiplatform to 1.8.0.
 - Update KMPKit to 1.0.7.
 
-- ## [1.3.4] - April 15, 2025
+## [1.3.4] - April 15, 2025
 - Update Kotlin to 2.1.20.
 
 ## [1.3.3] - February 28, 2025
