@@ -1,10 +1,7 @@
-name: Passage build
+name: Build Passage library
 
 on:
   workflow_call:
-    secrets:
-      SLACK_WEBHOOK_URL:
-        required: true
   workflow_dispatch:
 
 jobs:
@@ -25,20 +22,21 @@ jobs:
       - name: Validate Gradle Wrapper
         uses: gradle/actions/wrapper-validation@v3
 
-      - name: Set up Java JDK ${{ vars.JAVA_JDK_VERSION }}"
+      - name: Set up Java JDK ${{ vars.JAVA_JDK_VERSION }}
         uses: actions/setup-java@v4
         with:
           java-version: '${{ vars.JAVA_JDK_VERSION }}'
           distribution: "zulu"
 
-      - name: Setup Gradle cache
+      - name: Caching Kotlin/Native tooling
         uses: actions/cache@v3
         with:
           path: |
             ~/.konan
           key: ${{ runner.os }}-${{ hashFiles('**/.lock') }}
 
-      - name: Build with Gradle
-        uses: gradle/actions/setup-gradle@v3
-        with:
-          arguments: ${{ matrix.target }}
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build library
+        run: ./gradlew ${{ matrix.target }}

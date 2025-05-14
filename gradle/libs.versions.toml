@@ -1,12 +1,12 @@
 [versions]
 kotlin = "2.1.21"
 gradle = "8.8.2"
+composeMultiplatform = "1.8.0"
 dependencyVersionsPlugin = "0.51.0"
-nexusSonatype = "2.0.0"
+mavenPublish = "0.30.0"
 dokka = "1.9.20"
 androidAnnotations = "1.9.1"
 coroutines = "1.10.1"
-composeMultiplatform = "1.8.0"
 firebaseGitLiveApp = "2.1.0" # Firebase for KMP https://firebaseopensource.com/projects/gitliveapp/firebase-kotlin-sdk/
 googleServicesPlugin = "4.4.2"
 crashlyticsPlugin = "3.0.3"
@@ -53,7 +53,7 @@ android-library = { id = "com.android.library", version.ref = "gradle" }
 android-application = { id = "com.android.application", version.ref = "gradle" }
 dependency-versions = { id = "com.github.ben-manes.versions", version.ref = "dependencyVersionsPlugin" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
-nexus-sonatype = { id = "io.github.gradle-nexus.publish-plugin", version.ref = "nexusSonatype" }
+maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "mavenPublish" }
 jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
 jetbrains-compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-nativeCocoaPods = { id = "org.jetbrains.kotlin.native.cocoapods", version.ref = "kotlin" }
