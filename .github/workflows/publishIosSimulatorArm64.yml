@@ -6,9 +6,6 @@ permissions:
 on:
   workflow_dispatch:
 
-  release:
-    types: [ released ]
-
 jobs:
   build-release:
     name: Build library
