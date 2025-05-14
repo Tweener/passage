@@ -213,6 +213,40 @@ val result = passage.authenticateWithEmailAndPassword(PassageEmailAuthParams(ema
 // Handle result similarly
 ```
 
+#### Email Link Sign-in Authentication
+
+##### a. Send the sign-in link email:
+You can send an email with a sign-in link to the user's email adress:
+
+```kotlin
+val result = passage.sendSignInLinkToEmail(
+    params = PassageSignInLinkToEmailParams(
+        email = userEmail, // Ask the user for its email address
+        url = "https://passagesample.page.link/action/sign_in_link_email",
+        iosParams = PassageSignInLinkToEmailIosParams(bundleId = "com.tweener.passage.sample"),
+        androidParams = PassageSignInLinkToEmailAndroidParams(
+            packageName = "com.tweener.passage.sample",
+            installIfNotAvailable = true,
+            minimumVersion = "1.0",
+        ),
+        canHandleCodeInApp = true,
+    )
+)
+result.fold(
+    onSuccess = { entrant -> Log.d("Passage", "An email has been sent to the user with a sign-in link.") },
+    onFailure = { error -> Log.e("Passage", "Couldn't send the email", error) }
+)
+```
+
+##### b. Verify sign-in link and authenticate the user:
+Once the user clicks on this link from the email, it will redirect to your app and automatically sign-in the user:
+
+```kotlin
+passage.handleSignInLinkToEmail(email = "{Your email address}", emailLink = it.link)
+    .onSuccess { entrant = it } // User is sucessfully signed-in
+    .onFailure { println("Couldn't sign-in the user, error: ${it.message}") }
+```
+
 ### 2. Sign Out or Reauthenticate
 ```kotlin
 passage.signOut()
