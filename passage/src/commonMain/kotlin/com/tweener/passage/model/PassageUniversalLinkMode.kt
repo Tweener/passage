@@ -9,5 +9,6 @@ package com.tweener.passage.model
  */
 enum class PassageUniversalLinkMode {
     VERIFY_EMAIL,
-    RESET_PASSWORD
+    RESET_PASSWORD,
+    SIGN_IN_EMAIL,
 }

@@ -40,11 +40,15 @@ import com.tweener.passage.gatekeeper.email.model.PassageEmailVerificationParams
 import com.tweener.passage.gatekeeper.email.model.PassageForgotPasswordAndroidParams
 import com.tweener.passage.gatekeeper.email.model.PassageForgotPasswordIosParams
 import com.tweener.passage.gatekeeper.email.model.PassageForgotPasswordParams
+import com.tweener.passage.gatekeeper.email.model.PassageSignInLinkToEmailAndroidParams
+import com.tweener.passage.gatekeeper.email.model.PassageSignInLinkToEmailIosParams
+import com.tweener.passage.gatekeeper.email.model.PassageSignInLinkToEmailParams
 import com.tweener.passage.model.AppleGatekeeperConfiguration
 import com.tweener.passage.model.EmailPasswordGatekeeperConfiguration
 import com.tweener.passage.model.Entrant
 import com.tweener.passage.model.GoogleGatekeeperAndroidConfiguration
 import com.tweener.passage.model.GoogleGatekeeperConfiguration
+import com.tweener.passage.model.PassageUniversalLinkMode
 import com.tweener.passage.sample.ui.theme.PassageTheme
 import kotlinx.coroutines.launch
 
@@ -83,6 +87,18 @@ fun App() {
     LaunchedEffect(link.value) {
         link.value?.let {
             snackbarScope.launch { snackbarHostState.showSnackbar(message = "Universal link handled for mode: ${it.mode} with continueUrl: ${it.continueUrl}") }
+
+            when (it.mode) {
+                PassageUniversalLinkMode.SIGN_IN_EMAIL -> {
+                    // Handle sign in email link
+                    passage.handleSignInLinkToEmail(email = "{Your email address}", emailLink = it.link)
+                        .onSuccess { entrant = it }
+                        .onFailure { it.message?.let { message -> snackbarScope.launch { snackbarHostState.showSnackbar(message = message) } } }
+                }
+
+                else -> Unit
+            }
+
             passage.onLinkHandled()
         }
     }
@@ -148,6 +164,31 @@ fun App() {
                         }
                     }) {
                         Text("Sign in with Email/Password")
+                    }
+
+                    HorizontalDivider(modifier = Modifier.width(50.dp), thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
+
+                    Button(onClick = {
+                        buttonsScope.launch {
+                            passage
+                                .sendSignInLinkToEmail(
+                                    params = PassageSignInLinkToEmailParams(
+                                        email = "{Your email address}",
+                                        url = "https://passagesample.page.link/action/sign_in_link_email",
+                                        iosParams = PassageSignInLinkToEmailIosParams(bundleId = "com.tweener.passage.sample"),
+                                        androidParams = PassageSignInLinkToEmailAndroidParams(
+                                            packageName = "com.tweener.passage.sample",
+                                            installIfNotAvailable = true,
+                                            minimumVersion = "1.0",
+                                        ),
+                                        canHandleCodeInApp = true,
+                                    )
+                                )
+                                .onSuccess { snackbarScope.launch { snackbarHostState.showSnackbar(message = "Email with link sent!") } }
+                                .onFailure { it.message?.let { message -> snackbarScope.launch { snackbarHostState.showSnackbar(message = message) } } }
+                        }
+                    }) {
+                        Text("Sign up with link")
                     }
                 } else {
                     Button(onClick = {

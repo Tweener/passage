@@ -9,6 +9,7 @@ import com.tweener.passage.gatekeeper.email.model.PassageEmailAuthParams
 import com.tweener.passage.gatekeeper.email.model.PassageEmailVerificationParams
 import com.tweener.passage.gatekeeper.email.model.PassageForgotPasswordParams
 import com.tweener.passage.gatekeeper.email.model.PassageResetPasswordParams
+import com.tweener.passage.gatekeeper.email.model.PassageSignInLinkToEmailParams
 import com.tweener.passage.gatekeeper.google.PassageGoogleGatekeeper
 import com.tweener.passage.mapper.toEntrant
 import com.tweener.passage.model.AppleGatekeeperConfiguration
@@ -319,6 +320,30 @@ abstract class Passage {
             ?: Result.failure(PassageGatekeeperNotConfiguredException(gatekeeper = GatekeeperType.EMAIL_PASSWORD))
 
     // endregion Email & Password gatekeeper
+
+    // region Sign in link to email
+
+    /**
+     * Sends a sign-in link to the specified email address.
+     *
+     * @param params The parameters required for sending the sign-in link to email.
+     */
+    suspend fun sendSignInLinkToEmail(params: PassageSignInLinkToEmailParams): Result<Unit> =
+        emailGatekeeper
+            ?.sendSignInLinkToEmail(params = params)
+            ?: Result.failure(PassageGatekeeperNotConfiguredException(gatekeeper = GatekeeperType.EMAIL_PASSWORD))
+
+    /**
+     * Handles the sign-in process using the provided email and sign-in link.
+     *
+     * @param email The email address of the user.
+     * @param emailLink The sign-in link sent to the user's email.
+     * @return A [Result] containing the signed-in user or an error if the sign-in fails.
+     */
+    suspend fun handleSignInLinkToEmail(email: String, emailLink: String): Result<Entrant> =
+        emailGatekeeper
+            ?.handleSignInLinkToEmail(email = email, emailLink = emailLink)
+            ?: Result.failure(PassageGatekeeperNotConfiguredException(gatekeeper = GatekeeperType.EMAIL_PASSWORD))
 
     // region Universal Links
 

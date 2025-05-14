@@ -5,12 +5,14 @@ import com.tweener.passage.error.PassageEmailAddressAlreadyExistsException
 import com.tweener.passage.error.PassageGatekeeperUnknownEntrantException
 import com.tweener.passage.error.PassageInvalidCredentialsException
 import com.tweener.passage.error.PassageNoUserMatchingEmailException
+import com.tweener.passage.error.PassageSignInLinkToEmailException
 import com.tweener.passage.error.PassageTooManyRequestsException
 import com.tweener.passage.error.PassageWeakPasswordException
 import com.tweener.passage.gatekeeper.PassageGatekeeper
 import com.tweener.passage.gatekeeper.email.model.PassageEmailAuthParams
 import com.tweener.passage.gatekeeper.email.model.PassageEmailVerificationParams
 import com.tweener.passage.gatekeeper.email.model.PassageForgotPasswordParams
+import com.tweener.passage.gatekeeper.email.model.PassageSignInLinkToEmailParams
 import com.tweener.passage.mapper.toEntrant
 import com.tweener.passage.model.Entrant
 import dev.gitlive.firebase.Firebase
@@ -188,6 +190,50 @@ internal class PassageEmailGatekeeper(
                 Result.failure(mapFirebaseAuthError(throwable))
             }
         )
+
+    /**
+     * Sends a sign-in link to the specified email address with the provided parameters.
+     *
+     * @param params The parameters required for sending the sign-in link to email.
+     */
+    suspend fun sendSignInLinkToEmail(params: PassageSignInLinkToEmailParams): Result<Unit> = suspendCatching {
+        val actionCodeSettings = buildActionCodeSettings(
+            url = params.url,
+            iOSBundleId = params.iosParams?.bundleId,
+            androidPackageName = params.androidParams?.packageName,
+            installIfNotAvailable = params.androidParams?.installIfNotAvailable ?: true,
+            minimumVersion = params.androidParams?.minimumVersion,
+            canHandleCodeInApp = params.canHandleCodeInApp,
+        )
+
+        firebaseAuth.sendSignInLinkToEmail(email = params.email, actionCodeSettings = actionCodeSettings)
+    }.fold(
+        onSuccess = { Result.success(it) },
+        onFailure = { throwable ->
+            println("Couldn't send sign-in link to email: $throwable")
+            Result.failure(mapFirebaseAuthError(throwable))
+        }
+    )
+
+    /**
+     * Handles the sign-in process using the provided email and sign-in link.
+     *
+     * @param email The email address of the user.
+     * @param emailLink The sign-in link sent to the user's email.
+     * @return A [Result] containing the signed-in user or an error if the sign-in fails.
+     */
+    suspend fun handleSignInLinkToEmail(email: String, emailLink: String): Result<Entrant> = suspendCatching {
+        if (firebaseAuth.isSignInWithEmailLink(link = emailLink).not()) throw PassageSignInLinkToEmailException()
+
+        firebaseAuth.signInWithEmailLink(email = email, link = emailLink).user?.toEntrant()
+            ?: throw PassageGatekeeperUnknownEntrantException()
+    }.fold(
+        onSuccess = { Result.success(it) },
+        onFailure = { throwable ->
+            println("Couldn't sign in the user with the email link: $throwable")
+            Result.failure(mapFirebaseAuthError(throwable))
+        }
+    )
 
     private fun buildActionCodeSettings(
         url: String,
