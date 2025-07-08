@@ -1,6 +1,12 @@
 
 # Changelog
 
+## [1.4.1] - July 8th, 2025
+- Update Kotlin to 2.2.0.
+- Update Compose Multiplatform to 1.8.2.
+- Update Gradle to 8.11.0.
+- Update KMPKit to 1.0.9.
+ 
 ## [1.4.0] - May 14, 2025
 - Add email link sign-in feature. (https://github.com/Tweener/passage/issues/1)
 - Migrate publishing from Sonatype to Maven Central.
