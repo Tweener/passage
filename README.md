@@ -33,6 +33,15 @@ Be sure to show your support by starring ⭐️ this repository, and feel free t
 
 ---
 
+## 🚀 Used in production
+
+Alarmee powers notifications in real-world apps:
+
+- [**KMPShip**](https://www.kmpship.app/) — a Kotlin Multiplatform boilerplate to build mobile apps faster.
+- [**Bloomeo**](https://bloomeo.app/) — a personal finance app.
+- 
+---
+
 ## 🎯 Concept
 
 Passage uses [**Firebase Authentication**](https://firebase.google.com/) as the backbone for secure and reliable user identity management. It abstracts the complexity of integrating with Firebase's SDKs on multiple platforms, providing a unified API for developers.
