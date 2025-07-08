@@ -64,7 +64,7 @@ abstract class Passage {
      * This method sets up the required Gatekeepers by initializing Firebase and passing the
      * configurations along with the default Firebase instance.
      *
-     * Use this method if your app already uses a Firebase instance.
+     * Use this method if your app does not already use a Firebase instance.
      *
      * @param gatekeeperConfigurations A list of Gatekeeper configurations implementing [PassageGatekeeperConfiguration].
      *
@@ -81,7 +81,7 @@ abstract class Passage {
      * This method sets up the required Gatekeepers (e.g., Google, Apple, Email/Password) using the provided configurations
      * and the specified Firebase instance.
      *
-     * Use this method if your app does not already use a Firebase instance.
+     * Use this method if your app already uses a Firebase instance.
      *
      * @param gatekeeperConfigurations A list of Gatekeeper configurations implementing [PassageGatekeeperConfiguration].
      * @param firebase The Firebase instance used to initialize Firebase Authentication.

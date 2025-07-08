@@ -1,7 +1,7 @@
 package com.tweener.passage.gatekeeper.google
 
 import cocoapods.GoogleSignIn.GIDSignIn
-import com.tweener.kmpkit.safeLet
+import com.tweener.kmpkit.utils.safeLet
 import com.tweener.kmpkit.thread.suspendCatching
 import com.tweener.passage.error.PassageGatekeeperUnknownEntrantException
 import com.tweener.passage.gatekeeper.google.error.PassageGoogleGatekeeperException
