@@ -121,6 +121,7 @@ val gatekeeperConfigurations = listOf(
     GoogleGatekeeperConfiguration(
         serverClientId = "your-google-server-client-id",
         android = GoogleGatekeeperAndroidConfiguration(
+            useGoogleButtonFlow = true,
             filterByAuthorizedAccounts = false,
             autoSelectEnabled = true,
             maxRetries = 3
@@ -138,6 +139,7 @@ val gatekeeperConfigurations = listOf(
     GoogleGatekeeperConfiguration(
         serverClientId = "your-google-server-client-id",
         android = GoogleGatekeeperAndroidConfiguration(
+            useGoogleButtonFlow = true,
             filterByAuthorizedAccounts = false,
             autoSelectEnabled = true,
             maxRetries = 3
