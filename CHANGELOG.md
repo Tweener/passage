@@ -2,57 +2,64 @@
 # Changelog
 
 ## [1.4.1] - July 8th, 2025
-- Update Kotlin to 2.2.0.
-- Update Compose Multiplatform to 1.8.2.
-- Update Gradle to 8.11.0.
-- Update KMPKit to 1.0.9.
+- 🚨 **`[BREAKING]`**: The property `useSignInWithGoogle` from the class `GoogleGatekeeperAndroidConfiguration` has been renamed to `useGoogleButtonFlow` to use a more descriptive naming.
+
+When using `useGoogleButtonFlow = true`, Passage uses the [Google button flow](https://developer.android.com/identity/sign-in/credential-manager-siwg#trigger-siwg). Otherwise, use the [Google sign-in request](https://developer.android.com/identity/sign-in/credential-manager-siwg#instantiate-google).
+- 🔄 Update Gradle to 8.11.0.
+- 🔄 Update KMPKit to 1.0.10.
+ 
+## [1.4.1] - July 8th, 2025
+- 🔄 Update Kotlin to 2.2.0.
+- 🔄 Update Compose Multiplatform to 1.8.2.
+- 🔄 Update Gradle to 8.11.0.
+- 🔄 Update KMPKit to 1.0.9.
  
 ## [1.4.0] - May 14, 2025
-- Add email link sign-in feature. (https://github.com/Tweener/passage/issues/1)
-- Migrate publishing from Sonatype to Maven Central.
+- ✨ **`[FEATURE]`**: Add email link sign-in feature. (https://github.com/Tweener/passage/issues/1)
+- 🛠 **`[IMPROVMENT]`**: Migrate publishing from Sonatype to Maven Central.
 
 ## [1.3.5] - May 13, 2025
-- Update Kotlin to 2.1.21.
-- Update Compose Multiplatform to 1.8.0.
-- Update KMPKit to 1.0.7.
+- 🔄 Update Kotlin to 2.1.21.
+- 🔄 Update Compose Multiplatform to 1.8.0.
+- 🔄 Update KMPKit to 1.0.7.
 
 ## [1.3.4] - April 15, 2025
-- Update Kotlin to 2.1.20.
+- 🔄 Update Kotlin to 2.1.20.
 
 ## [1.3.3] - February 28, 2025
-- Remove Napier library from Passage and use basic `println` to display log messages.
+- 📦 **`[BUILD]`**: Remove Napier library from Passage and use basic `println` to display log messages.
 
 ## [1.3.2] - February 27, 2025
-- **[FIX]** 🤖 Fixed sign-out issue on Android with the Google Legacy Gatekeeper when the binding activity was null.
+- 🐛 **`[FIX]`**: 🤖 Fixed sign-out issue on Android with the Google Legacy Gatekeeper when the binding activity was null.
 
 ## [1.3.1] - February 24, 2025
-- 🤖 Add a thrid way to authenticate with Google on Android: Sign-In with Google UI button flow.
+- 🛠 **`[IMPROVMENT]`**: 🤖 Add a thrid way to authenticate with Google on Android: Sign-In with Google UI button flow.
 
 ## [1.3.0] - February 18, 2025
-- 🤖 Enhanced Google Authentication on Android: When authentication with the Google Gatekeeper fails, the library now automatically falls back to Google Legacy Sign-In.
+- 🛠 **`[IMPROVMENT]`**: 🤖 Enhanced Google Authentication on Android: When authentication with the Google Gatekeeper fails, the library now automatically falls back to Google Legacy Sign-In.
 
 ## [1.2.0] - February 12, 2025
-- **[BREAKING]** 🤖 `PassageAndroid` parameter `context` has been renamed `applicationContext` to avoid confusion with the Activity-based context required for the Google Sign-In UI: `PassageAndroid(applicationContext: Context)`.
+- 🚨 **`[BREAKING]`**: 🤖 `PassageAndroid` parameter `context` has been renamed `applicationContext` to avoid confusion with the Activity-based context required for the Google Sign-In UI: `PassageAndroid(applicationContext: Context)`.
 - 🤖 When using the Google gatekeeper on Android, you must now call [`bindToView()`](https://github.com/Tweener/passage/blob/main/passage/src/commonMain/kotlin/com/tweener/passage/Passage.kt#L107) in Passage before performing any authentication operations. This ensures that Passage can access the Activity-based context needed to display the Google Sign-In UI.
-- Remove some GitLive Firebase dependencies that were not used.
+- 📦 **`[BUILD]`**: Remove some GitLive Firebase dependencies that were not used.
 
 ## [1.1.2] - February 11, 2025
-- **[FIX]** 🤖 On Android, use Activity-based context instead of Application-based context to prevent a crash on some Android devices.
-- **[FIX]** 🤖 On Android, the sign-in retry mechanism now works as expected.
+- 🐛 **`[FIX]`**: 🤖 On Android, use Activity-based context instead of Application-based context to prevent a crash on some Android devices.
+- 🐛 **`[FIX]`**: 🤖 On Android, the sign-in retry mechanism now works as expected.
 - Update Kotlin to 2.1.10.
 
 ## [1.1.1] - January 24, 2025
-- `Passage` now provides two separate methods to check if the user is logged in:
+- ✨ **`[FEATURE]`**: `Passage` now provides two separate methods to check if the user is logged in:
   - [`isUserLoggedIn`](https://github.com/Tweener/passage/blob/main/passage/src/commonMain/kotlin/com/tweener/passage/Passage.kt#L128): Returns instantly.
   - [`isUserLoggedInAsFlow`](https://github.com/Tweener/passage/blob/main/passage/src/commonMain/kotlin/com/tweener/passage/Passage.kt#L136): Allows observing changes over time.
-- Update Kotlin to 2.1.0.
-- Update Compose Multiplatform to 1.7.3.
-- Update Gradle to 8.11.1.
+- 🔄 Update Kotlin to 2.1.0.
+- 🔄 Update Compose Multiplatform to 1.7.3.
+- 🔄 Update Gradle to 8.11.1.
 
 ## [1.1.0] - December 16, 2024
-- Added new method `Passage#confirmResetPassword(params: PassageResetPasswordParams)` to confirm the reset password and set the Entrant account's new password.
-- **[BREAKING]** Method `Passage#handlePasswordResetCode(oobCode: String)` now returns `Result<EmailAddress>`, instead of `Result<Unit>`, where `EmailAddress` is a the Entrant account's email address.
-- **[BREAKING]** `PassageUniversalLink.mode` property is now an enum class `PassageUniversalLinkMode` instead of a String.
+- ✨ **`[FEATURE]`**: Added new method `Passage#confirmResetPassword(params: PassageResetPasswordParams)` to confirm the reset password and set the Entrant account's new password.
+- 🚨 **`[BREAKING]`**: Method `Passage#handlePasswordResetCode(oobCode: String)` now returns `Result<EmailAddress>`, instead of `Result<Unit>`, where `EmailAddress` is a the Entrant account's email address.
+- 🚨 **`[BREAKING]`**: `PassageUniversalLink.mode` property is now an enum class `PassageUniversalLinkMode` instead of a String.
 
 ## [1.0.0] - December 4, 2024
 
