@@ -37,8 +37,8 @@ Be sure to show your support by starring ⭐️ this repository, and feel free t
 
 Alarmee powers notifications in real-world apps:
 
-- [**KMPShip**](https://www.kmpship.app/) — a Kotlin Multiplatform boilerplate to build mobile apps faster.
-- [**Bloomeo**](https://bloomeo.app/) — a personal finance app.
+- [**KMPShip**](https://www.kmpship.app/): a Kotlin Multiplatform boilerplate to build mobile apps faster.
+- [**Bloomeo**](https://bloomeo.app/): a personal finance app.
 
 ---
 
@@ -127,7 +127,7 @@ val gatekeeperConfigurations = listOf(
         )
     ),
     AppleGatekeeperConfiguration(),
-    EmailPasswordGatekeeperConfiguration()
+    EmailPasswordGatekeeperConfiguration
 )
 ```
 
@@ -154,15 +154,15 @@ val gatekeeperConfigurations = listOf(
 Initialize Passage in your common module entry point:
 
 ```kotlin
-passage.initialize(gatekeepersConfiguration = gatekeepersConfiguration)
+passage.initialize(gatekeepersConfigurations = gatekeeperConfigurations)
 ```
 
 > [!NOTE]  
 > If your app already uses Firebase, you can pass the existing Firebase instance to Passage to reuse it and prevent reinitializing Firebase unnecessarily:
 ```kotlin
 passage.initialize(
-    gatekeepersConfiguration = gatekeepersConfiguration,
-    firebaseAuth = Firebase.Auth,
+    gatekeepersConfigurations = gatekeeperConfigurations,
+    firebase = Firebase,
 )
 ```
 
@@ -200,6 +200,10 @@ result.fold(
 
 #### Apple Authentication
 `Passage#authenticateWithApple()` authenticates a user via Apple Sign-In. If the user does not already exist, a new account will be created automatically.
+
+> [!WARNING]  
+> Apple Sign-In only works on iOS. Passage does not handle Apple Sign-In on Android, since this scenario is quite uncommon.
+
 
 ```kotlin
 val result = passage.authenticateWithApple()
