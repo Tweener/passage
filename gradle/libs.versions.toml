@@ -11,7 +11,7 @@ firebaseGitLiveApp = "2.1.0" # Firebase for KMP https://firebaseopensource.com/p
 googleServicesPlugin = "4.4.3"
 crashlyticsPlugin = "3.0.4"
 jetbrainsLifecycle = "2.9.1"
-kmpKit = "1.0.9"
+kmpKit = "1.0.10"
 
 # Android
 androidCore = "1.16.0"
