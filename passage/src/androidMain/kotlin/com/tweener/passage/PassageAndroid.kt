@@ -71,7 +71,7 @@ class PassageAndroid(private val applicationContext: Context) : Passage() {
             activityContext = { activityContext },
             activityResultLauncher = { activityResultLauncher },
             activityResult = { activityResult },
-            useSignInWithGoogle = configuration.android.useSignInWithGoogle,
+            useGoogleButtonFlow = configuration.android.useGoogleButtonFlow,
             filterByAuthorizedAccounts = configuration.android.filterByAuthorizedAccounts,
             autoSelectEnabled = configuration.android.autoSelectEnabled,
             maxRetries = configuration.android.maxRetries,

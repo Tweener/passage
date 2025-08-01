@@ -43,7 +43,7 @@ import dev.gitlive.firebase.auth.GoogleAuthProvider
  * @param activityContext A lambda that provides the current Android [Context] for activity-related operations.
  * @param activityResultLauncher A lambda that provides the [ManagedActivityResultLauncher] for activity results.
  * @param activityResult A lambda that provides the current [ActivityResult] for activity results.
- * @param useSignInWithGoogle If true, uses the `signInWithGoogle` method for authentication.
+ * @param useGoogleButtonFlow If true, uses the [Google button flow](https://developer.android.com/identity/sign-in/credential-manager-siwg#trigger-siwg). Otherwise, use the [Google sign-in request](https://developer.android.com/identity/sign-in/credential-manager-siwg#instantiate-google).
  * @param filterByAuthorizedAccounts If true, filters credentials by authorized accounts for the app.
  * @param autoSelectEnabled If true, enables automatic credential selection when possible.
  * @param maxRetries The maximum number of retries for authentication attempts.
@@ -58,7 +58,7 @@ internal class PassageGoogleGatekeeperAndroid(
     private val activityContext: () -> Context?,
     activityResultLauncher: () -> ManagedActivityResultLauncher<Intent, ActivityResult>?,
     activityResult: () -> ActivityResult?,
-    private val useSignInWithGoogle: Boolean,
+    private val useGoogleButtonFlow: Boolean,
     private val filterByAuthorizedAccounts: Boolean,
     private val autoSelectEnabled: Boolean,
     private val maxRetries: Int,
@@ -87,10 +87,10 @@ internal class PassageGoogleGatekeeperAndroid(
         var attempts = 0
         var lastThrowable: Throwable?
 
-        var useGoogle = useSignInWithGoogle
+        var useGoogleButtonFlow = useGoogleButtonFlow
 
         while (attempts <= maxRetries) {
-            retrieveGoogleTokens(useSignInWithGoogle = useGoogle).fold(
+            retrieveGoogleTokens(useGoogleButtonFlow = useGoogleButtonFlow).fold(
                 onSuccess = { googleTokens ->
                     val firebaseCredential = GoogleAuthProvider.credential(idToken = googleTokens.idToken, accessToken = googleTokens.accessToken)
 
@@ -117,10 +117,10 @@ internal class PassageGoogleGatekeeperAndroid(
                     }
 
                     // Toggle the use of Google Sign-In method for the next attempt
-                    useGoogle = useGoogle.not()
+                    useGoogleButtonFlow = useGoogleButtonFlow.not()
 
                     if (attempts >= maxRetries) {
-                        throw lastThrowable!! // Only throw on the final attempt
+                        throw lastThrowable // Only throw on the final attempt
                     }
                 },
             )
@@ -147,7 +147,7 @@ internal class PassageGoogleGatekeeperAndroid(
      * @return A [Result] indicating the success or failure of the re-authentication process.
      */
     override suspend fun reauthenticate(): Result<Unit> = suspendCatching {
-        retrieveGoogleTokens(useSignInWithGoogle = useSignInWithGoogle).fold(
+        retrieveGoogleTokens(useGoogleButtonFlow = useGoogleButtonFlow).fold(
             onSuccess = { googleTokens ->
                 val firebaseCredential = GoogleAuthProvider.credential(idToken = googleTokens.idToken, accessToken = googleTokens.accessToken)
                 firebaseAuth.currentUser?.reauthenticate(credential = firebaseCredential)
@@ -175,8 +175,8 @@ internal class PassageGoogleGatekeeperAndroid(
         )
     }
 
-    private suspend fun retrieveGoogleTokens(useSignInWithGoogle: Boolean): Result<GoogleTokens> = suspendCatching {
-        when (val credential = createCredentials(useSignInWithGoogle = useSignInWithGoogle)) {
+    private suspend fun retrieveGoogleTokens(useGoogleButtonFlow: Boolean): Result<GoogleTokens> = suspendCatching {
+        when (val credential = createCredentials(useGoogleButtonFlow = useGoogleButtonFlow)) {
             is CustomCredential -> {
                 when (credential.type) {
                     GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL -> {
@@ -207,12 +207,14 @@ internal class PassageGoogleGatekeeperAndroid(
         }
     }
 
-    private suspend fun createCredentials(useSignInWithGoogle: Boolean): Credential {
+    private suspend fun createCredentials(useGoogleButtonFlow: Boolean): Credential {
         activityContext.invoke() ?: throw PassageActivityContextNotInitializedException()
 
-        val credentialOption = when (useSignInWithGoogle) {
+        val credentialOption = when (useGoogleButtonFlow) {
+            // https://developer.android.com/identity/sign-in/credential-manager-siwg#create-sign
             true -> GetSignInWithGoogleOption.Builder(serverClientId).build()
 
+            // https://developer.android.com/identity/sign-in/credential-manager-siwg#instantiate-google
             false -> GetGoogleIdOption.Builder()
                 .setFilterByAuthorizedAccounts(filterByAuthorizedAccounts)
                 .setServerClientId(serverClientId)

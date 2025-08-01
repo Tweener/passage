@@ -39,13 +39,13 @@ data class GoogleGatekeeperConfiguration(
  * This class provides optional settings to customize Google Sign-In behavior on Android,
  * such as filtering by authorized accounts, enabling auto-selection, and retrying failed sign-ins.
  *
- * @property useSignInWithGoogle If true, uses the `signInWithGoogle` method for authentication.
+ * @property useGoogleButtonFlow If true, uses the [Google button flow](https://developer.android.com/identity/sign-in/credential-manager-siwg#trigger-siwg). Otherwise, use the [Google sign-in request](https://developer.android.com/identity/sign-in/credential-manager-siwg#instantiate-google).
  * @property filterByAuthorizedAccounts If true, filters credentials by authorized accounts for the app.
  * @property autoSelectEnabled If true, enables automatic credential selection when possible.
  * @property maxRetries The maximum number of retries for authentication attempts.
  */
 data class GoogleGatekeeperAndroidConfiguration(
-    val useSignInWithGoogle: Boolean = true,
+    val useGoogleButtonFlow: Boolean = true,
     val filterByAuthorizedAccounts: Boolean = false,
     val autoSelectEnabled: Boolean = true,
     val maxRetries: Int = 3,
