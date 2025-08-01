@@ -1,7 +1,7 @@
 
 # Changelog
 
-## [1.4.1] - July 8th, 2025
+## [1.4.2] - August 1st, 2025
 - 🚨 **`[BREAKING]`**: The property `useSignInWithGoogle` from the class `GoogleGatekeeperAndroidConfiguration` has been renamed to `useGoogleButtonFlow` to use a more descriptive naming.
 
 When using `useGoogleButtonFlow = true`, Passage uses the [Google button flow](https://developer.android.com/identity/sign-in/credential-manager-siwg#trigger-siwg). Otherwise, use the [Google sign-in request](https://developer.android.com/identity/sign-in/credential-manager-siwg#instantiate-google).
