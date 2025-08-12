@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./gradlew:*)",
+      "WebFetch(domain:firebase.google.com)"
+    ],
+    "deny": []
+  }
+}
