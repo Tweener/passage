@@ -91,12 +91,12 @@ internal class PassageEmailGatekeeper(
     suspend fun sendPasswordResetEmail(params: PassageForgotPasswordParams): Result<Unit> = suspendCatching {
         val actionCodeSettings = buildActionCodeSettings(
             url = params.url,
+            linkDomain = params.hostingDomain,
             iOSBundleId = params.iosParams?.bundleId,
             androidPackageName = params.androidParams?.packageName,
             installIfNotAvailable = params.androidParams?.installIfNotAvailable ?: true,
             minimumVersion = params.androidParams?.minimumVersion,
             canHandleCodeInApp = params.canHandleCodeInApp,
-            linkDomain = params.hostingDomain,
         )
 
         firebaseAuth.sendPasswordResetEmail(email = params.email, actionCodeSettings = actionCodeSettings)
@@ -156,12 +156,12 @@ internal class PassageEmailGatekeeper(
     suspend fun sendEmailVerification(params: PassageEmailVerificationParams): Result<Unit> = suspendCatching {
         val actionCodeSettings = buildActionCodeSettings(
             url = params.url,
+            linkDomain = params.hostingDomain,
             iOSBundleId = params.iosParams?.bundleId,
             androidPackageName = params.androidParams?.packageName,
             installIfNotAvailable = params.androidParams?.installIfNotAvailable ?: true,
             minimumVersion = params.androidParams?.minimumVersion,
             canHandleCodeInApp = params.canHandleCodeInApp,
-            linkDomain = params.hostingDomain,
         )
 
         firebaseAuth.currentUser?.sendEmailVerification(actionCodeSettings = actionCodeSettings)
@@ -201,12 +201,12 @@ internal class PassageEmailGatekeeper(
     suspend fun sendSignInLinkToEmail(params: PassageSignInLinkToEmailParams): Result<Unit> = suspendCatching {
         val actionCodeSettings = buildActionCodeSettings(
             url = params.url,
+            linkDomain = params.hostingDomain,
             iOSBundleId = params.iosParams?.bundleId,
             androidPackageName = params.androidParams?.packageName,
             installIfNotAvailable = params.androidParams?.installIfNotAvailable ?: true,
             minimumVersion = params.androidParams?.minimumVersion,
             canHandleCodeInApp = params.canHandleCodeInApp,
-            linkDomain = params.hostingDomain,
         )
 
         firebaseAuth.sendSignInLinkToEmail(email = params.email, actionCodeSettings = actionCodeSettings)
@@ -240,19 +240,19 @@ internal class PassageEmailGatekeeper(
 
     private fun buildActionCodeSettings(
         url: String,
+        linkDomain: String,
         iOSBundleId: String?,
         androidPackageName: String?,
         installIfNotAvailable: Boolean,
         minimumVersion: String?,
         canHandleCodeInApp: Boolean,
-        linkDomain: String? = null,
     ): ActionCodeSettings =
         ActionCodeSettings(
             url = url,
+            dynamicLinkDomain = linkDomain, // Change "dynamicLinkDomain" to "linkDomain" when implemented in GitLive Firebase SDK
             androidPackageName = androidPackageName?.let { AndroidPackageName(packageName = it, installIfNotAvailable = installIfNotAvailable, minimumVersion = minimumVersion) },
             iOSBundleId = iOSBundleId,
             canHandleCodeInApp = canHandleCodeInApp,
-            dynamicLinkDomain = linkDomain, // Change "dynamicLinkDomain" to "linkDomain" when implemented in GitLive Firebase SDK
         )
 
     private suspend fun <T : ActionCodeResult> handleOobCode(oobCode: String) = suspendCatching {

@@ -5,10 +5,10 @@ package com.tweener.passage.gatekeeper.email.model
  *
  * @param email The email address to send the sign-in link to.
  * @param url The URL for the email address sign-in page.
+ * @param hostingDomain The hosting domain for the app. This is used to ensure the email link is valid for the app's domain.
  * @param iosParams The specific parameters for iOS platform.
  * @param androidParams The specific parameters for Android platform.
- * @param canHandleCodeInApp Whether the app can handle the code in app. Default is false.
- * @param hostingDomain Optional custom hosting domain for the email links. Default is null.
+ * @param canHandleCodeInApp Whether the app can handle the code in app. Default is true.
  *
  * @author Vivien Mahe
  * @since 14/05/2025
@@ -16,10 +16,10 @@ package com.tweener.passage.gatekeeper.email.model
 data class PassageSignInLinkToEmailParams(
     val email: String,
     val url: String,
+    val hostingDomain: String,
     val iosParams: PassageSignInLinkToEmailIosParams? = null,
     val androidParams: PassageSignInLinkToEmailAndroidParams? = null,
-    val canHandleCodeInApp: Boolean,
-    val hostingDomain: String? = null,
+    val canHandleCodeInApp: Boolean = true,
 )
 
 /**

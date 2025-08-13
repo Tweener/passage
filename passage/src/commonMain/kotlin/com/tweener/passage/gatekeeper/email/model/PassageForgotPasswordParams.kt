@@ -4,11 +4,11 @@ package com.tweener.passage.gatekeeper.email.model
  * Parameters required for sending a password reset email.
  *
  * @param email The email address to send the password reset email to.
+ * @param hostingDomain The hosting domain for the app. This is used to ensure the email link is valid for the app's domain.
  * @param url The URL for the password reset page.
  * @param iosParams The specific parameters for iOS platform.
  * @param androidParams The specific parameters for Android platform.
- * @param canHandleCodeInApp Whether the app can handle the code in app. Default is false.
- * @param hostingDomain Optional custom hosting domain for the email links. Default is null.
+ * @param canHandleCodeInApp Whether the app can handle the code in app. Default is true.
  *
  * @author Vivien Mahe
  * @since 02/12/2024
@@ -16,10 +16,10 @@ package com.tweener.passage.gatekeeper.email.model
 data class PassageForgotPasswordParams(
     val email: String,
     val url: String,
+    val hostingDomain: String,
     val iosParams: PassageForgotPasswordIosParams? = null,
     val androidParams: PassageForgotPasswordAndroidParams? = null,
-    val canHandleCodeInApp: Boolean,
-    val hostingDomain: String? = null,
+    val canHandleCodeInApp: Boolean = true,
 )
 
 /**
