@@ -175,6 +175,7 @@ fun App() {
                                     params = PassageSignInLinkToEmailParams(
                                         email = "{Your email address}",
                                         url = "https://passagesample.web.app/action/sign_in_link_email",
+                                        hostingDomain = "passagesample.web.app",
                                         iosParams = PassageSignInLinkToEmailIosParams(bundleId = "com.tweener.passage.sample"),
                                         androidParams = PassageSignInLinkToEmailAndroidParams(
                                             packageName = "com.tweener.passage.sample",
@@ -182,7 +183,6 @@ fun App() {
                                             minimumVersion = "1.0",
                                         ),
                                         canHandleCodeInApp = true,
-                                        hostingDomain = "passagesample.web.app"
                                     )
                                 )
                                 .onSuccess { snackbarScope.launch { snackbarHostState.showSnackbar(message = "Email with link sent!") } }
@@ -198,6 +198,7 @@ fun App() {
                                 .sendEmailVerification(
                                     params = PassageEmailVerificationParams(
                                         url = "https://passagesample.web.app/action/email_verified",
+                                        hostingDomain = "passagesample.web.app",
                                         iosParams = PassageEmailVerificationIosParams(bundleId = "com.tweener.passage.sample"),
                                         androidParams = PassageEmailVerificationAndroidParams(
                                             packageName = "com.tweener.passage.sample",
@@ -225,6 +226,7 @@ fun App() {
                                     params = PassageForgotPasswordParams(
                                         email = entrant?.email!!,
                                         url = "https://passagesample.web.app/action/password_reset",
+                                        hostingDomain = "passagesample.web.app",
                                         iosParams = PassageForgotPasswordIosParams(bundleId = "com.tweener.passage.sample"),
                                         androidParams = PassageForgotPasswordAndroidParams(
                                             packageName = "com.tweener.passage.sample",
