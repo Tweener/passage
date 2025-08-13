@@ -1,6 +1,18 @@
 
 # Changelog
 
+## [2.0.0] - August 12th, 2025
+- 🚨 **`[BREAKING]`**: **Complete elimination of Firebase Dynamic Links** - Migrated to Firebase Hosting domains ahead of Firebase Dynamic Links shutdown on August 25, 2025.
+  - **Platform Configuration Changes Required:**
+    - **Android:** Update `AndroidManifest.xml` intent filter to use Firebase Hosting domain (e.g., `PROJECT_ID.web.app`) with `/__/auth/links` path prefix
+    - **iOS:** Update `associated-domains` in entitlements file to use Firebase Hosting domain only
+  - **API Changes:** Email action methods now require `hostingDomain` parameter:
+    - `sendSignInLinkToEmail(params)` - Added required `hostingDomain` to `PassageSignInLinkToEmailParams`
+    - `sendPasswordResetEmail(params)` - Added required `hostingDomain` to `PassageForgotPasswordParams`
+    - `sendEmailVerification(params)` - Added required `hostingDomain` to `PassageEmailVerificationParams`
+  - **URL Format Changes:** Email action URLs now use Firebase Hosting domains (e.g., `https://PROJECT_ID.web.app/action`)
+  - **Firebase Console:** Firebase Dynamic Links can be completely disabled
+
 ## [1.4.2] - August 1st, 2025
 - 🚨 **`[BREAKING]`**: The property `useSignInWithGoogle` from the class `GoogleGatekeeperAndroidConfiguration` has been renamed to `useGoogleButtonFlow` to use a more descriptive naming.
 
