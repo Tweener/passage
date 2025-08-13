@@ -40,7 +40,7 @@ internal class PassageUniversalLinkHandler {
         // Decode the URL if needed
         validLink = urlCodec.decode(encodedUrl = validLink)
 
-        // From this link parameter, we need to check for if "mode" and "oobCode" query params are present. It means it comes from a Firebase Dynamic Link.
+        // From this link parameter, we need to check for if "mode" and "oobCode" query params are present. It means it comes from a Firebase email action link.
         val modeParam = extractQueryParameter(url = validLink, parameter = LINK_QUERY_PARAMETER_MODE)
         val oobCodeParam = extractQueryParameter(url = validLink, parameter = LINK_QUERY_PARAMETER_OOB_CODE)
         val continueUrlParam = extractQueryParameter(url = validLink, parameter = LINK_QUERY_PARAMETER_CONTINUE_URL)

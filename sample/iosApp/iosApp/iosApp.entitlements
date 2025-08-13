@@ -8,7 +8,7 @@
 	</array>
 	<key>com.apple.developer.associated-domains</key>
 	<array>
-		<string>applinks:passagesample.page.link</string>
+		<string>applinks:passagesample.web.app</string>
 	</array>
 </dict>
 </plist>

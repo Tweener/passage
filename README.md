@@ -237,7 +237,7 @@ You can send an email with a sign-in link to the user's email adress:
 val result = passage.sendSignInLinkToEmail(
     params = PassageSignInLinkToEmailParams(
         email = userEmail, // Ask the user for its email address
-        url = "https://passagesample.page.link/action/sign_in_link_email",
+        url = "https://passagesample.web.app/action/sign_in_link_email",
         iosParams = PassageSignInLinkToEmailIosParams(bundleId = "com.tweener.passage.sample"),
         androidParams = PassageSignInLinkToEmailAndroidParams(
             packageName = "com.tweener.passage.sample",
@@ -275,8 +275,8 @@ passage.reauthenticateWithEmailAndPassword(params)
 You may need to [send emails](https://firebase.google.com/docs/auth/android/passing-state-in-email-actions) to the user for a password reset if the user forgot their password for instance, or for verifying the user's email address when creating an account.
 
 > [!IMPORTANT]
-> Passage uses [Firebase Dynamic Links](https://firebase.google.com/docs/dynamic-links) to send emails containing universal links.
-> Follow the documentation to configure your app with Firebase Dynamic Links (you don't need to add Firebase Dynamic Links SDK to your app).
+> Passage uses Firebase Hosting domains to send emails containing universal links for authentication flows.
+> You need to configure your app to handle Firebase Hosting links (e.g., `PROJECT_ID.web.app` or `PROJECT_ID.firebaseapp.com`).
 
 To handle universal links, additional configuration is required for each platform:
 
@@ -373,7 +373,7 @@ If you want to reinforce authentication, you can send the user an email to verif
 ```Kotlin
 val result = passage.sendEmailVerification(
     params = PassageEmailVerificationParams(
-        url = "https://passagesample.page.link/action/email_verified",
+        url = "https://passagesample.web.app/action/email_verified",
         iosParams = PassageEmailVerificationIosParams(bundleId = "com.tweener.passage.sample"),
         androidParams = PassageEmailVerificationAndroidParams(
             packageName = "com.tweener.passage.sample",
@@ -396,7 +396,7 @@ If you want to reinforce authentication, you can send the user an email to verif
 val result = passage.sendPasswordResetEmail(
     params = PassageForgotPasswordParams(
         email = passage.getCurrentUser()!!.email,
-        url = "https://passagesample.page.link/action/password_reset",
+        url = "https://passagesample.web.app/action/password_reset",
         iosParams = PassageForgotPasswordIosParams(bundleId = "com.tweener.passage.sample"),
         androidParams = PassageForgotPasswordAndroidParams(
             packageName = "com.tweener.passage.sample",

@@ -174,7 +174,7 @@ fun App() {
                                 .sendSignInLinkToEmail(
                                     params = PassageSignInLinkToEmailParams(
                                         email = "{Your email address}",
-                                        url = "https://passagesample.page.link/action/sign_in_link_email",
+                                        url = "https://passagesample.web.app/action/sign_in_link_email",
                                         iosParams = PassageSignInLinkToEmailIosParams(bundleId = "com.tweener.passage.sample"),
                                         androidParams = PassageSignInLinkToEmailAndroidParams(
                                             packageName = "com.tweener.passage.sample",
@@ -196,7 +196,7 @@ fun App() {
                             passage
                                 .sendEmailVerification(
                                     params = PassageEmailVerificationParams(
-                                        url = "https://passagesample.page.link/action/email_verified",
+                                        url = "https://passagesample.web.app/action/email_verified",
                                         iosParams = PassageEmailVerificationIosParams(bundleId = "com.tweener.passage.sample"),
                                         androidParams = PassageEmailVerificationAndroidParams(
                                             packageName = "com.tweener.passage.sample",
@@ -223,7 +223,7 @@ fun App() {
                                 .sendPasswordResetEmail(
                                     params = PassageForgotPasswordParams(
                                         email = entrant?.email!!,
-                                        url = "https://passagesample.page.link/action/password_reset",
+                                        url = "https://passagesample.web.app/action/password_reset",
                                         iosParams = PassageForgotPasswordIosParams(bundleId = "com.tweener.passage.sample"),
                                         androidParams = PassageForgotPasswordAndroidParams(
                                             packageName = "com.tweener.passage.sample",
