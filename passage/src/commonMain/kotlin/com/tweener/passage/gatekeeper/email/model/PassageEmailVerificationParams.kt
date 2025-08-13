@@ -7,6 +7,7 @@ package com.tweener.passage.gatekeeper.email.model
  * @param iosParams The specific parameters for iOS platform.
  * @param androidParams The specific parameters for Android platform.
  * @param canHandleCodeInApp Whether the app can handle the code in app. Default is false.
+ * @param hostingDomain Optional custom hosting domain for the email links. Default is null.
  *
  * @author Vivien Mahe
  * @since 02/12/2024
@@ -16,6 +17,7 @@ data class PassageEmailVerificationParams(
     val iosParams: PassageEmailVerificationIosParams? = null,
     val androidParams: PassageEmailVerificationAndroidParams? = null,
     val canHandleCodeInApp: Boolean,
+    val hostingDomain: String? = null,
 )
 
 /**

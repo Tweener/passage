@@ -96,6 +96,7 @@ internal class PassageEmailGatekeeper(
             installIfNotAvailable = params.androidParams?.installIfNotAvailable ?: true,
             minimumVersion = params.androidParams?.minimumVersion,
             canHandleCodeInApp = params.canHandleCodeInApp,
+            linkDomain = params.hostingDomain,
         )
 
         firebaseAuth.sendPasswordResetEmail(email = params.email, actionCodeSettings = actionCodeSettings)
@@ -160,6 +161,7 @@ internal class PassageEmailGatekeeper(
             installIfNotAvailable = params.androidParams?.installIfNotAvailable ?: true,
             minimumVersion = params.androidParams?.minimumVersion,
             canHandleCodeInApp = params.canHandleCodeInApp,
+            linkDomain = params.hostingDomain,
         )
 
         firebaseAuth.currentUser?.sendEmailVerification(actionCodeSettings = actionCodeSettings)
@@ -204,6 +206,7 @@ internal class PassageEmailGatekeeper(
             installIfNotAvailable = params.androidParams?.installIfNotAvailable ?: true,
             minimumVersion = params.androidParams?.minimumVersion,
             canHandleCodeInApp = params.canHandleCodeInApp,
+            linkDomain = params.hostingDomain,
         )
 
         firebaseAuth.sendSignInLinkToEmail(email = params.email, actionCodeSettings = actionCodeSettings)
@@ -242,12 +245,14 @@ internal class PassageEmailGatekeeper(
         installIfNotAvailable: Boolean,
         minimumVersion: String?,
         canHandleCodeInApp: Boolean,
+        linkDomain: String? = null,
     ): ActionCodeSettings =
         ActionCodeSettings(
             url = url,
             androidPackageName = androidPackageName?.let { AndroidPackageName(packageName = it, installIfNotAvailable = installIfNotAvailable, minimumVersion = minimumVersion) },
             iOSBundleId = iOSBundleId,
             canHandleCodeInApp = canHandleCodeInApp,
+            dynamicLinkDomain = linkDomain, // Change "dynamicLinkDomain" to "linkDomain" when implemented in GitLive Firebase SDK
         )
 
     private suspend fun <T : ActionCodeResult> handleOobCode(oobCode: String) = suspendCatching {

@@ -182,6 +182,7 @@ fun App() {
                                             minimumVersion = "1.0",
                                         ),
                                         canHandleCodeInApp = true,
+                                        hostingDomain = "passagesample.web.app"
                                     )
                                 )
                                 .onSuccess { snackbarScope.launch { snackbarHostState.showSnackbar(message = "Email with link sent!") } }
