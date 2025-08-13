@@ -29,7 +29,10 @@ Be sure to show your support by starring ⭐️ this repository, and feel free t
 - **Firebase Authentication**: Powered by Firebase for robust and secure authentication.
 - **Gatekeeper (Provider) Support**: Google, Apple, Email/Password.
 - **Extensible Configuration**: Customize authentication flows with platform-specific settings.
-- **Email actions**: Send email actions for password resets or verifying a user's email. 
+- **Email actions**: Send email actions for magic link sign-in, password resets or verifying a user's email.
+
+> [!WARNING]
+> From August 25, 2025, email actions will stop working due to the [shut down](https://firebase.google.com/support/dynamic-links-faq) of Firebase Dynamic Links, until GitLiveApp provides a [fix](https://github.com/GitLiveApp/firebase-kotlin-sdk/issues/731) for this issue.
 
 ---
 
