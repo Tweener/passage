@@ -64,7 +64,7 @@ The library is built on Firebase Authentication using the GitLive Firebase KMP S
 
 - Firebase initialization happens in platform-specific `initializeFirebase()` methods
 - Authentication state flows through `FirebaseAuth.authStateChanged`
-- Universal links for email actions are handled via Firebase Dynamic Links
+- Universal links for email actions are handled via Firebase Hosting domains
 
 ## Platform-Specific Implementation Notes
 
@@ -88,7 +88,7 @@ Each gatekeeper implements the `PassageGatekeeper<SignInParams>` abstract class:
 
 ## Universal Links & Email Actions
 
-The library handles Firebase Dynamic Links for:
+The library handles Firebase Hosting links for:
 - Email verification
 - Password reset flows  
 - Sign-in link authentication
