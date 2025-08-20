@@ -35,10 +35,7 @@ jobs:
           xcode-version: '${{ vars.XCODE_VERSION }}'
 
       - name: Download iOS 18 platform
-        run: |
-          sudo xcodebuild -license accept || true
-          sudo xcodebuild -downloadPlatform iOS
-          xcrun simctl list runtimes
+        run: xcodebuild -downloadPlatform iOS
 
       - name: Caching Kotlin/Native tooling
         uses: actions/cache@v3
