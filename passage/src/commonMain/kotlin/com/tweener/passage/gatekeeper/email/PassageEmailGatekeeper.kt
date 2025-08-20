@@ -249,7 +249,7 @@ internal class PassageEmailGatekeeper(
     ): ActionCodeSettings =
         ActionCodeSettings(
             url = url,
-            dynamicLinkDomain = linkDomain, // Change "dynamicLinkDomain" to "linkDomain" when implemented in GitLive Firebase SDK
+            linkDomain = linkDomain,
             androidPackageName = androidPackageName?.let { AndroidPackageName(packageName = it, installIfNotAvailable = installIfNotAvailable, minimumVersion = minimumVersion) },
             iOSBundleId = iOSBundleId,
             canHandleCodeInApp = canHandleCodeInApp,
