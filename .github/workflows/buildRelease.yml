@@ -10,7 +10,7 @@ jobs:
       matrix:
         include:
           - target: iosSimulatorArm64Test
-            os: macos-latest
+            os: macos-15
           - target: testReleaseUnitTest
             os: ubuntu-latest
     runs-on: ${{ matrix.os }}
@@ -27,6 +27,11 @@ jobs:
         with:
           java-version: '${{ vars.JAVA_JDK_VERSION }}'
           distribution: "zulu"
+
+      - name: Set Xcode version
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '${{ vars.XCODE_VERSION }}'
 
       - name: Caching Kotlin/Native tooling
         uses: actions/cache@v3
