@@ -7,13 +7,19 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-release:
+  build-android-release:
     name: Build library
-    uses: ./.github/workflows/buildRelease.yml
+    uses: ./.github/workflows/buildAndroidRelease.yml
+
+  build-ios-release:
+    name: Build library
+    uses: ./.github/workflows/buildIosRelease.yml
 
   publish:
     name: Publish library
-    needs: build-release
+    needs:
+      - build-android-release
+      - build-ios-release
     runs-on: macos-15
 
     steps:
