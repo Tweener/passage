@@ -1,7 +1,7 @@
 
 # Changelog
 
-## [1.5.0] - August 12th, 2025
+## [1.5.0] - August 20th, 2025
 - 🚨 **`[BREAKING]`**: **Complete elimination of Firebase Dynamic Links**
 > [!WARNING]  
 > Starting **August 25, 2025**, email actions will no longer work due to the [shutdown of Firebase Dynamic Links](https://firebase.google.com/support/dynamic-links-faq).  
