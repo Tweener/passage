@@ -22,9 +22,9 @@ jobs:
       matrix:
         include:
           - target: publishIosArm64PublicationToMavenCentralRepository
-            os: macos-latest
+            os: macos-15
           - target: publishIosSimulatorArm64PublicationToMavenCentralRepository
-            os: macos-latest
+            os: macos-15
           - target: publishAndroidReleasePublicationToMavenCentralRepository
             os: ubuntu-latest
           - target: publishKotlinMultiplatformPublicationToMavenCentralRepository
