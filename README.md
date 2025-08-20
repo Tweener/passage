@@ -31,8 +31,14 @@ Be sure to show your support by starring ⭐️ this repository, and feel free t
 - **Extensible Configuration**: Customize authentication flows with platform-specific settings.
 - **Email actions**: Send email actions for magic link sign-in, password resets or verifying a user's email.
 
-> [!WARNING]
-> From August 25, 2025, email actions will stop working due to the [shut down](https://firebase.google.com/support/dynamic-links-faq) of Firebase Dynamic Links, until GitLiveApp provides a [fix](https://github.com/GitLiveApp/firebase-kotlin-sdk/issues/731) for this issue.
+> [!WARNING]  
+> Starting **August 25, 2025**, email actions will no longer work due to the [shutdown of Firebase Dynamic Links](https://firebase.google.com/support/dynamic-links-faq).  
+>   
+> I decided to drop support of these features for two main reasons:  
+> - I attempted to follow the [migration guide](https://firebase.google.com/docs/auth/android/email-link-migration) to move from Dynamic Links to Firebase Hosting, but had no success.  
+> - Firebase recently [updated the free plan limit](https://firebase.google.com/docs/auth/limits#email_sending_limits) for email link sign-in emails to only **5 per day**, which makes development both harder and more expensive.  
+>   
+> If you discover a reliable solution, contributions via PR are very welcome!
 
 ---
 
