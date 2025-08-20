@@ -10,21 +10,27 @@ on:
     types: [ released ]
 
 jobs:
-  build-release:
-    name: Build library
-    uses: ./.github/workflows/buildRelease.yml
+  build-android-release:
+    name: Build Android library
+    uses: ./.github/workflows/buildAndroidRelease.yml
+
+  build-ios-release:
+    name: Build iOS library
+    uses: ./.github/workflows/buildIosRelease.yml
 
   publish:
     name: Publish library
-    needs: build-release
+    needs:
+      - build-android-release
+      - build-ios-release
 
     strategy:
       matrix:
         include:
           - target: publishIosArm64PublicationToMavenCentralRepository
-            os: macos-latest
+            os: macos-14
           - target: publishIosSimulatorArm64PublicationToMavenCentralRepository
-            os: macos-latest
+            os: macos-14
           - target: publishAndroidReleasePublicationToMavenCentralRepository
             os: ubuntu-latest
           - target: publishKotlinMultiplatformPublicationToMavenCentralRepository
@@ -43,6 +49,11 @@ jobs:
         with:
           java-version: '${{ vars.JAVA_JDK_VERSION }}'
           distribution: "zulu"
+
+      - name: Set Xcode version
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '${{ vars.XCODE_VERSION }}'
 
       - name: Caching Kotlin/Native tooling
         uses: actions/cache@v3

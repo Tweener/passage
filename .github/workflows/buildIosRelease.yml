@@ -1,4 +1,4 @@
-name: Build Passage library
+name: Build Passage library for iOS
 
 on:
   workflow_call:
@@ -6,14 +6,7 @@ on:
 
 jobs:
   build:
-    strategy:
-      matrix:
-        include:
-          - target: iosSimulatorArm64Test
-            os: macos-latest
-          - target: testReleaseUnitTest
-            os: ubuntu-latest
-    runs-on: ${{ matrix.os }}
+    runs-on: macos-14
 
     steps:
       - name: Checkout
@@ -22,11 +15,10 @@ jobs:
       - name: Validate Gradle Wrapper
         uses: gradle/actions/wrapper-validation@v3
 
-      - name: Set up Java JDK ${{ vars.JAVA_JDK_VERSION }}
-        uses: actions/setup-java@v4
+      - name: Set Xcode version
+        uses: maxim-lobanov/setup-xcode@v1
         with:
-          java-version: '${{ vars.JAVA_JDK_VERSION }}'
-          distribution: "zulu"
+          xcode-version: '${{ vars.XCODE_VERSION }}'
 
       - name: Caching Kotlin/Native tooling
         uses: actions/cache@v3

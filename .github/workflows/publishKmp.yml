@@ -7,14 +7,20 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-release:
+  build-android-release:
     name: Build library
-    uses: ./.github/workflows/buildRelease.yml
+    uses: ./.github/workflows/buildAndroidRelease.yml
+
+  build-ios-release:
+    name: Build library
+    uses: ./.github/workflows/buildIosRelease.yml
 
   publish:
     name: Publish library
-    needs: build-release
-    runs-on: macos-latest
+    needs:
+      - build-android-release
+      - build-ios-release
+    runs-on: macos-14
 
     steps:
       - name: Checkout
@@ -28,6 +34,11 @@ jobs:
         with:
           java-version: '${{ vars.JAVA_JDK_VERSION }}'
           distribution: "zulu"
+
+      - name: Set Xcode version
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '${{ vars.XCODE_VERSION }}'
 
       - name: Caching Kotlin/Native tooling
         uses: actions/cache@v3

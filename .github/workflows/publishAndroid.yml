@@ -9,7 +9,7 @@ on:
 jobs:
   build-release:
     name: Build library
-    uses: ./.github/workflows/buildRelease.yml
+    uses: ./.github/workflows/buildAndroidRelease.yml
 
   publish:
     name: Publish library
