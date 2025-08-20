@@ -1,0 +1,13 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.tweener.passage.sample",
+      "sha256_cert_fingerprints": [
+        "2F:2D:6E:25:7F:FA:53:F0:67:91:37:FD:94:90:F8:AA:E0:5A:B6:AA:F9:8A:E3:E9:08:4F:2F:7C:F5:92:CA:2B"
+      ]
+    }
+  }
+]
+[

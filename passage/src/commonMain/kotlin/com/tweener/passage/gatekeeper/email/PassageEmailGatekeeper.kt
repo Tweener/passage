@@ -91,6 +91,7 @@ internal class PassageEmailGatekeeper(
     suspend fun sendPasswordResetEmail(params: PassageForgotPasswordParams): Result<Unit> = suspendCatching {
         val actionCodeSettings = buildActionCodeSettings(
             url = params.url,
+            linkDomain = params.hostingDomain,
             iOSBundleId = params.iosParams?.bundleId,
             androidPackageName = params.androidParams?.packageName,
             installIfNotAvailable = params.androidParams?.installIfNotAvailable ?: true,
@@ -155,6 +156,7 @@ internal class PassageEmailGatekeeper(
     suspend fun sendEmailVerification(params: PassageEmailVerificationParams): Result<Unit> = suspendCatching {
         val actionCodeSettings = buildActionCodeSettings(
             url = params.url,
+            linkDomain = params.hostingDomain,
             iOSBundleId = params.iosParams?.bundleId,
             androidPackageName = params.androidParams?.packageName,
             installIfNotAvailable = params.androidParams?.installIfNotAvailable ?: true,
@@ -199,6 +201,7 @@ internal class PassageEmailGatekeeper(
     suspend fun sendSignInLinkToEmail(params: PassageSignInLinkToEmailParams): Result<Unit> = suspendCatching {
         val actionCodeSettings = buildActionCodeSettings(
             url = params.url,
+            linkDomain = params.hostingDomain,
             iOSBundleId = params.iosParams?.bundleId,
             androidPackageName = params.androidParams?.packageName,
             installIfNotAvailable = params.androidParams?.installIfNotAvailable ?: true,
@@ -237,6 +240,7 @@ internal class PassageEmailGatekeeper(
 
     private fun buildActionCodeSettings(
         url: String,
+        linkDomain: String,
         iOSBundleId: String?,
         androidPackageName: String?,
         installIfNotAvailable: Boolean,
@@ -245,6 +249,7 @@ internal class PassageEmailGatekeeper(
     ): ActionCodeSettings =
         ActionCodeSettings(
             url = url,
+            linkDomain = linkDomain,
             androidPackageName = androidPackageName?.let { AndroidPackageName(packageName = it, installIfNotAvailable = installIfNotAvailable, minimumVersion = minimumVersion) },
             iOSBundleId = iOSBundleId,
             canHandleCodeInApp = canHandleCodeInApp,

@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Open in app</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+        body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans"; margin: 0; padding: 24px; }
+        .card { max-width: 560px; margin: 0 auto; padding: 24px; border: 1px solid #eee; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        h1 { font-size: 1.25rem; margin: 0 0 8px; }
+        p { color: #444; line-height: 1.5; margin: 8px 0; }
+        .btn { display: inline-block; padding: 12px 16px; border-radius: 10px; border: 0; background: #1b73e8; color: #fff; font-weight: 600; cursor: pointer; text-decoration: none; }
+        .row { display:flex; gap:12px; flex-wrap:wrap; margin-top:8px; }
+        .muted { color: #666; font-size: 0.9rem; }
+        .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; }
+        .kvs { background:#fafafa;border:1px solid #eee;padding:12px;border-radius:8px;margin-top:12px; }
+        .kvs div { display:grid;grid-template-columns:120px 1fr;gap:8px;padding:4px 0; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h1>Continue in the app</h1>
+    <p>This link is meant to open <span class="mono">com.tweener.passage.sample</span>.</p>
+
+    <div class="row">
+        <a id="openBtn" class="btn" href="#">Open in app</a>
+        <a id="storeBtn" class="btn" href="#" style="background:#0f9d58;">Get it on Google Play</a>
+    </div>
+
+    <p class="muted">If nothing happens, make sure the app is installed and that App Links are verified for <span class="mono">passagesample.web.app</span>.</p>
+
+    <div id="debug" class="kvs" style="display:none;">
+        <div><strong>Path</strong> <span id="path"></span></div>
+        <div><strong>mode</strong> <span id="mode"></span></div>
+        <div><strong>oobCode</strong> <span id="oobCode"></span></div>
+        <div><strong>continueUrl</strong> <span id="continueUrl"></span></div>
+        <div><strong>All params</strong> <span id="allParams"></span></div>
+    </div>
+</div>
+
+<script>
+    (function () {
+      // CONFIG
+      const ANDROID_PACKAGE = "com.tweener.passage.sample";
+      const PLAY_STORE_HTTP = "https://play.google.com/store/apps/details?id=" + ANDROID_PACKAGE;
+      const PLAY_STORE_MARKET = "market://details?id=" + ANDROID_PACKAGE;
+
+      const isAndroid = /Android/i.test(navigator.userAgent);
+      const deepLink = window.location.href;              // current HTTPS link (Android App Link)
+      const openBtn = document.getElementById("openBtn");
+      const storeBtn = document.getElementById("storeBtn");
+
+      // Wire buttons
+      openBtn.setAttribute("href", deepLink);
+      storeBtn.setAttribute("href", isAndroid ? PLAY_STORE_MARKET : PLAY_STORE_HTTP);
+
+      // Show debug info for Firebase Auth params
+      const u = new URL(deepLink);
+      const qp = u.searchParams;
+      const set = (id, val) => document.getElementById(id).textContent = val || "—";
+      if ([...qp.keys()].length > 0) {
+        document.getElementById("debug").style.display = "block";
+        set("path", u.pathname);
+        set("mode", qp.get("mode"));
+        set("oobCode", qp.get("oobCode"));
+        set("continueUrl", qp.get("continueUrl"));
+        set("allParams", [...qp.entries()].map(([k,v]) => `${k}=${v}`).join("&"));
+      }
+
+      // Auto-open + fallback-to-Play
+      // Strategy: try to open the App Link; if the page stays visible after ~1.5s,
+      // assume the app isn't installed or not verified, and redirect to Play.
+      if (isAndroid) {
+        let fallbackTimer;
+
+        const cancelFallback = () => {
+          if (fallbackTimer) {
+            clearTimeout(fallbackTimer);
+            fallbackTimer = null;
+          }
+        };
+
+        // If app opens, browser tab becomes hidden → cancel fallback
+        document.addEventListener("visibilitychange", () => {
+          if (document.visibilityState === "hidden") cancelFallback();
+        });
+
+        // Kick off deep link after a tiny delay to allow user to cancel via back
+        setTimeout(() => {
+          // Schedule fallback to Play if still visible
+          fallbackTimer = setTimeout(() => {
+            // If user is still here, try market:// first, then HTTPS as a safety
+            try {
+              window.location.href = PLAY_STORE_MARKET;
+              // If market:// fails (e.g., no Play Store), try HTTPS shortly after
+              setTimeout(() => { window.location.href = PLAY_STORE_HTTP; }, 400);
+            } catch (e) {
+              window.location.href = PLAY_STORE_HTTP;
+            }
+          }, 1500);
+
+          // Try to open the app via the verified HTTPS deep link
+          window.location.href = deepLink;
+        }, 250);
+      }
+    })();
+</script>
+</body>
+</html>

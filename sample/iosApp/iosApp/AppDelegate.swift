@@ -44,7 +44,7 @@ class AppDelegate : NSObject, UIApplicationDelegate, UNUserNotificationCenterDel
             print("Handled by GIDSignIn")
         }
 
-        // Then check if the URL is handled by Passage (Firebase Dynamic Links)
+        // Then check if the URL is handled by Passage (Firebase email action links)
         else if (PassageHelper().handle(url: url.absoluteString)) {
             print("Handled by Passage")
         }

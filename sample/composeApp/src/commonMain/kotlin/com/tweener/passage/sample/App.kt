@@ -115,7 +115,8 @@ fun App() {
             ) {
                 Spacer(modifier = Modifier.padding(vertical = 8.dp))
 
-                Text(entrant?.email?.let { "Entrant email: $it" } ?: "User not logged in")
+                Text("Entrant email: " + (entrant?.email ?: "User not logged in"))
+                Text("Entrant displayName: " + (entrant?.displayName ?: "User not logged in"))
 
                 HorizontalDivider(modifier = Modifier.width(250.dp), thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
 
@@ -174,7 +175,8 @@ fun App() {
                                 .sendSignInLinkToEmail(
                                     params = PassageSignInLinkToEmailParams(
                                         email = "{Your email address}",
-                                        url = "https://passagesample.page.link/action/sign_in_link_email",
+                                        url = "https://passagesample.web.app/action/sign_in_link_email",
+                                        hostingDomain = "passagesample.web.app",
                                         iosParams = PassageSignInLinkToEmailIosParams(bundleId = "com.tweener.passage.sample"),
                                         androidParams = PassageSignInLinkToEmailAndroidParams(
                                             packageName = "com.tweener.passage.sample",
@@ -196,7 +198,8 @@ fun App() {
                             passage
                                 .sendEmailVerification(
                                     params = PassageEmailVerificationParams(
-                                        url = "https://passagesample.page.link/action/email_verified",
+                                        url = "https://passagesample.web.app/action/email_verified",
+                                        hostingDomain = "passagesample.web.app",
                                         iosParams = PassageEmailVerificationIosParams(bundleId = "com.tweener.passage.sample"),
                                         androidParams = PassageEmailVerificationAndroidParams(
                                             packageName = "com.tweener.passage.sample",
@@ -223,7 +226,8 @@ fun App() {
                                 .sendPasswordResetEmail(
                                     params = PassageForgotPasswordParams(
                                         email = entrant?.email!!,
-                                        url = "https://passagesample.page.link/action/password_reset",
+                                        url = "https://passagesample.web.app/action/password_reset",
+                                        hostingDomain = "passagesample.web.app",
                                         iosParams = PassageForgotPasswordIosParams(bundleId = "com.tweener.passage.sample"),
                                         androidParams = PassageForgotPasswordAndroidParams(
                                             packageName = "com.tweener.passage.sample",

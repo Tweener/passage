@@ -18,7 +18,7 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>Dynamic Link</string>
+			<string>Firebase Email Link</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>com.tweener.passage.sample</string>

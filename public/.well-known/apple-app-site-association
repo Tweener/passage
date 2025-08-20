@@ -1,0 +1,14 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["5T66W8EEF2.com.tweener.passage.sample"],
+        "components": [
+          { "/": "/action/sign_in_link_email/*" },
+          { "/": "/action/email_verified/*" },
+          { "/": "/action/password_reset/*" }
+        ]
+      }
+    ]
+  }
+}
