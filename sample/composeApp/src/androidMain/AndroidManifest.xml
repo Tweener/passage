@@ -29,7 +29,7 @@
 
                 <data
                     android:host="passagesample.web.app"
-                    android:pathPrefix="/__/auth/links"
+                    android:pathPrefix="/action/"
                     android:scheme="https" />
             </intent-filter>
         </activity>

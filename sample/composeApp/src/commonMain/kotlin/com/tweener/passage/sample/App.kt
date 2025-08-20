@@ -115,7 +115,8 @@ fun App() {
             ) {
                 Spacer(modifier = Modifier.padding(vertical = 8.dp))
 
-                Text(entrant?.email?.let { "Entrant email: $it" } ?: "User not logged in")
+                Text("Entrant email: " + (entrant?.email ?: "User not logged in"))
+                Text("Entrant displayName: " + (entrant?.displayName ?: "User not logged in"))
 
                 HorizontalDivider(modifier = Modifier.width(250.dp), thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
 
