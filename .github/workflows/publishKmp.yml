@@ -20,7 +20,7 @@ jobs:
     needs:
       - build-android-release
       - build-ios-release
-    runs-on: macos-15
+    runs-on: macos-14
 
     steps:
       - name: Checkout

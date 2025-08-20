@@ -11,11 +11,11 @@ on:
 
 jobs:
   build-android-release:
-    name: Build library
+    name: Build Android library
     uses: ./.github/workflows/buildAndroidRelease.yml
 
   build-ios-release:
-    name: Build library
+    name: Build iOS library
     uses: ./.github/workflows/buildIosRelease.yml
 
   publish:
@@ -28,9 +28,9 @@ jobs:
       matrix:
         include:
           - target: publishIosArm64PublicationToMavenCentralRepository
-            os: macos-15
+            os: macos-14
           - target: publishIosSimulatorArm64PublicationToMavenCentralRepository
-            os: macos-15
+            os: macos-14
           - target: publishAndroidReleasePublicationToMavenCentralRepository
             os: ubuntu-latest
           - target: publishKotlinMultiplatformPublicationToMavenCentralRepository
