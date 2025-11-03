@@ -38,7 +38,7 @@ Be sure to show your support by starring ⭐️ this repository, and feel free t
 > - I attempted to follow the [migration guide](https://firebase.google.com/docs/auth/android/email-link-migration) to move from Dynamic Links to Firebase Hosting, but had no success.  
 > - Firebase recently [updated the free plan limit](https://firebase.google.com/docs/auth/limits#email_sending_limits) for email link sign-in emails to only **5 per day**, which makes development both harder and more expensive.  
 >   
-> If you discover a reliable solution, contributions via PR are very welcome!
+> [Other solutions](https://firebase.google.com/support/dynamic-links-faq#how_should_i_migrate_from_the_service) exist that provide similar features to Firebase Dynamic Links..
 
 ---
 
