@@ -122,7 +122,7 @@ mavenPublishing {
     coordinates(groupId = group.toString(), artifactId = ProjectConfiguration.Passage.Maven.name.lowercase(), version = version.toString())
     configure(
         platform = KotlinMultiplatform(
-            javadocJar = JavadocJar.Dokka("dokkaHtml"),
+            javadocJar = JavadocJar.Dokka("dokkaGeneratePublicationHtml"),
             sourcesJar = true,
         )
     )

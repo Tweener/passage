@@ -11,7 +11,7 @@ object ProjectConfiguration {
         const val packageName = "com.tweener.passage"
         const val versionName = "1.5.0"
         const val namespace = "$packageName.android"
-        const val compileSDK = 35
+        const val compileSDK = 36
         const val minSDK = 24
 
         object Maven {
