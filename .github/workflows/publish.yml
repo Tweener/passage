@@ -34,7 +34,7 @@ jobs:
           - target: publishAndroidReleasePublicationToMavenCentralRepository
             os: ubuntu-latest
           - target: publishKotlinMultiplatformPublicationToMavenCentralRepository
-            os: ubuntu-latest
+            os: macos-14
     runs-on: ${{ matrix.os }}
 
     steps:
