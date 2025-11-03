@@ -1,6 +1,17 @@
 
 # Changelog
 
+## [1.5.1] - November 3rd, 2025
+- 📦 **`[BUILD]`**: Bump Android compile SDK to 36.
+- 🔄 Update Kotlin to 2.2.21.
+- 🔄 Update Gradle to 8.13.0.
+- 🔄 Update Compose Multiplatform to 1.9.1.
+- 🔄 Update Material3 to 1.9.0.
+- 🔄 Update Firebase GitLive to 2.4.0.
+- 🔄 Update KMPKit to 1.0.13.
+- 🔄 Update Dokka to 2.1.0.
+- 🔄 Update various Android dependencies (AndroidX Core, Activity, etc.).
+
 ## [1.5.0] - August 20th, 2025
 - 🚨 **`[BREAKING]`**: **Complete elimination of Firebase Dynamic Links**
 > [!WARNING]  
