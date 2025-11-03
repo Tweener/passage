@@ -34,7 +34,7 @@ jobs:
           - target: publishAndroidReleasePublicationToMavenCentralRepository
             os: ubuntu-latest
           - target: publishKotlinMultiplatformPublicationToMavenCentralRepository
-            os: macos-14
+            os: ubuntu-latest
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -51,6 +51,7 @@ jobs:
           distribution: "zulu"
 
       - name: Set Xcode version
+        if: startsWith(matrix.os, 'macos')
         uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: '${{ vars.XCODE_VERSION }}'

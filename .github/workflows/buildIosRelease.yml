@@ -16,6 +16,7 @@ jobs:
         uses: gradle/actions/wrapper-validation@v3
 
       - name: Set Xcode version
+        if: startsWith(matrix.os, 'macos')
         uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: '${{ vars.XCODE_VERSION }}'
