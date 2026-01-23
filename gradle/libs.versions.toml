@@ -50,6 +50,7 @@ googleSignIn = ["googleSignIn-credentials", "googleSignIn-credentials-playServic
 
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 android-library = { id = "com.android.library", version.ref = "gradle" }
 android-application = { id = "com.android.application", version.ref = "gradle" }
 dependency-versions = { id = "com.github.ben-manes.versions", version.ref = "dependencyVersionsPlugin" }

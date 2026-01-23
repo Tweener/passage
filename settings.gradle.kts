@@ -17,4 +17,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "Passage"
 include(":passage")
-include(":sample:composeApp")
+include(":sample:shared")
+include(":sample:androidApp")

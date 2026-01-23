@@ -7,7 +7,7 @@
 
 import SwiftUI
 import GoogleSignIn
-import composeApp
+import shared
 
 @MainActor
 class AppDelegate : NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {

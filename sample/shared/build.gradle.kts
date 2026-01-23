@@ -1,10 +1,8 @@
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
-    alias(libs.plugins.android.application)
+    alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.compose)
     alias(libs.plugins.jetbrains.compose.compiler)
-    alias(libs.plugins.google.services)
-    alias(libs.plugins.firebase.crashlytics)
 }
 
 kotlin {
@@ -19,7 +17,7 @@ kotlin {
         iosSimulatorArm64()
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
-            baseName = "composeApp"
+            baseName = "shared"
             isStatic = true
 
             // Add here any extra framework dependencies
@@ -54,22 +52,11 @@ kotlin {
 }
 
 android {
-    namespace = ProjectConfiguration.Passage.packageName + ".sample"
+    namespace = ProjectConfiguration.Passage.packageName + ".sample.shared"
     compileSdk = ProjectConfiguration.Passage.compileSDK
 
     defaultConfig {
-        applicationId = ProjectConfiguration.Passage.packageName + ".sample"
         minSdk = ProjectConfiguration.Passage.minSDK
-        targetSdk = ProjectConfiguration.Passage.compileSDK
-        versionCode = 1
-        versionName = "1.0"
-    }
-
-    buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-        }
     }
 
     compileOptions {
@@ -79,9 +66,5 @@ android {
 
     buildFeatures {
         compose = true
-    }
-
-    dependencies {
-        implementation(libs.android.startup)
     }
 }
