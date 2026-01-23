@@ -1,7 +1,7 @@
 [![Maven Central Version](https://img.shields.io/maven-central/v/io.github.tweener/passage?color=orange)](https://central.sonatype.com/artifact/io.github.tweener/passage)
-[![Kotlin](https://img.shields.io/badge/kotlin-2.2.21-blue.svg?logo=kotlin)](http://kotlinlang.org)
-[![Compose](https://img.shields.io/badge/compose-1.9.3-blue.svg?logo=jetpackcompose)](https://www.jetbrains.com/lp/compose-multiplatform)
-![gradle-version](https://img.shields.io/badge/gradle-8.13.1-blue?logo=gradle)
+[![Kotlin](https://img.shields.io/badge/kotlin-2.3.0-blue.svg?logo=kotlin)](http://kotlinlang.org)
+[![Compose](https://img.shields.io/badge/compose-1.10.0-blue.svg?logo=jetpackcompose)](https://www.jetbrains.com/lp/compose-multiplatform)
+![gradle-version](https://img.shields.io/badge/gradle-8.13.2-blue?logo=gradle)
 [![License](https://img.shields.io/badge/License-Apache%202.0-green.svg)](https://opensource.org/licenses/Apache-2.0)
 
 [![Website](https://img.shields.io/badge/Author-vivienmahe.com-purple)](https://vivienmahe.com/)
@@ -280,7 +280,21 @@ passage.reauthenticateWithApple()
 passage.reauthenticateWithEmailAndPassword(params)
 ```
 
-### 3. Email actions
+### 3. Retrieve Firebase ID Token
+You can retrieve the Firebase ID token for the currently authenticated user. This is useful for authenticating requests to your backend server.
+
+```kotlin
+val result = passage.getIdToken(forceRefresh = false)
+result.fold(
+    onSuccess = { token -> Log.d("Passage", "ID Token: $token") },
+    onFailure = { error -> Log.e("Passage", "Failed to get ID token", error) }
+)
+```
+
+> [!NOTE]
+> Set `forceRefresh = true` to force a refresh of the ID token, which is useful when the token might be expired or you need the latest claims.
+
+### 4. Email actions
 You may need to [send emails](https://firebase.google.com/docs/auth/android/passing-state-in-email-actions) to the user for a password reset if the user forgot their password for instance, or for verifying the user's email address when creating an account.
 
 > [!IMPORTANT]
