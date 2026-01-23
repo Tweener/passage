@@ -1,6 +1,16 @@
 
 # Changelog
 
+## [1.6.0] - January 23rd, 2026
+- ✨ **`[FEATURE]`**: Add `getIdToken()` method in `Passage` to retrieve the current user's Firebase ID token, with an option to force refresh.
+- 🔄 Update Kotlin to 2.3.0.
+- 🔄 Update Gradle to 8.13.2.
+- 🔄 Update Compose Multiplatform to 1.10.0.
+- 🔄 Update Maven Publish to 0.36.0.
+- 🔄 Update Android Activity to 1.12.2.
+- 🔄 Update Play Services to 21.5.0.
+- 🔄 Update Google ID Identity to 1.2.0.
+
 ## [1.5.1] - November 3rd, 2025
 - 📦 **`[BUILD]`**: Bump Android compile SDK to 36.
 - 🔄 Update Kotlin to 2.2.21.
