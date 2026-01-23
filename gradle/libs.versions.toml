@@ -1,10 +1,10 @@
 [versions]
-kotlin = "2.2.21"
-gradle = "8.13.1"
-composeMultiplatform = "1.9.3"
+kotlin = "2.3.0"
+gradle = "8.13.2"
+composeMultiplatform = "1.10.0"
 material3 = "1.9.0"
 dependencyVersionsPlugin = "0.53.0"
-mavenPublish = "0.35.0"
+mavenPublish = "0.36.0"
 dokka = "2.1.0"
 androidAnnotations = "1.9.1"
 coroutines = "1.10.2"
@@ -16,9 +16,9 @@ kmpKit = "1.0.13"
 
 # Android
 androidCore = "1.17.0"
-androidActivity = "1.12.1"
-playServices = "21.4.0"
-googleIdIdentity = "1.1.1"
+androidActivity = "1.12.2"
+playServices = "21.5.0"
+googleIdIdentity = "1.2.0"
 androidCredentials = "1.5.0"
 androidStartup = "1.2.0"
 
