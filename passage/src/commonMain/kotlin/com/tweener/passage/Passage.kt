@@ -156,6 +156,18 @@ abstract class Passage {
     }
 
     /**
+     * Retrieves the ID token for the currently authenticated user.
+     *
+     * @param forceRefresh If `true`, forces a refresh of the ID token. Defaults to `false`.
+     * @return A [Result] containing the ID token as a [String], or an error if no user is authenticated.
+     */
+    suspend fun getIdToken(forceRefresh: Boolean = false): Result<String> =
+        firebaseAuth.currentUser
+            ?.getIdToken(forceRefresh = forceRefresh)
+            ?.let { token -> Result.success(token) }
+            ?: Result.failure(IllegalStateException("No authenticated user found to retrieve ID token."))
+
+    /**
      * Platform-specific initialization for Firebase.
      */
     protected abstract fun initializeFirebase()

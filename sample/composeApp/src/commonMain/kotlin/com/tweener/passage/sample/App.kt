@@ -246,6 +246,22 @@ fun App() {
                         Text("Send password reset email")
                     }
 
+                    HorizontalDivider(modifier = Modifier.width(50.dp), thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
+
+                    Button(onClick = {
+                        buttonsScope.launch {
+                            passage
+                                .getIdToken(forceRefresh = true)
+                                .onSuccess { token ->
+                                    snackbarScope.launch { snackbarHostState.showSnackbar(message = "Firebase ID token: $token") }
+                                    println("Firebase ID token: $token")
+                                }
+                                .onFailure { it.message?.let { message -> snackbarScope.launch { snackbarHostState.showSnackbar(message = message) } } }
+                        }
+                    }) {
+                        Text("Retrieve Firebase ID token")
+                    }
+
                     HorizontalDivider(modifier = Modifier.width(250.dp), thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
 
                     Button(onClick = {
