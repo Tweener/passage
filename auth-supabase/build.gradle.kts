@@ -13,11 +13,11 @@ plugins {
 }
 
 android {
-    namespace = "com.tweener.passage.auth.supabase.android"
-    compileSdk = ProjectConfiguration.Passage.compileSDK
+    namespace = ProjectConfiguration.PassageAuthSupabase.namespace
+    compileSdk = ProjectConfiguration.PassageAuthSupabase.compileSDK
 
     defaultConfig {
-        minSdk = ProjectConfiguration.Passage.minSDK
+        minSdk = ProjectConfiguration.PassageAuthSupabase.minSDK
 
         consumerProguardFiles("consumer-rules.pro")
     }
@@ -101,8 +101,8 @@ kotlin {
 
 // region Publishing
 
-group = ProjectConfiguration.Passage.Maven.group
-version = ProjectConfiguration.Passage.versionName
+group = ProjectConfiguration.PassageAuthSupabase.Maven.group
+version = ProjectConfiguration.PassageAuthSupabase.versionName
 
 mavenPublishing {
     publishToMavenCentral(automaticRelease = true)
@@ -113,7 +113,7 @@ mavenPublishing {
         signAllPublications()
     }
 
-    coordinates(groupId = group.toString(), artifactId = ProjectConfiguration.Passage.Maven.name.lowercase(), version = version.toString())
+    coordinates(groupId = group.toString(), artifactId = ProjectConfiguration.PassageAuthSupabase.Maven.artifactId.lowercase(), version = version.toString())
     configure(
         platform = KotlinMultiplatform(
             javadocJar = JavadocJar.Dokka("dokkaGeneratePublicationHtml"),
@@ -122,9 +122,9 @@ mavenPublishing {
     )
 
     pom {
-        name = ProjectConfiguration.Passage.Maven.name
-        description = ProjectConfiguration.Passage.Maven.description
-        url = ProjectConfiguration.Passage.Maven.packageUrl
+        name = ProjectConfiguration.PassageAuthSupabase.Maven.name
+        description = ProjectConfiguration.PassageAuthSupabase.Maven.description
+        url = ProjectConfiguration.PassageAuthSupabase.Maven.packageUrl
 
         licenses {
             license {
@@ -135,21 +135,33 @@ mavenPublishing {
 
         issueManagement {
             system = "GitHub Issues"
-            url = "${ProjectConfiguration.Passage.Maven.packageUrl}/issues"
+            url = "${ProjectConfiguration.PassageAuthSupabase.Maven.packageUrl}/issues"
         }
 
         developers {
             developer {
-                id = ProjectConfiguration.Passage.Maven.Developer.id
-                name = ProjectConfiguration.Passage.Maven.Developer.name
-                email = ProjectConfiguration.Passage.Maven.Developer.email
+                id = ProjectConfiguration.PassageAuthSupabase.Maven.Developer.id
+                name = ProjectConfiguration.PassageAuthSupabase.Maven.Developer.name
+                email = ProjectConfiguration.PassageAuthSupabase.Maven.Developer.email
+            }
+        }
+
+        contributors {
+            contributor {
+                name = ProjectConfiguration.PassageAuthSupabase.Maven.Contributor.name
+                email = ProjectConfiguration.PassageAuthSupabase.Maven.Contributor.email
+                properties.set(
+                    mapOf(
+                        "id" to ProjectConfiguration.PassageAuthSupabase.Maven.Contributor.id
+                    )
+                )
             }
         }
 
         scm {
-            connection = "scm:git:git://${ProjectConfiguration.Passage.Maven.gitUrl}"
-            developerConnection = "scm:git:ssh://${ProjectConfiguration.Passage.Maven.gitUrl}"
-            url = ProjectConfiguration.Passage.Maven.packageUrl
+            connection = "scm:git:git://${ProjectConfiguration.PassageAuthSupabase.Maven.gitUrl}"
+            developerConnection = "scm:git:ssh://${ProjectConfiguration.PassageAuthSupabase.Maven.gitUrl}"
+            url = ProjectConfiguration.PassageAuthSupabase.Maven.packageUrl
         }
     }
 }

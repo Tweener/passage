@@ -34,6 +34,7 @@ jetbrains-lifecycle-runtime-compose = { group = "org.jetbrains.androidx.lifecycl
 kmpkit = { group = "io.github.tweener", name = "kmpkit", version.ref = "kmpKit" }
 firebase-auth = { group = "dev.gitlive", name = "firebase-auth", version.ref = "firebaseGitLiveApp" }
 supabase-bom = { module = "io.github.jan-tennert.supabase:bom", version.ref = "supabase-bom" }
+supabase-auth-kt = { module = "io.github.jan-tennert.supabase:auth-kt" }
 supabase-postgrest = { module = "io.github.jan-tennert.supabase:postgrest-kt" }
 supabase-realtime = { module = "io.github.jan-tennert.supabase:realtime-kt" }
 
@@ -61,7 +62,7 @@ junit = { group = "androidx.test.ext", name = "junit", version.ref = "junit" }
 
 [bundles]
 googleSignIn = ["googleSignIn-credentials", "googleSignIn-credentials-playServicesAuth", "googleSignIn-identity", "googleSignIn-playServicesAuth"]
-supabase = ["supabase-postgrest", "supabase-realtime"]
+supabase = ["supabase-auth-kt"]
 
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }

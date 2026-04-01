@@ -210,7 +210,7 @@ internal class PassageGoogleGatekeeperAndroid<T : EntrantInterface>(
                         val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
 
                         val idToken = googleIdTokenCredential.idToken
-                        println("Successful Google Sin In flow with idToken: $idToken")
+                        println("Successful Google Sign In flow with idToken: $idToken")
 
                         GoogleTokens(idToken = idToken)
                     }

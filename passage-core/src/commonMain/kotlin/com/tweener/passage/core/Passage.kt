@@ -103,7 +103,7 @@ abstract class Passage<T : EntrantInterface> {
 
         return when (val result = authPlugin.getCurrentUser()) {
             is AuthResult.Success -> result.data
-            is AuthResult.Error -> throw result.throwable
+            is AuthResult.Error -> null
         }
     }
 
@@ -151,7 +151,6 @@ abstract class Passage<T : EntrantInterface> {
     /**
      * Retrieves the ID token for the currently authenticated user.
      *
-     * @param forceRefresh If `true`, forces a refresh of the ID token. Defaults to `false`.
      * @return A [Result] containing the ID token as a [String], or an error if no user is authenticated.
      */
     suspend fun getIdToken(): Result<String> {

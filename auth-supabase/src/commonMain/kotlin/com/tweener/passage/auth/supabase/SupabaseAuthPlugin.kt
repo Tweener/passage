@@ -339,17 +339,25 @@ class SupabaseAuthPlugin<T : EntrantInterface>(
     }
 
     override suspend fun deleteCurrentUser(): AuthResult<Unit> {
-        return try {
-            val userId = supabaseAuth.currentUserOrNull()?.id
-                ?: return AuthResult.Error(PassageGatekeeperUnknownEntrantException())
+        // Supabase Admin APIs require a service-role key and must not be called from client/mobile code.
+        // User deletion should be implemented via a secure server-side endpoint that uses the Admin API.
+        return AuthResult.Error(
+            UnsupportedOperationException(
+                "Deleting users must be performed via a server-side endpoint using Supabase Admin API."
+            )
+        )
 
-            // Supabase requires admin API to delete users
-            supabaseAuth.admin.deleteUser(userId)
-
-            AuthResult.Success(Unit)
-        } catch (e: Exception) {
-            AuthResult.Error(mapPluginAuthError(e))
-        }
+//        return try {
+//            val userId = supabaseAuth.currentUserOrNull()?.id
+//                ?: return AuthResult.Error(PassageGatekeeperUnknownEntrantException())
+//
+//            // Supabase requires admin API to delete users
+//            supabaseAuth.admin.deleteUser(userId)
+//
+//            AuthResult.Success(Unit)
+//        } catch (e: Exception) {
+//            AuthResult.Error(mapPluginAuthError(e))
+//        }
     }
 
     override fun mapPluginAuthError(throwable: Throwable): Throwable {

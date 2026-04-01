@@ -1,5 +1,7 @@
 package com.tweener.passage.core.error
 
+import com.tweener.passage.core.model.GatekeeperType
+
 /**
  * @author Vivien Mahe
  * @since 02/12/2024
