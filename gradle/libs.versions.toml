@@ -9,6 +9,7 @@ dokka = "2.1.0"
 androidAnnotations = "1.9.1"
 coroutines = "1.10.2"
 firebaseGitLiveApp = "2.4.0" # Firebase for KMP https://firebaseopensource.com/projects/gitliveapp/firebase-kotlin-sdk/
+supabase-bom = "3.4.1"
 googleServicesPlugin = "4.4.4"
 crashlyticsPlugin = "3.0.6"
 jetbrainsLifecycle = "2.9.6"
@@ -21,12 +22,21 @@ playServices = "21.5.0"
 googleIdIdentity = "1.2.0"
 androidCredentials = "1.5.0"
 androidStartup = "1.2.0"
+kotlinStdlib = "2.3.0"
+kotlinTest = "2.3.0"
+runner = "1.5.2"
+core = "1.5.0"
+junit = "1.1.5"
 
 [libraries]
 compose-multiplatform-material3 = { group = "org.jetbrains.compose.material3", name = "material3", version.ref = "material3" }
 jetbrains-lifecycle-runtime-compose = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "jetbrainsLifecycle" }
 kmpkit = { group = "io.github.tweener", name = "kmpkit", version.ref = "kmpKit" }
 firebase-auth = { group = "dev.gitlive", name = "firebase-auth", version.ref = "firebaseGitLiveApp" }
+supabase-bom = { module = "io.github.jan-tennert.supabase:bom", version.ref = "supabase-bom" }
+supabase-auth-kt = { module = "io.github.jan-tennert.supabase:auth-kt" }
+supabase-postgrest = { module = "io.github.jan-tennert.supabase:postgrest-kt" }
+supabase-realtime = { module = "io.github.jan-tennert.supabase:realtime-kt" }
 
 # Coroutines
 kotlin-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
@@ -44,9 +54,15 @@ googleSignIn-playServicesAuth = { module = "com.google.android.gms:play-services
 googleSignIn-identity = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleIdIdentity" }
 googleSignIn-credentials = { module = "androidx.credentials:credentials", version.ref = "androidCredentials" }
 googleSignIn-credentials-playServicesAuth = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "androidCredentials" }
+kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlinStdlib" }
+kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.ref = "kotlinTest" }
+runner = { group = "androidx.test", name = "runner", version.ref = "runner" }
+core = { group = "androidx.test", name = "core", version.ref = "core" }
+junit = { group = "androidx.test.ext", name = "junit", version.ref = "junit" }
 
 [bundles]
 googleSignIn = ["googleSignIn-credentials", "googleSignIn-credentials-playServicesAuth", "googleSignIn-identity", "googleSignIn-playServicesAuth"]
+supabase = ["supabase-auth-kt"]
 
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
@@ -61,3 +77,5 @@ jetbrains-compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", versi
 kotlin-nativeCocoaPods = { id = "org.jetbrains.kotlin.native.cocoapods", version.ref = "kotlin" }
 google-services = { id = "com.google.gms.google-services", version.ref = "googleServicesPlugin" }
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "crashlyticsPlugin" }
+android-kotlin-multiplatform-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "gradle" }
+android-lint = { id = "com.android.lint", version.ref = "gradle" }

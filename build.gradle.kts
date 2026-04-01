@@ -13,7 +13,9 @@ plugins {
     alias(libs.plugins.firebase.crashlytics).apply(false)
     alias(libs.plugins.dokka).apply(false)
     alias(libs.plugins.maven.publish).apply(false)
-    alias(libs.plugins.dependency.versions) // ./gradlew dependencyUpdates
+    alias(libs.plugins.dependency.versions)
+    alias(libs.plugins.android.kotlin.multiplatform.library).apply(false)
+    alias(libs.plugins.android.lint).apply(false)
 }
 
 tasks.register<gradle.RenameProjectTask>("renameProject")
