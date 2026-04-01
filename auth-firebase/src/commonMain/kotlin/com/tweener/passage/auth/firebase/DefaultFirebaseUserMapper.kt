@@ -4,24 +4,22 @@ import com.tweener.passage.core.model.DefaultEntrant
 import dev.gitlive.firebase.auth.FirebaseUser
 
 /**
- * Project       : Passage
- * Author        : Chirag Redij
- * Created on    : Tuesday, 31/03/26 at 23:43
- * -------------------------------------------------------------------------------------
- * Last updated  : chiragredij on Tuesday, 31/03/26 at 23:43
+ * Default [FirebaseUserMapper] implementation that maps [FirebaseUser] to [DefaultEntrant].
  *
- * Description   : [Add a brief description of this file or component]
+ * If the user's primary `photoURL` is not set, this mapper falls back to the first
+ * non-null photo URL from the user's linked provider data.
  *
- * Copyright (c) 2026 ChiragRedij. All rights reserved.
+ * @author Chirag Redij
+ * @since 31/03/2026
  */
-class DefaultFirebaseUserMapper(): FirebaseUserMapper<DefaultEntrant> {
+class DefaultFirebaseUserMapper : FirebaseUserMapper<DefaultEntrant> {
     override fun map(firebaseUser: FirebaseUser): DefaultEntrant {
         return DefaultEntrant(
             uid = firebaseUser.uid,
             email = firebaseUser.email,
             displayName = firebaseUser.displayName,
             phoneNumber = firebaseUser.phoneNumber,
-            photoUrl = firebaseUser.photoURL ?: firebaseUser.providerData.map { it.photoURL }.firstOrNull { it != null },
+            photoUrl = firebaseUser.photoURL ?: firebaseUser.providerData.firstNotNullOfOrNull { it.photoURL },
             isAnonymous = firebaseUser.isAnonymous,
             isEmailVerified = firebaseUser.isEmailVerified
         )

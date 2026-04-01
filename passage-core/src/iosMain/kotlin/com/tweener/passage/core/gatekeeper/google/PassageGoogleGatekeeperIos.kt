@@ -17,16 +17,16 @@ import kotlin.coroutines.suspendCoroutine
 /**
  * An iOS-specific implementation of the [PassageGoogleGatekeeper].
  *
- * This class handles authentication using Google Sign-In on iOS devices. It integrates with Firebase
+ * This class handles authentication using Google Sign-In on iOS devices. It integrates with Backend adapter
  * for user management and utilizes the Google Identity SDK for iOS to retrieve tokens for Google authentication.
  * The class provides functionality for signing in, signing out, and re-authenticating users.
  *
  * Responsibilities:
  * - Facilitating Google Sign-In on iOS and retrieving authentication tokens.
- * - Using Firebase credentials to authenticate or re-authenticate users.
+ * - Using Auth credentials to authenticate or re-authenticate users.
  * - Managing error handling for the authentication process.
  *
- * @param firebaseAuth The Firebase authentication instance used for managing authenticated users.
+ * @param authPlugin The Backend authentication adapter instance used for managing authenticated users.
  * @param serverClientId The server client ID associated with the Google Sign-In configuration.
  *
  * @author Vivien Mahe
@@ -66,14 +66,6 @@ internal class PassageGoogleGatekeeperIos<T : EntrantInterface>(
 
     override suspend fun signOut() {
         // Nothing to do here (same behavior)
-
-        // Optional backend sync
-        when (val result = authPlugin.signOut()) {
-            is AuthResult.Error -> {
-                println("Backend signOut failed: ${result.throwable}")
-            }
-            else -> Unit
-        }
     }
 
     override suspend fun reauthenticate(): Result<Unit> {

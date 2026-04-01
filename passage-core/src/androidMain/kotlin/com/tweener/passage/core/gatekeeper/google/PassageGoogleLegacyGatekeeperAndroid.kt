@@ -63,14 +63,6 @@ internal class PassageGoogleLegacyGatekeeperAndroid<T : EntrantInterface>(
         } catch (throwable: Throwable) {
             println("Google Legacy sign out failed with an unknown error: $throwable")
         }
-
-        // Optional: also call backend
-        when (val result = authPlugin.signOut()) {
-            is AuthResult.Error -> {
-                println("Backend signOut failed: ${result.throwable}")
-            }
-            else -> Unit
-        }
     }
 
     override suspend fun reauthenticate(): Result<Unit> {

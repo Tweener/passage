@@ -7,17 +7,17 @@ import com.tweener.passage.core.gatekeeper.email.model.PassageEmailAuthParams
 import com.tweener.passage.core.gatekeeper.email.model.PassageEmailVerificationParams
 import com.tweener.passage.core.gatekeeper.email.model.PassageForgotPasswordParams
 import com.tweener.passage.core.gatekeeper.email.model.PassageSignInLinkToEmailParams
-import com.tweener.passage.core.model.ActionCodeType
 import com.tweener.passage.core.model.AuthCredential
 import com.tweener.passage.core.model.AuthResult
 import com.tweener.passage.core.model.EntrantInterface
+import com.tweener.passage.core.model.PassageUniversalLinkMode
 import kotlin.jvm.JvmInline
 
 @JvmInline
 value class EmailAddress(val email: String)
 
 /**
- * Handles authentication with Firebase via email.
+ * Handles authentication with Backend Adapter via email.
  *
  * This class provides functionality for signing in users using their email and password.
  * It also provides methods to create a new user with email and password, send a password reset email and send an email address verification email.
@@ -43,7 +43,7 @@ internal class PassageEmailGatekeeper<T : EntrantInterface>(
     }
 
     override suspend fun signOut() {
-        authPlugin.signOut()
+        // Nothing to do here (same behavior)
     }
 
     suspend fun signUp(params: PassageEmailAuthParams): Result<T> {
@@ -121,7 +121,7 @@ internal class PassageEmailGatekeeper<T : EntrantInterface>(
     suspend fun handleEmailVerificationCode(oobCode: String): Result<Unit> {
         return when (val result = authPlugin.handleOobCode(
             oobCode = oobCode,
-            type = ActionCodeType.VerifyEmail
+            mode = PassageUniversalLinkMode.VERIFY_EMAIL
         )) {
             is AuthResult.Success -> Result.success(Unit)
             is AuthResult.Error -> {

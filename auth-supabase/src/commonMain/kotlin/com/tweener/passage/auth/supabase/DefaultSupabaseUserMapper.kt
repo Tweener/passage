@@ -6,17 +6,14 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonPrimitive
 
 /**
- * Project       : Passage
- * Author        : Chirag Redij
- * Created on    : Wednesday, 01/04/26 at 00:19
- * -------------------------------------------------------------------------------------
- * Last updated  : chiragredij on Wednesday, 01/04/26 at 00:19
+ * Default [SupabaseUserMapper] implementation that maps Supabase [UserInfo] to [DefaultEntrant].
  *
- * Description   : [Add a brief description of this file or component]
+ * Display name and photo URL are extracted from the user's metadata JSON object,
+ * checking common field names used by OAuth providers (e.g., `full_name`, `avatar_url`).
  *
- * Copyright (c) 2026 ChiragRedij. All rights reserved.
+ * @author Chirag Redij
+ * @since 01/04/2026
  */
-
 class DefaultSupabaseUserMapper : SupabaseUserMapper<DefaultEntrant> {
     override fun map(supabaseUser: UserInfo): DefaultEntrant {
         return DefaultEntrant(

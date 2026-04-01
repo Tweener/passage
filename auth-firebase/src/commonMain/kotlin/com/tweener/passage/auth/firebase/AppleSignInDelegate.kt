@@ -6,22 +6,36 @@ import com.tweener.passage.core.model.EntrantInterface
 import dev.gitlive.firebase.auth.FirebaseAuth
 
 /**
- * Project       : Passage
- * Author        : Chirag Redij
- * Created on    : Tuesday, 31/03/26 at 23:08
- * -------------------------------------------------------------------------------------
- * Last updated  : chiragredij on Tuesday, 31/03/26 at 23:08
+ * Platform-specific delegate for Apple Sign-In with Firebase.
  *
- * Description   : [Add a brief description of this file or component]
+ * On iOS this performs the native ASAuthorization flow and signs into Firebase;
+ * on Android a [com.tweener.passage.core.error.PassageGatekeeperNotImplementedException] is returned.
  *
- * Copyright (c) 2026 ChiragRedij. All rights reserved.
+ * @param T The domain user type, constrained to [EntrantInterface].
+ *
+ * @author Chirag Redij
+ * @since 31/03/2026
  */
 interface AppleSignInDelegate<T : EntrantInterface> {
+
+    /**
+     * Signs in a user with an Apple credential via Firebase.
+     *
+     * @param credential The Apple credential containing an ID token and raw nonce.
+     * @return [AuthResult.Success] containing the authenticated user, or [AuthResult.Error] on failure.
+     */
     suspend fun signInWithApple(
         credential: AuthCredential.AppleCredential
     ): AuthResult<T>
 }
 
+/**
+ * Creates a platform-specific [AppleSignInDelegate] instance.
+ *
+ * @param firebaseAuth The Firebase Auth instance.
+ * @param mapper The mapper used to convert Firebase users to the domain model.
+ * @return A platform-specific [AppleSignInDelegate].
+ */
 expect fun <T : EntrantInterface> provideAppleSignInDelegate(
     firebaseAuth: FirebaseAuth,
     mapper: FirebaseUserMapper<T>

@@ -28,17 +28,17 @@ import com.tweener.passage.core.model.EntrantInterface
 /**
  * An Android-specific implementation of the [PassageGoogleGatekeeper].
  *
- * This class handles authentication using Google Sign-In on Android devices. It integrates with Firebase
+ * This class handles authentication using Google Sign-In on Android devices. It integrates with Backend adapter
  * for user management and leverages the Credential Manager API to retrieve and manage Google credentials.
  * The class provides functionality for signing in, signing out, and re-authenticating users.
  *
  * Responsibilities:
- * - Initiating Google Sign-In and retrieving tokens for Firebase authentication.
+ * - Initiating Google Sign-In and retrieving tokens for Backend authentication.
  * - Managing user sessions, including signing out and re-authentication.
  * - Handling credential retrieval and error scenarios during authentication flows.
  *
  * @param serverClientId The server client ID associated with the Google Sign-In configuration.
- * @param firebaseAuth The Firebase authentication instance used for managing authenticated users.
+ * @param authPlugin The Backend authentication adapter instance used for managing authenticated users.
  * @param applicationContext The Android [Context] required for accessing system resources and APIs.
  * @param activityContext A lambda that provides the current Android [Context] for activity-related operations.
  * @param activityResultLauncher A lambda that provides the [ManagedActivityResultLauncher] for activity results.
@@ -77,7 +77,7 @@ internal class PassageGoogleGatekeeperAndroid<T : EntrantInterface>(
      * Signs in a user using Google Sign-In.
      *
      * This method retrieves Google tokens using the Credential Manager API and uses them to
-     * authenticate the user with Firebase. On success, it returns an authenticated [Entrant].
+     * authenticate the user with Backend adapter. On success, it returns an authenticated [Entrant].
      * On failure, it logs the error and provides an appropriate exception.
      *
      * @param params Unused, as no parameters are required for Google Sign-In.
@@ -149,21 +149,13 @@ internal class PassageGoogleGatekeeperAndroid<T : EntrantInterface>(
      */
     override suspend fun signOut() {
         credentialManager.clearCredentialState(ClearCredentialStateRequest())
-
-        when (val result = authPlugin.signOut()) {
-            is AuthResult.Error -> {
-                println("Plugin signOut failed: ${result.throwable}")
-            }
-            else -> Unit
-        }
-
         legacyGatekeeper.signOut()
     }
 
     /**
      * Re-authenticates the currently authenticated user using Google Sign-In.
      *
-     * This method retrieves new Google tokens and uses them to re-authenticate the user with Firebase.
+     * This method retrieves new Google tokens and uses them to re-authenticate the user with Backend adapter.
      * On success, it ensures the user's session is refreshed.
      *
      * @return A [Result] indicating the success or failure of the re-authentication process.

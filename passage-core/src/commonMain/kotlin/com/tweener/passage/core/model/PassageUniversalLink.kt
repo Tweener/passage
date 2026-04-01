@@ -1,11 +1,11 @@
 package com.tweener.passage.core.model
 
 /**
- * Represents a parsed universal link from an email sent via Firebase.
+ * Represents a parsed universal link from an authentication email action.
  *
  * This class encapsulates the details of a universal link, including the original link,
  * the operation mode, the one-time-use code (oobCode), and the continue URL.
- * These links are typically used in Firebase email actions, such as email verification
+ * These links are typically used in email actions, such as email verification
  * or password resets.
  *
  * @property link The original universal link as a string.

@@ -26,7 +26,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 
 /**
- * Handles Firebase authentication operations.
+ * Handles authentication operations through a pluggable [AuthPlugin] backend.
  *
  * The **Passage** represents the authentication entry point—a secure gateway through which users (Entrants)
  * must pass to access the system. To navigate the Passage, Entrants are verified by Gatekeepers,
@@ -36,9 +36,10 @@ import kotlinx.coroutines.flow.map
  * - **Passage**: The entry point for authentication. It facilitates interactions between Entrants and Gatekeepers.
  * - **Gatekeeper**: An authentication provider that verifies an Entrant's identity (e.g., Google, Apple, Email/Password).
  * - **Entrant**: A user who has been successfully authenticated and granted access to the system.
+ * - **AuthPlugin**: The backend adapter (e.g., Firebase, Supabase) that performs the actual authentication calls.
  *
  * ### Usage
- * 1. Initialize the service with the necessary configuration for each Gatekeeper.
+ * 1. Initialize the service with the necessary configuration for each Gatekeeper and an [AuthPlugin] instance.
  * 2. Use methods like `authenticateWithGoogle`, `authenticateWithApple`, or `authenticateWithEmailAndPassword` to allow Entrants to pass through the Passage.
  * 3. Retrieve the current Entrant or observe authentication state changes as needed.
  *
@@ -52,20 +53,24 @@ abstract class Passage<T : EntrantInterface> {
 
     protected lateinit var authPlugin: AuthPlugin<T>
 
+    /**
+     * Returns `true` if the [authPlugin] has been initialized via [initialize].
+     */
+    private val isInitialized: Boolean
+        get() = ::authPlugin.isInitialized
+
     private var googleGatekeeper: PassageGoogleGatekeeper<T>? = null
     private var appleGatekeeper: PassageAppleGatekeeper<T>? = null
     private var emailGatekeeper: PassageEmailGatekeeper<T>? = null
 
     /**
-     * Initializes the Passage library with the specified list of Gatekeeper configurations and Firebase instance.
+     * Initializes the Passage library with the specified list of Gatekeeper configurations and [AuthPlugin] instance.
      *
      * This method sets up the required Gatekeepers (e.g., Google, Apple, Email/Password) using the provided configurations
-     * and the specified Firebase instance.
-     *
-     * Use this method if your app already uses a Firebase instance.
+     * and the specified [AuthPlugin] backend.
      *
      * @param gatekeeperConfigurations A list of Gatekeeper configurations implementing [PassageGatekeeperConfiguration].
-     * @param firebase The Firebase instance used to initialize Firebase Authentication.
+     * @param authPlugin The authentication plugin used for backend operations.
      *
      * @see PassageGatekeeperConfiguration
      */
@@ -94,6 +99,8 @@ abstract class Passage<T : EntrantInterface> {
      * @return The current [Entrant], or `null` if no user is logged in.
      */
     suspend fun getCurrentUser(): T? {
+        check(isInitialized) { "Passage must be initialized before calling getCurrentUser()." }
+
         return when (val result = authPlugin.getCurrentUser()) {
             is AuthResult.Success -> result.data
             is AuthResult.Error -> throw result.throwable
@@ -105,7 +112,10 @@ abstract class Passage<T : EntrantInterface> {
      *
      * @return A [Flow] that emits the current [Entrant], or `null` if no user is logged in.
      */
-    fun getCurrentUserAsFlow(): Flow<T?> = authPlugin.authStateChanged
+    fun getCurrentUserAsFlow(): Flow<T?> {
+        check(isInitialized) { "Passage must be initialized before calling getCurrentUserAsFlow()." }
+        return authPlugin.authStateChanged
+    }
 
     /**
      * Indicates whether a user is currently logged in.
@@ -121,7 +131,7 @@ abstract class Passage<T : EntrantInterface> {
         getCurrentUserAsFlow().map { it != null }
 
     /**
-     * Signs out the current user from all configured Gatekeepers and Firebase.
+     * Signs out the current user from all configured Gatekeepers and the authentication backend.
      */
     suspend fun signOut() {
         googleGatekeeper?.signOut()
@@ -132,7 +142,7 @@ abstract class Passage<T : EntrantInterface> {
     }
 
     /**
-     * Deletes the currently authenticated user from Firebase.
+     * Deletes the currently authenticated user from the authentication backend.
      */
     suspend fun deleteCurrentUser() {
         authPlugin.deleteCurrentUser()
@@ -185,7 +195,7 @@ abstract class Passage<T : EntrantInterface> {
      * Creates the Google Gatekeeper for handling authentication.
      *
      * @param configuration The configuration for the Google Gatekeeper.
-     * @param firebaseAuth The Firebase authentication instance.
+     * @param authPlugin The Backend Adapter authentication instance.
      * @return The created [PassageGoogleGatekeeper].
      */
     internal abstract fun createGoogleGatekeeper(configuration: GoogleGatekeeperConfiguration, authPlugin: AuthPlugin<T>): PassageGoogleGatekeeper<T>
@@ -208,6 +218,7 @@ abstract class Passage<T : EntrantInterface> {
      * Creates the Apple Gatekeeper for handling authentication.
      *
      * @param configuration The configuration for the Apple Gatekeeper.
+     * @param authPlugin The Backend Adapter authentication instance.
      * @return The created [PassageAppleGatekeeper].
      */
     internal abstract fun createAppleGatekeeper(configuration: AppleGatekeeperConfiguration, authPlugin: AuthPlugin<T>): PassageAppleGatekeeper<T>
@@ -220,6 +231,7 @@ abstract class Passage<T : EntrantInterface> {
      * Creates the Email/Password Gatekeeper for handling authentication.
      *
      * @param configuration The configuration for the Email/Password Gatekeeper.
+     * @param authPlugin The Backend Adapter authentication instance.
      * @return The created [PassageEmailGatekeeper].
      */
     internal fun createEmailGatekeeper(
@@ -229,7 +241,7 @@ abstract class Passage<T : EntrantInterface> {
     /**
      * Authenticates a user with an email and password.
      *
-     * @param params TThe parameters required for authentication.
+     * @param params The parameters required for authentication.
      * @return The authenticated entrant.
      */
     suspend fun authenticateWithEmailAndPassword(params: PassageEmailAuthParams): Result<T> =
@@ -240,7 +252,7 @@ abstract class Passage<T : EntrantInterface> {
     /**
      * Creates a new user with the given email and password.
      *
-     * @param params TThe parameters required for authentication.
+     * @param params The parameters required for account creation.
      * @return The created entrant.
      */
     suspend fun createUserWithEmailAndPassword(params: PassageEmailAuthParams): Result<T> =

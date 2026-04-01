@@ -1,41 +1,51 @@
 package com.tweener.passage.auth.firebase
 
 import com.tweener.passage.core.authplugin.AuthPlugin
+import com.tweener.passage.core.error.PassageEmailAddressAlreadyExistsException
 import com.tweener.passage.core.error.PassageGatekeeperUnknownEntrantException
+import com.tweener.passage.core.error.PassageInvalidCredentialsException
+import com.tweener.passage.core.error.PassageNoUserMatchingEmailException
+import com.tweener.passage.core.error.PassageTooManyRequestsException
+import com.tweener.passage.core.error.PassageWeakPasswordException
 import com.tweener.passage.core.gatekeeper.email.model.PassageEmailVerificationParams
 import com.tweener.passage.core.gatekeeper.email.model.PassageForgotPasswordParams
 import com.tweener.passage.core.gatekeeper.email.model.PassageSignInLinkToEmailParams
-import com.tweener.passage.core.model.ActionCodeType
 import com.tweener.passage.core.model.AuthCredential
 import com.tweener.passage.core.model.AuthResult
 import com.tweener.passage.core.model.EntrantInterface
+import com.tweener.passage.core.model.PassageUniversalLinkMode
 import dev.gitlive.firebase.auth.ActionCodeResult
 import dev.gitlive.firebase.auth.ActionCodeSettings
 import dev.gitlive.firebase.auth.AndroidPackageName
 import dev.gitlive.firebase.auth.EmailAuthProvider
 import dev.gitlive.firebase.auth.FirebaseAuth
+import dev.gitlive.firebase.auth.FirebaseAuthInvalidCredentialsException
+import dev.gitlive.firebase.auth.FirebaseAuthInvalidUserException
+import dev.gitlive.firebase.auth.FirebaseAuthUserCollisionException
+import dev.gitlive.firebase.auth.FirebaseAuthWeakPasswordException
 import dev.gitlive.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 /**
- * Project       : Passage
- * Author        : Chirag Redij
- * Created on    : Tuesday, 31/03/26 at 12:12
- * -------------------------------------------------------------------------------------
- * Last updated  : chiragredij on Tuesday, 31/03/26 at 12:12
+ * Firebase implementation of [AuthPlugin].
  *
- * Description   : [Add a brief description of this file or component]
+ * This class delegates all authentication operations to the Firebase Auth SDK,
+ * mapping Firebase-specific user objects to the domain model via [FirebaseUserMapper].
  *
- * Copyright (c) 2026 ChiragRedij. All rights reserved.
+ * @param T The domain user type, constrained to [EntrantInterface].
+ * @property firebaseAuth The Firebase Auth instance used for all operations.
+ * @property firebaseUserMapper The mapper that converts [dev.gitlive.firebase.auth.FirebaseUser] to [T].
+ *
+ * @author Chirag Redij
+ * @since 31/03/2026
  */
-
 class FirebaseAuthPlugin<T : EntrantInterface>(
     private val firebaseAuth: FirebaseAuth,
     private val firebaseUserMapper: FirebaseUserMapper<T>,
 ) : AuthPlugin<T> {
 
-    val appleSignInDelegate: AppleSignInDelegate<T> = provideAppleSignInDelegate(firebaseAuth, firebaseUserMapper)
+    internal val appleSignInDelegate: AppleSignInDelegate<T> = provideAppleSignInDelegate(firebaseAuth, firebaseUserMapper)
 
     override val currentUser: T?
         get() = firebaseAuth.currentUser?.let { firebaseUserMapper.map(it) }
@@ -65,7 +75,7 @@ class FirebaseAuthPlugin<T : EntrantInterface>(
 
                     val user = result.user
                         ?.let { firebaseUserMapper.map(it) }
-                        ?: return AuthResult.Error(Exception("User is null"))
+                        ?: return AuthResult.Error(PassageGatekeeperUnknownEntrantException())
 
                     AuthResult.Success(user)
                 }
@@ -79,10 +89,9 @@ class FirebaseAuthPlugin<T : EntrantInterface>(
                     val result = firebaseAuth
                         .signInWithCredential(firebaseCredential)
 
-
                     val user = result.user
                         ?.let { firebaseUserMapper.map(it) }
-                        ?: return AuthResult.Error(Exception("User is null"))
+                        ?: return AuthResult.Error(PassageGatekeeperUnknownEntrantException())
 
                     AuthResult.Success(user)
                 }
@@ -107,7 +116,7 @@ class FirebaseAuthPlugin<T : EntrantInterface>(
 
                     val user = result.user
                         ?.let { firebaseUserMapper.map(it) }
-                        ?: return AuthResult.Error(Exception("User is null"))
+                        ?: return AuthResult.Error(PassageGatekeeperUnknownEntrantException())
 
                     AuthResult.Success(user)
                 }
@@ -124,7 +133,7 @@ class FirebaseAuthPlugin<T : EntrantInterface>(
     override suspend fun reauthenticate(credential: AuthCredential): AuthResult<Unit> {
         return try {
             val user = firebaseAuth.currentUser
-                ?: return AuthResult.Error(Exception("No user"))
+                ?: return AuthResult.Error(PassageGatekeeperUnknownEntrantException())
 
             val firebaseCredential = when (credential) {
                 is AuthCredential.EmailCredential -> EmailAuthProvider.credential(
@@ -202,39 +211,38 @@ class FirebaseAuthPlugin<T : EntrantInterface>(
                 ?: return AuthResult.Error(PassageGatekeeperUnknownEntrantException())
 
             AuthResult.Success(Unit)
-        } catch (e: Throwable) {
+        } catch (e: Exception) {
             AuthResult.Error(mapPluginAuthError(e))
         }
     }
 
     override suspend fun handleOobCode(
         oobCode: String,
-        type: ActionCodeType
+        mode: PassageUniversalLinkMode
     ): AuthResult<Unit> {
         return try {
 
-            when (type) {
+            when (mode) {
 
-                ActionCodeType.VerifyEmail -> {
+                PassageUniversalLinkMode.VERIFY_EMAIL -> {
                     firebaseAuth.checkActionCode<ActionCodeResult.VerifyEmail>(oobCode)
                     firebaseAuth.applyActionCode(oobCode)
                     firebaseAuth.currentUser?.reload()
                 }
 
-                ActionCodeType.PasswordReset -> {
+                PassageUniversalLinkMode.RESET_PASSWORD -> {
                     firebaseAuth.checkActionCode<ActionCodeResult.PasswordReset>(oobCode)
                     // DO NOT apply here → handled separately via confirmPasswordReset
                 }
 
-                ActionCodeType.SignInWithEmailLink -> {
+                PassageUniversalLinkMode.SIGN_IN_EMAIL -> {
                     firebaseAuth.checkActionCode<ActionCodeResult.SignInWithEmailLink>(oobCode)
-                    // No applyActionCode needed
                 }
             }
 
             AuthResult.Success(Unit)
 
-        } catch (e: Throwable) {
+        } catch (e: Exception) {
             AuthResult.Error(mapPluginAuthError(e))
         }
     }
@@ -257,7 +265,7 @@ class FirebaseAuthPlugin<T : EntrantInterface>(
             firebaseAuth.sendSignInLinkToEmail(email, actionCodeSettings)
             AuthResult.Success(Unit)
 
-        } catch (e: Throwable) {
+        } catch (e: Exception) {
             AuthResult.Error(mapPluginAuthError(e))
         }
     }
@@ -266,7 +274,7 @@ class FirebaseAuthPlugin<T : EntrantInterface>(
         return try {
             val result = firebaseAuth.isSignInWithEmailLink(link)
             AuthResult.Success(result)
-        } catch (e: Throwable) {
+        } catch (e: Exception) {
             AuthResult.Error(mapPluginAuthError(e))
         }
     }
@@ -277,7 +285,7 @@ class FirebaseAuthPlugin<T : EntrantInterface>(
     ): AuthResult<T> {
         return try {
             if (!firebaseAuth.isSignInWithEmailLink(link)) {
-                return AuthResult.Error(Exception("Invalid email link"))
+                return AuthResult.Error(IllegalArgumentException("Invalid email link"))
             }
 
             val result = firebaseAuth.signInWithEmailLink(email, link)
@@ -288,7 +296,7 @@ class FirebaseAuthPlugin<T : EntrantInterface>(
 
             AuthResult.Success(user)
 
-        } catch (e: Throwable) {
+        } catch (e: Exception) {
             AuthResult.Error(mapPluginAuthError(e))
         }
     }
@@ -305,7 +313,7 @@ class FirebaseAuthPlugin<T : EntrantInterface>(
     override suspend fun deleteCurrentUser(): AuthResult<Unit> {
         return try {
             firebaseAuth.currentUser?.delete()
-                ?: return AuthResult.Error(Exception("No user"))
+                ?: return AuthResult.Error(PassageGatekeeperUnknownEntrantException())
 
             AuthResult.Success(Unit)
         } catch (e: Exception) {
@@ -338,6 +346,12 @@ class FirebaseAuthPlugin<T : EntrantInterface>(
     }
 
     override fun mapPluginAuthError(throwable: Throwable): Throwable {
-        return throwable // extend later with Firebase error mapping
+        return when (throwable) {
+            is FirebaseAuthInvalidUserException -> PassageNoUserMatchingEmailException()
+            is FirebaseAuthInvalidCredentialsException -> PassageInvalidCredentialsException()
+            is FirebaseAuthUserCollisionException -> PassageEmailAddressAlreadyExistsException()
+            is FirebaseAuthWeakPasswordException -> PassageWeakPasswordException()
+            else -> throwable
+        }
     }
 }

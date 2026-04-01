@@ -35,17 +35,17 @@ import kotlin.coroutines.cancellation.CancellationException
  * An iOS-specific implementation of the [PassageAppleGatekeeper].
  *
  * This class handles authentication using Apple Sign-In on iOS devices. It integrates with
- * Firebase for user management and uses the `ASAuthorizationAppleIDProvider` to initiate
+ * Backend Adapter for user management and uses the `ASAuthorizationAppleIDProvider` to initiate
  * the Apple Sign-In process. The `signIn` method facilitates the authentication flow, while
  * the `signOut` method is a no-op since Apple Sign-In does not require explicit sign-out
  * operations.
  *
  * Responsibilities:
  * - Initiating the Apple Sign-In process using the Apple ID provider.
- * - Generating and securely hashing a nonce for secure communication with Firebase.
+ * - Generating and securely hashing a nonce for secure communication with Backend adapter.
  * - Managing callbacks and responses via the `AuthorizationControllerDelegate`.
  *
- * @param firebaseAuth The Firebase authentication instance used for managing authenticated users.
+ * @param authPlugin The Backend authentication adapter instance used for managing authenticated users.
  *
  * @author Vivien Mahe
  * @since 02/12/2024
@@ -61,7 +61,7 @@ internal class PassageAppleGatekeeperIos<T : EntrantInterface>(
      * Authenticates a user using Apple Sign-In on iOS.
      *
      * This method initiates the Apple Sign-In flow using the `ASAuthorizationAppleIDProvider`,
-     * generates a secure nonce, and integrates with Firebase to complete the authentication process.
+     * generates a secure nonce, and integrates with Backend adapter to complete the authentication process.
      *
      * @param params Unused, as no parameters are required for Apple Sign-In.
      * @return A [Result] containing the authenticated [Entrant] if successful, or an error if the process fails.

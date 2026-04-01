@@ -4,16 +4,25 @@ import com.tweener.passage.core.model.EntrantInterface
 import io.github.jan.supabase.auth.user.UserInfo
 
 /**
- * Project       : Passage
- * Author        : Chirag Redij
- * Created on    : Wednesday, 01/04/26 at 00:02
- * -------------------------------------------------------------------------------------
- * Last updated  : chiragredij on Wednesday, 01/04/26 at 00:02
+ * Maps a Supabase [UserInfo] to the domain user model [T].
  *
- * Description   : [Add a brief description of this file or component]
+ * Implement this interface to provide a custom mapping from Supabase's user representation
+ * to your application's [EntrantInterface] implementation.
  *
- * Copyright (c) 2026 ChiragRedij. All rights reserved.
+ * @param T The domain user type, constrained to [EntrantInterface].
+ *
+ * @see DefaultSupabaseUserMapper
+ *
+ * @author Chirag Redij
+ * @since 01/04/2026
  */
-interface SupabaseUserMapper <T : EntrantInterface> {
+interface SupabaseUserMapper<T : EntrantInterface> {
+
+    /**
+     * Converts a Supabase [UserInfo] into the domain model [T].
+     *
+     * @param supabaseUser The Supabase user to map.
+     * @return The mapped domain user.
+     */
     fun map(supabaseUser: UserInfo): T
 }

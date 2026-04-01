@@ -51,8 +51,17 @@ class AppleSignInDelegateImpl<T : EntrantInterface>(
                 }
 
                 firebaseAuth.currentUser != null -> {
-                    val mapped = mapper.map(firebaseAuth.currentUser!!)
-                    continuation.resume(AuthResult.Success(mapped))
+                    val currentUser = firebaseAuth.currentUser
+                    if (currentUser != null) {
+                        val mapped = mapper.map(currentUser)
+                        continuation.resume(AuthResult.Success(mapped))
+                    } else {
+                        continuation.resume(
+                            AuthResult.Error(
+                                Exception("User became null after Apple sign-in")
+                            )
+                        )
+                    }
                 }
 
                 else -> {

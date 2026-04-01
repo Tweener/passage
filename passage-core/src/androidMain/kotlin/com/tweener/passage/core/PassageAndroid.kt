@@ -57,7 +57,7 @@ class PassageAndroid<T : EntrantInterface>(private val applicationContext: Conte
      * operations on Android.
      *
      * @param configuration The configuration for the Google Gatekeeper.
-     * @param firebaseAuth The Firebase authentication instance used for user management.
+     * @param authPlugin The Backend authentication adapter instance used for user management.
      * @return An instance of [PassageGoogleGatekeeperAndroid].
      */
     override fun createGoogleGatekeeper(configuration: GoogleGatekeeperConfiguration, authPlugin: AuthPlugin<T>): PassageGoogleGatekeeper<T> =
@@ -86,6 +86,7 @@ class PassageAndroid<T : EntrantInterface>(private val applicationContext: Conte
      * implementation for Apple authentication on Android.
      *
      * @param configuration The configuration for the Apple Gatekeeper.
+     * @param authPlugin The Backend authentication adapter instance used for user management.
      * @return An instance of [PassageAppleGatekeeperAndroid].
      */
     override fun createAppleGatekeeper(configuration: AppleGatekeeperConfiguration, authPlugin: AuthPlugin<T>): PassageAppleGatekeeper<T> =
