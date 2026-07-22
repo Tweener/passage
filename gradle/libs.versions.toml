@@ -1,6 +1,6 @@
 [versions]
 kotlin = "2.3.0"
-gradle = "8.13.2"
+gradle = "9.1.1"
 composeMultiplatform = "1.10.0"
 material3 = "1.9.0"
 dependencyVersionsPlugin = "0.53.0"
