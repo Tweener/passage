@@ -28,6 +28,7 @@ Be sure to show your support by starring ⭐️ this repository, and feel free t
 
 - **Firebase Authentication**: Powered by Firebase for robust and secure authentication.
 - **Gatekeeper (Provider) Support**: Google, Apple, Email/Password.
+- **Raw provider credentials**: Retrieve the raw Google/Apple provider token without signing into Firebase, to authenticate against your own backend.
 - **Extensible Configuration**: Customize authentication flows with platform-specific settings.
 - **Email actions**: Send email actions for magic link sign-in, password resets or verifying a user's email.
 
@@ -295,7 +296,39 @@ result.fold(
 > [!NOTE]
 > Set `forceRefresh = true` to force a refresh of the ID token, which is useful when the token might be expired or you need the latest claims.
 
-### 4. Email actions
+### 4. Retrieve raw provider credentials
+If your app authenticates against your **own backend** instead of Firebase, you can retrieve the raw provider credential (Google ID token, Apple identity token) **without** signing the user into Firebase. Your backend can then verify the token itself and mint its own session.
+
+These methods run the native provider UI exactly like `authenticateWithGoogle()` / `authenticateWithApple()`, but return the raw credential rather than a Firebase-backed `Entrant`. On Android, `bindToView()` is still required before calling `retrieveGoogleCredential()`.
+
+#### Google
+
+```kotlin
+val result = passage.retrieveGoogleCredential()
+result.fold(
+    onSuccess = { credential -> Log.d("Passage", "Google ID token: ${credential.idToken}") },
+    onFailure = { error -> Log.e("Passage", "Couldn't retrieve the credential", error) }
+)
+```
+
+`PassageGoogleCredential` exposes the `idToken`, and — when available — the `accessToken`, `email` and `displayName`.
+
+#### Apple
+
+```kotlin
+val result = passage.retrieveAppleCredential()
+result.fold(
+    onSuccess = { credential -> Log.d("Passage", "Apple identity token: ${credential.identityToken}") },
+    onFailure = { error -> Log.e("Passage", "Couldn't retrieve the credential", error) }
+)
+```
+
+`PassageAppleCredential` exposes the `identityToken` and the `rawNonce`, plus the `name` and `email`.
+
+> [!WARNING]
+> Apple delivers the user's `name` and `email` **only on the first authorization**; they are `null` on every subsequent sign-in. Capture and forward them the first time, or they are lost. As with `authenticateWithApple()`, retrieving an Apple credential only works on iOS.
+
+### 5. Email actions
 You may need to [send emails](https://firebase.google.com/docs/auth/android/passing-state-in-email-actions) to the user for a password reset if the user forgot their password for instance, or for verifying the user's email address when creating an account.
 
 > [!IMPORTANT]
