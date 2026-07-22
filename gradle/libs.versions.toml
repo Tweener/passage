@@ -1,25 +1,25 @@
 [versions]
-kotlin = "2.3.0"
+kotlin = "2.4.10"
 gradle = "9.1.1"
-composeMultiplatform = "1.10.0"
+composeMultiplatform = "1.11.1"
 material3 = "1.9.0"
-dependencyVersionsPlugin = "0.53.0"
-mavenPublish = "0.36.0"
-dokka = "2.1.0"
-androidAnnotations = "1.9.1"
-coroutines = "1.10.2"
-firebaseGitLiveApp = "2.4.0" # Firebase for KMP https://firebaseopensource.com/projects/gitliveapp/firebase-kotlin-sdk/
-googleServicesPlugin = "4.4.4"
-crashlyticsPlugin = "3.0.6"
-jetbrainsLifecycle = "2.9.6"
-kmpKit = "1.0.13"
+dependencyVersionsPlugin = "0.54.0"
+mavenPublish = "0.37.0"
+dokka = "2.2.0"
+androidAnnotations = "1.10.0"
+coroutines = "1.11.0"
+firebaseGitLiveApp = "2.5.0" # Firebase for KMP https://firebaseopensource.com/projects/gitliveapp/firebase-kotlin-sdk/
+googleServicesPlugin = "4.5.0"
+crashlyticsPlugin = "3.0.7"
+jetbrainsLifecycle = "2.11.0"
+kmpKit = "1.0.14"
 
 # Android
-androidCore = "1.17.0"
-androidActivity = "1.12.2"
-playServices = "21.5.0"
+androidCore = "1.19.0"
+androidActivity = "1.13.0"
+playServices = "21.6.0"
 googleIdIdentity = "1.2.0"
-androidCredentials = "1.5.0"
+androidCredentials = "1.6.0"
 androidStartup = "1.2.0"
 
 [libraries]
