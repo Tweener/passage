@@ -262,6 +262,36 @@ fun App() {
                         Text("Retrieve Firebase ID token")
                     }
 
+                    HorizontalDivider(modifier = Modifier.width(50.dp), thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
+
+                    Button(onClick = {
+                        buttonsScope.launch {
+                            passage
+                                .retrieveGoogleCredential()
+                                .onSuccess { credential ->
+                                    snackbarScope.launch { snackbarHostState.showSnackbar(message = "Google credential: ${credential.idToken}") }
+                                    println("Google credential: $credential")
+                                }
+                                .onFailure { it.message?.let { message -> snackbarScope.launch { snackbarHostState.showSnackbar(message = message) } } }
+                        }
+                    }) {
+                        Text("Retrieve Google credential")
+                    }
+
+                    Button(onClick = {
+                        buttonsScope.launch {
+                            passage
+                                .retrieveAppleCredential()
+                                .onSuccess { credential ->
+                                    snackbarScope.launch { snackbarHostState.showSnackbar(message = "Apple credential: ${credential.identityToken}") }
+                                    println("Apple credential: $credential")
+                                }
+                                .onFailure { it.message?.let { message -> snackbarScope.launch { snackbarHostState.showSnackbar(message = message) } } }
+                        }
+                    }) {
+                        Text("Retrieve Apple credential")
+                    }
+
                     HorizontalDivider(modifier = Modifier.width(250.dp), thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
 
                     Button(onClick = {
