@@ -1,6 +1,6 @@
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
-    alias(libs.plugins.android.library)
+    alias(libs.plugins.android.kotlinMultiplatformLibrary)
     alias(libs.plugins.jetbrains.compose)
     alias(libs.plugins.jetbrains.compose.compiler)
 }
@@ -8,7 +8,15 @@ plugins {
 kotlin {
     applyDefaultHierarchyTemplate()
 
-    androidTarget()
+    android {
+        namespace = ProjectConfiguration.Passage.packageName + ".sample.shared"
+        compileSdk = ProjectConfiguration.Passage.compileSDK
+        minSdk = ProjectConfiguration.Passage.minSDK
+
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.fromTarget(ProjectConfiguration.Compiler.jvmTarget))
+        }
+    }
 
     // region iOS configuration
 
@@ -36,7 +44,7 @@ kotlin {
 
             // Compose
             implementation(compose.runtime)
-            implementation(compose.foundation)
+            implementation(libs.compose.multiplatform.foundation)
             implementation(compose.material)
             implementation(compose.ui)
             implementation(libs.compose.multiplatform.material3)
@@ -48,23 +56,5 @@ kotlin {
             implementation(libs.android.activity)
             implementation(libs.android.activity.compose)
         }
-    }
-}
-
-android {
-    namespace = ProjectConfiguration.Passage.packageName + ".sample.shared"
-    compileSdk = ProjectConfiguration.Passage.compileSDK
-
-    defaultConfig {
-        minSdk = ProjectConfiguration.Passage.minSDK
-    }
-
-    compileOptions {
-        sourceCompatibility = ProjectConfiguration.Compiler.javaCompatibility
-        targetCompatibility = ProjectConfiguration.Compiler.javaCompatibility
-    }
-
-    buildFeatures {
-        compose = true
     }
 }

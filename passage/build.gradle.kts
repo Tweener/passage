@@ -1,10 +1,11 @@
 import com.vanniktech.maven.publish.JavadocJar
 import com.vanniktech.maven.publish.KotlinMultiplatform
+import com.vanniktech.maven.publish.SourcesJar
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
-    alias(libs.plugins.android.library)
+    alias(libs.plugins.android.kotlinMultiplatformLibrary)
     alias(libs.plugins.dokka)
     alias(libs.plugins.kotlin.nativeCocoaPods)
     alias(libs.plugins.jetbrains.compose)
@@ -12,41 +13,13 @@ plugins {
     alias(libs.plugins.maven.publish)
 }
 
-android {
-    namespace = ProjectConfiguration.Passage.namespace
-    compileSdk = ProjectConfiguration.Passage.compileSDK
-
-    defaultConfig {
-        minSdk = ProjectConfiguration.Passage.minSDK
-
-        consumerProguardFiles("consumer-rules.pro")
-    }
-
-    buildTypes {
-        getByName("release") {
-            isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-        }
-
-        getByName("debug") {
-        }
-    }
-
-    buildFeatures {
-        compose = true
-    }
-
-    compileOptions {
-        sourceCompatibility = ProjectConfiguration.Compiler.javaCompatibility
-        targetCompatibility = ProjectConfiguration.Compiler.javaCompatibility
-    }
-}
-
 kotlin {
     applyDefaultHierarchyTemplate()
 
-    androidTarget {
-        publishLibraryVariants("release")
+    android {
+        namespace = ProjectConfiguration.Passage.namespace
+        compileSdk = ProjectConfiguration.Passage.compileSDK
+        minSdk = ProjectConfiguration.Passage.minSDK
 
         compilerOptions {
             jvmTarget.set(JvmTarget.fromTarget(ProjectConfiguration.Compiler.jvmTarget))
@@ -83,11 +56,15 @@ kotlin {
             implementation(libs.firebase.auth)
 
             // Compose
-            implementation(compose.foundation)
+            implementation(libs.compose.multiplatform.foundation)
 
         }
 
         androidMain.dependencies {
+            // Firebase (BoM pins the transitive com.google.firebase artifact versions
+            // that GitLive's firebase-auth leaves unversioned on the compile classpath)
+            implementation(project.dependencies.platform(libs.firebase.bom))
+
             // Coroutines
             implementation(libs.kotlin.coroutines.android)
 
@@ -123,7 +100,7 @@ mavenPublishing {
     configure(
         platform = KotlinMultiplatform(
             javadocJar = JavadocJar.Dokka("dokkaGeneratePublicationHtml"),
-            sourcesJar = true,
+            sourcesJar = SourcesJar.Sources(),
         )
     )
 

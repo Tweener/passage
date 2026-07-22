@@ -9,6 +9,7 @@ dokka = "2.2.0"
 androidAnnotations = "1.10.0"
 coroutines = "1.11.0"
 firebaseGitLiveApp = "2.5.0" # Firebase for KMP https://firebaseopensource.com/projects/gitliveapp/firebase-kotlin-sdk/
+firebaseBom = "33.15.0" # Firebase Android BoM used by GitLive firebaseGitLiveApp above
 googleServicesPlugin = "4.5.0"
 crashlyticsPlugin = "3.0.7"
 jetbrainsLifecycle = "2.11.0"
@@ -23,10 +24,12 @@ androidCredentials = "1.6.0"
 androidStartup = "1.2.0"
 
 [libraries]
+compose-multiplatform-foundation = { group = "org.jetbrains.compose.foundation", name = "foundation", version.ref = "composeMultiplatform" }
 compose-multiplatform-material3 = { group = "org.jetbrains.compose.material3", name = "material3", version.ref = "material3" }
 jetbrains-lifecycle-runtime-compose = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "jetbrainsLifecycle" }
 kmpkit = { group = "io.github.tweener", name = "kmpkit", version.ref = "kmpKit" }
 firebase-auth = { group = "dev.gitlive", name = "firebase-auth", version.ref = "firebaseGitLiveApp" }
+firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
 
 # Coroutines
 kotlin-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
@@ -52,6 +55,7 @@ googleSignIn = ["googleSignIn-credentials", "googleSignIn-credentials-playServic
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 android-library = { id = "com.android.library", version.ref = "gradle" }
+android-kotlinMultiplatformLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "gradle" }
 android-application = { id = "com.android.application", version.ref = "gradle" }
 dependency-versions = { id = "com.github.ben-manes.versions", version.ref = "dependencyVersionsPlugin" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
