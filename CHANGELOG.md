@@ -1,6 +1,20 @@
 
 # Changelog
 
+## [1.7.0] - July 22nd, 2026
+- ✨ **`[FEATURE]`**: Add `retrieveGoogleCredential()` and `retrieveAppleCredential()` methods in `Passage` to retrieve the raw Google/Apple provider credential (ID token + profile) **without** signing the user into Firebase, for apps authenticating against a first-party backend.
+- 📦 **`[BUILD]`**: 🤖 Migrate Android modules to the AGP 9 Kotlin Multiplatform library plugin.
+- 📦 **`[BUILD]`**: Bump Android compile SDK to 37.
+- 🔄 Update Kotlin to 2.4.10.
+- 🔄 Update Gradle to 9.1.1.
+- 🔄 Update Compose Multiplatform to 1.11.1.
+- 🔄 Update Maven Publish to 0.37.0.
+- 🔄 Update Firebase GitLive to 2.5.0.
+- 🔄 Update KMPKit to 1.0.14.
+- 🔄 Update Android Activity to 1.13.0.
+- 🔄 Update Play Services to 21.6.0.
+- 🔄 Update AndroidX Credentials to 1.6.0.
+
 ## [1.6.0] - January 23rd, 2026
 - ✨ **`[FEATURE]`**: Add `getIdToken()` method in `Passage` to retrieve the current user's Firebase ID token, with an option to force refresh.
 - 🔄 Update Kotlin to 2.3.0.
