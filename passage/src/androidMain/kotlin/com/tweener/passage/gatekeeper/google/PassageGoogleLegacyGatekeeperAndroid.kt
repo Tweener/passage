@@ -11,9 +11,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.tweener.kmpkit.thread.suspendCatching
 import com.tweener.passage.error.PassageGatekeeperUnknownEntrantException
-import com.tweener.passage.gatekeeper.google.model.GoogleTokens
 import com.tweener.passage.mapper.toEntrant
 import com.tweener.passage.model.Entrant
+import com.tweener.passage.model.PassageGoogleCredential
 import dev.gitlive.firebase.auth.FirebaseAuth
 import dev.gitlive.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.Dispatchers
@@ -33,15 +33,18 @@ internal class PassageGoogleLegacyGatekeeperAndroid(
 ) : PassageGoogleGatekeeper(serverClientId = serverClientId) {
 
     override suspend fun signIn(params: Unit): Result<Entrant> = suspendCatching {
-        retrieveGoogleTokens().fold(
-            onSuccess = { googleTokens ->
-                val firebaseCredential = GoogleAuthProvider.credential(idToken = googleTokens.idToken, accessToken = googleTokens.accessToken)
+        retrieveGoogleCredential().fold(
+            onSuccess = { credential ->
+                val firebaseCredential = GoogleAuthProvider.credential(idToken = credential.idToken, accessToken = credential.accessToken)
                 firebaseAuth.signInWithCredential(authCredential = firebaseCredential).user?.toEntrant()
                     ?: throw PassageGatekeeperUnknownEntrantException()
             },
             onFailure = { throwable -> throw throwable }
         )
     }
+
+    override suspend fun retrieveCredential(): Result<PassageGoogleCredential> =
+        retrieveGoogleCredential()
 
     override suspend fun signOut() {
         try {
@@ -52,9 +55,9 @@ internal class PassageGoogleLegacyGatekeeperAndroid(
     }
 
     override suspend fun reauthenticate(): Result<Unit> = suspendCatching {
-        retrieveGoogleTokens().fold(
-            onSuccess = { googleTokens ->
-                val firebaseCredential = GoogleAuthProvider.credential(idToken = googleTokens.idToken, accessToken = googleTokens.accessToken)
+        retrieveGoogleCredential().fold(
+            onSuccess = { credential ->
+                val firebaseCredential = GoogleAuthProvider.credential(idToken = credential.idToken, accessToken = credential.accessToken)
                 firebaseAuth.currentUser?.reauthenticate(credential = firebaseCredential)
                     ?: throw PassageGatekeeperUnknownEntrantException()
             },
@@ -62,7 +65,7 @@ internal class PassageGoogleLegacyGatekeeperAndroid(
         )
     }
 
-    private suspend fun retrieveGoogleTokens(): Result<GoogleTokens> = suspendCatching {
+    private suspend fun retrieveGoogleCredential(): Result<PassageGoogleCredential> = suspendCatching {
         try {
             activityResultLauncher.invoke()?.launch(getGoogleSignInClient().signInIntent)
 
@@ -77,7 +80,7 @@ internal class PassageGoogleLegacyGatekeeperAndroid(
             val account: GoogleSignInAccount = task.getResult(ApiException::class.java)
 
             account.idToken
-                ?.let { idToken -> GoogleTokens(idToken = idToken) }
+                ?.let { idToken -> PassageGoogleCredential(idToken = idToken, email = account.email, displayName = account.displayName) }
                 ?: throw Exception("Google idToken is null while signing in with Google Legacy provider.")
         } catch (throwable: Throwable) {
             when (throwable) {

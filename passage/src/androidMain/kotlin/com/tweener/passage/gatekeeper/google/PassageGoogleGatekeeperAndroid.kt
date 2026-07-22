@@ -19,9 +19,9 @@ import com.tweener.kmpkit.thread.suspendCatching
 import com.tweener.passage.error.PassageGatekeeperUnknownEntrantException
 import com.tweener.passage.gatekeeper.google.error.PassageActivityContextNotInitializedException
 import com.tweener.passage.gatekeeper.google.error.PassageGoogleGatekeeperUnknownCredentialException
-import com.tweener.passage.gatekeeper.google.model.GoogleTokens
 import com.tweener.passage.mapper.toEntrant
 import com.tweener.passage.model.Entrant
+import com.tweener.passage.model.PassageGoogleCredential
 import dev.gitlive.firebase.auth.FirebaseAuth
 import dev.gitlive.firebase.auth.GoogleAuthProvider
 
@@ -84,23 +84,35 @@ internal class PassageGoogleGatekeeperAndroid(
      * @return A [Result] containing the authenticated [Entrant] if successful, or an error if the process fails.
      */
     override suspend fun signIn(params: Unit): Result<Entrant> = suspendCatching {
+        val credential = retrieveCredentialInternal().getOrThrow()
+
+        val firebaseCredential = GoogleAuthProvider.credential(idToken = credential.idToken, accessToken = credential.accessToken)
+
+        firebaseAuth.signInWithCredential(authCredential = firebaseCredential).user?.toEntrant()
+            ?: throw PassageGatekeeperUnknownEntrantException()
+    }
+
+    override suspend fun retrieveCredential(): Result<PassageGoogleCredential> =
+        retrieveCredentialInternal()
+
+    /**
+     * Retrieves the raw Google credential via the Credential Manager API, with the retry loop, the
+     * [GetSignInWithGoogleOption] / [GetGoogleIdOption] toggle, and the legacy fallback. Shared by
+     * [signIn] and [retrieveCredential].
+     */
+    private suspend fun retrieveCredentialInternal(): Result<PassageGoogleCredential> = suspendCatching {
         var attempts = 0
         var lastThrowable: Throwable?
 
         var useGoogleButtonFlow = useGoogleButtonFlow
 
         while (attempts <= maxRetries) {
-            retrieveGoogleTokens(useGoogleButtonFlow = useGoogleButtonFlow).fold(
-                onSuccess = { googleTokens ->
-                    val firebaseCredential = GoogleAuthProvider.credential(idToken = googleTokens.idToken, accessToken = googleTokens.accessToken)
-
-                    return@suspendCatching firebaseAuth.signInWithCredential(authCredential = firebaseCredential).user?.toEntrant()
-                        ?: throw PassageGatekeeperUnknownEntrantException()
-                },
+            retrieveGoogleCredential(useGoogleButtonFlow = useGoogleButtonFlow).fold(
+                onSuccess = { credential -> return@suspendCatching credential },
                 onFailure = { throwable ->
                     lastThrowable = throwable
 
-                    println("Couldn't sign in the user. Attempt ${++attempts} of $maxRetries. Error:\n$throwable")
+                    println("Couldn't retrieve the Google credential. Attempt ${++attempts} of $maxRetries. Error:\n$throwable")
 
                     if (throwable is NoCredentialException) {
                         signOut()
@@ -108,11 +120,11 @@ internal class PassageGoogleGatekeeperAndroid(
 
                     if (throwable !is GetCredentialCancellationException) {
                         // Try with the legacy gatekeeper, only if the user didn't intentionally cancel the sign in
-                        println("Attempt to sign in with Google Legacy provider.")
+                        println("Attempt to retrieve the credential with Google Legacy provider.")
 
-                        legacyGatekeeper.signIn(Unit).fold(
+                        legacyGatekeeper.retrieveCredential().fold(
                             onSuccess = { return@suspendCatching it },
-                            onFailure = { legacyThrowable -> println("Couldn't sign in the user with Google Legacy provider. Error:\n$legacyThrowable") }
+                            onFailure = { legacyThrowable -> println("Couldn't retrieve the credential with Google Legacy provider. Error:\n$legacyThrowable") }
                         )
                     }
 
@@ -147,9 +159,9 @@ internal class PassageGoogleGatekeeperAndroid(
      * @return A [Result] indicating the success or failure of the re-authentication process.
      */
     override suspend fun reauthenticate(): Result<Unit> = suspendCatching {
-        retrieveGoogleTokens(useGoogleButtonFlow = useGoogleButtonFlow).fold(
-            onSuccess = { googleTokens ->
-                val firebaseCredential = GoogleAuthProvider.credential(idToken = googleTokens.idToken, accessToken = googleTokens.accessToken)
+        retrieveGoogleCredential(useGoogleButtonFlow = useGoogleButtonFlow).fold(
+            onSuccess = { credential ->
+                val firebaseCredential = GoogleAuthProvider.credential(idToken = credential.idToken, accessToken = credential.accessToken)
                 firebaseAuth.currentUser?.reauthenticate(credential = firebaseCredential)
                     ?: throw PassageGatekeeperUnknownEntrantException()
             },
@@ -175,7 +187,7 @@ internal class PassageGoogleGatekeeperAndroid(
         )
     }
 
-    private suspend fun retrieveGoogleTokens(useGoogleButtonFlow: Boolean): Result<GoogleTokens> = suspendCatching {
+    private suspend fun retrieveGoogleCredential(useGoogleButtonFlow: Boolean): Result<PassageGoogleCredential> = suspendCatching {
         when (val credential = createCredentials(useGoogleButtonFlow = useGoogleButtonFlow)) {
             is CustomCredential -> {
                 when (credential.type) {
@@ -185,7 +197,11 @@ internal class PassageGoogleGatekeeperAndroid(
                         val idToken = googleIdTokenCredential.idToken
                         println("Successful Google Sin In flow with idToken: $idToken")
 
-                        GoogleTokens(idToken = idToken)
+                        PassageGoogleCredential(
+                            idToken = idToken,
+                            email = googleIdTokenCredential.id,
+                            displayName = googleIdTokenCredential.displayName,
+                        )
                     }
 
                     else -> {

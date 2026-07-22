@@ -5,10 +5,12 @@ import cocoapods.FirebaseAuth.FIROAuthProvider
 import com.tweener.kmpkit.contract.requireNotNullOrThrow
 import com.tweener.kmpkit.thread.resumeIfActive
 import com.tweener.kmpkit.thread.resumeWithExceptionIfActive
+import com.tweener.kmpkit.thread.suspendCatching
 import com.tweener.passage.error.PassageGatekeeperUnknownEntrantException
 import com.tweener.passage.gatekeeper.apple.error.PassageAppleGatekeeperException
 import com.tweener.passage.mapper.toEntrant
 import com.tweener.passage.model.Entrant
+import com.tweener.passage.model.PassageAppleCredential
 import dev.gitlive.firebase.auth.FirebaseAuth
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
@@ -23,6 +25,7 @@ import platform.AuthenticationServices.ASAuthorizationScopeEmail
 import platform.AuthenticationServices.ASAuthorizationScopeFullName
 import platform.AuthenticationServices.ASPresentationAnchor
 import platform.Foundation.NSError
+import platform.Foundation.NSPersonNameComponents
 import platform.Foundation.NSString
 import platform.Foundation.NSUTF8StringEncoding
 import platform.Foundation.create
@@ -65,10 +68,42 @@ internal class PassageAppleGatekeeperIos(
      * @param params Unused, as no parameters are required for Apple Sign-In.
      * @return A [Result] containing the authenticated [Entrant] if successful, or an error if the process fails.
      */
-    override suspend fun signIn(params: Unit): Result<Entrant> = suspendCancellableCoroutine { continuation ->
+    override suspend fun signIn(params: Unit): Result<Entrant> = suspendCatching {
+        val rawCredential = performAppleAuthorization().getOrThrow()
+        signInToFirebase(rawCredential).getOrThrow()
+    }.onFailure { throwable ->
+        println("Couldn't sign in the user with Apple provider: $throwable")
+    }
+
+    override suspend fun retrieveCredential(): Result<PassageAppleCredential> = suspendCatching {
+        val rawCredential = performAppleAuthorization().getOrThrow()
+
+        PassageAppleCredential(
+            identityToken = rawCredential.identityToken,
+            name = rawCredential.formattedName,
+            email = rawCredential.email,
+            rawNonce = rawCredential.rawNonce,
+        )
+    }.onFailure { throwable ->
+        println("Couldn't retrieve the credential with Apple provider: $throwable")
+    }
+
+    /**
+     * Signs out the current user for Apple Sign-In on iOS.
+     *
+     * Since Apple Sign-In does not require explicit session management on iOS, this method performs no actions.
+     */
+    override suspend fun signOut() {
+        // Nothing to do here
+    }
+
+    /**
+     * Runs the native Apple Sign-In UI and resumes with the raw [AppleRawCredential]. Shared by [signIn] and [retrieveCredential].
+     */
+    private suspend fun performAppleAuthorization(): Result<AppleRawCredential> = suspendCancellableCoroutine { continuation ->
         try {
             val rawNonce = AppleNonceFactory.createRandomNonceString()
-            delegate = AuthorizationControllerDelegate(firebaseAuth = firebaseAuth, nonce = rawNonce) { result -> continuation.resumeIfActive(result) }
+            delegate = AuthorizationControllerDelegate(nonce = rawNonce) { result -> continuation.resumeIfActive(result) }
 
             continuation.invokeOnCancellation {
                 println("Canceled Apple Sign In on iOS")
@@ -95,19 +130,44 @@ internal class PassageAppleGatekeeperIos(
     }
 
     /**
-     * Signs out the current user for Apple Sign-In on iOS.
-     *
-     * Since Apple Sign-In does not require explicit session management on iOS, this method performs no actions.
+     * Exchanges the raw Apple credential for a Firebase session.
      */
-    override suspend fun signOut() {
-        // Nothing to do here
+    @OptIn(ExperimentalForeignApi::class)
+    private suspend fun signInToFirebase(rawCredential: AppleRawCredential): Result<Entrant> = suspendCancellableCoroutine { continuation ->
+        val credential = FIROAuthProvider.appleCredentialWithIDToken(idToken = rawCredential.identityToken, rawNonce = rawCredential.rawNonce, fullName = rawCredential.fullName)
+
+        FIRAuth.auth().signInWithCredential(credential) { authResult, error ->
+            error?.let { println("Couldn't sign in with Apple on iOS! $error") }
+
+            when {
+                error != null || authResult == null -> continuation.resumeIfActive(Result.failure(PassageAppleGatekeeperException(message = "FIRAuthDataResult is null")))
+
+                else -> {
+                    firebaseAuth.currentUser?.toEntrant()
+                        ?.let { user -> continuation.resumeIfActive(Result.success(user)) }
+                        ?: continuation.resumeIfActive(Result.failure(PassageGatekeeperUnknownEntrantException()))
+                }
+            }
+        }
     }
 }
 
+/**
+ * Raw data from an [ASAuthorizationAppleIDCredential]: the native [fullName] for the Firebase credential and a
+ * [formattedName] string for [PassageAppleCredential].
+ */
+@OptIn(ExperimentalForeignApi::class)
+private class AppleRawCredential(
+    val identityToken: String,
+    val fullName: NSPersonNameComponents?,
+    val formattedName: String?,
+    val email: String?,
+    val rawNonce: String,
+)
+
 private class AuthorizationControllerDelegate(
-    private val firebaseAuth: FirebaseAuth,
     private val nonce: String,
-    var onResponse: (Result<Entrant>) -> Unit,
+    var onResponse: (Result<AppleRawCredential>) -> Unit,
 ) : ASAuthorizationControllerDelegateProtocol, NSObject() {
 
     @OptIn(BetaInteropApi::class, ExperimentalForeignApi::class)
@@ -121,21 +181,19 @@ private class AuthorizationControllerDelegate(
             val idTokenString = NSString.create(data = appleIDToken, encoding = NSUTF8StringEncoding)?.toString()
             requireNotNullOrThrow(idTokenString) { PassageAppleGatekeeperException(message = "Unable to serialize token string from data: ${appleIDToken.debugDescription}") }
 
-            val credential = FIROAuthProvider.appleCredentialWithIDToken(idToken = idTokenString, rawNonce = nonce, fullName = appleIDCredential.fullName)
+            val fullName = appleIDCredential.fullName
 
-            FIRAuth.auth().signInWithCredential(credential) { authResult, error ->
-                error?.let { println("Couldn't sign in with Apple on iOS! $error") }
-
-                when {
-                    error != null || authResult == null -> onResponse(Result.failure(PassageAppleGatekeeperException(message = "FIRAuthDataResult is null")))
-
-                    else -> {
-                        firebaseAuth.currentUser?.toEntrant()
-                            ?.let { user -> onResponse(Result.success(user)) }
-                            ?: onResponse(Result.failure(PassageGatekeeperUnknownEntrantException()))
-                    }
-                }
-            }
+            onResponse(
+                Result.success(
+                    AppleRawCredential(
+                        identityToken = idTokenString,
+                        fullName = fullName,
+                        formattedName = fullName?.let { formatPersonName(it) },
+                        email = appleIDCredential.email,
+                        rawNonce = nonce,
+                    )
+                )
+            )
         } catch (throwable: Throwable) {
             onResponse(Result.failure(throwable))
         }
@@ -145,6 +203,15 @@ private class AuthorizationControllerDelegate(
         println("Didn't get authorization to sign in with Apple: $didCompleteWithError")
         onResponse(Result.failure(PassageAppleGatekeeperException(message = didCompleteWithError.localizedFailureReason)))
     }
+
+    /**
+     * Joins the given and family name components, or returns null when both are absent.
+     */
+    @OptIn(ExperimentalForeignApi::class)
+    private fun formatPersonName(components: NSPersonNameComponents): String? =
+        listOfNotNull(components.givenName, components.familyName)
+            .joinToString(" ")
+            .ifBlank { null }
 }
 
 private class PresentationContextProvider : ASAuthorizationControllerPresentationContextProvidingProtocol, NSObject() {

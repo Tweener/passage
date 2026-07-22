@@ -1,6 +1,7 @@
 package com.tweener.passage.gatekeeper.apple
 
 import com.tweener.passage.gatekeeper.PassageGatekeeper
+import com.tweener.passage.model.PassageAppleCredential
 
 /**
  * A Gatekeeper for handling authentication with Apple Sign-In in the Passage library.
@@ -17,4 +18,12 @@ import com.tweener.passage.gatekeeper.PassageGatekeeper
  * @author Vivien Mahe
  * @since 30/11/2024
  */
-internal abstract class PassageAppleGatekeeper : PassageGatekeeper<Unit>()
+internal abstract class PassageAppleGatekeeper : PassageGatekeeper<Unit>() {
+
+    /**
+     * Runs the native Apple Sign-In UI and returns the raw [PassageAppleCredential], without signing into Firebase.
+     *
+     * @return A [Result] with the raw [PassageAppleCredential], or an error if it fails.
+     */
+    abstract suspend fun retrieveCredential(): Result<PassageAppleCredential>
+}

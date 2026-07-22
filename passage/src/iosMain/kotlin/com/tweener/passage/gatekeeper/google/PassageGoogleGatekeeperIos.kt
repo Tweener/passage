@@ -5,9 +5,9 @@ import com.tweener.kmpkit.utils.safeLet
 import com.tweener.kmpkit.thread.suspendCatching
 import com.tweener.passage.error.PassageGatekeeperUnknownEntrantException
 import com.tweener.passage.gatekeeper.google.error.PassageGoogleGatekeeperException
-import com.tweener.passage.gatekeeper.google.model.GoogleTokens
 import com.tweener.passage.mapper.toEntrant
 import com.tweener.passage.model.Entrant
+import com.tweener.passage.model.PassageGoogleCredential
 import dev.gitlive.firebase.auth.FirebaseAuth
 import dev.gitlive.firebase.auth.GoogleAuthProvider
 import kotlinx.cinterop.ExperimentalForeignApi
@@ -50,9 +50,9 @@ internal class PassageGoogleGatekeeperIos(
      * @return A [Result] containing the authenticated [Entrant] if successful, or an error if the process fails.
      */
     override suspend fun signIn(params: Unit): Result<Entrant> = suspendCatching {
-        retrieveGoogleTokens().fold(
-            onSuccess = { googleTokens ->
-                val firebaseCredential = GoogleAuthProvider.credential(idToken = googleTokens.idToken, accessToken = googleTokens.accessToken)
+        retrieveGoogleCredential().fold(
+            onSuccess = { credential ->
+                val firebaseCredential = GoogleAuthProvider.credential(idToken = credential.idToken, accessToken = credential.accessToken)
                 firebaseAuth.signInWithCredential(authCredential = firebaseCredential).user?.toEntrant()
                     ?: throw PassageGatekeeperUnknownEntrantException()
             },
@@ -61,6 +61,9 @@ internal class PassageGoogleGatekeeperIos(
     }.onFailure { throwable ->
         println("Couldn't sign up the user: $throwable")
     }
+
+    override suspend fun retrieveCredential(): Result<PassageGoogleCredential> =
+        retrieveGoogleCredential()
 
     /**
      * Signs out the current user for Google Sign-In on iOS.
@@ -80,9 +83,9 @@ internal class PassageGoogleGatekeeperIos(
      * @return A [Result] indicating the success or failure of the re-authentication process.
      */
     override suspend fun reauthenticate(): Result<Unit> = suspendCatching {
-        retrieveGoogleTokens().fold(
-            onSuccess = { googleTokens ->
-                val firebaseCredential = GoogleAuthProvider.credential(idToken = googleTokens.idToken, accessToken = googleTokens.accessToken)
+        retrieveGoogleCredential().fold(
+            onSuccess = { credential ->
+                val firebaseCredential = GoogleAuthProvider.credential(idToken = credential.idToken, accessToken = credential.accessToken)
                 firebaseAuth.currentUser?.reauthenticate(credential = firebaseCredential)
                     ?: throw PassageGatekeeperUnknownEntrantException()
             },
@@ -93,7 +96,7 @@ internal class PassageGoogleGatekeeperIos(
     }
 
     @OptIn(ExperimentalForeignApi::class)
-    private suspend fun retrieveGoogleTokens(): Result<GoogleTokens> = suspendCoroutine { continuation ->
+    private suspend fun retrieveGoogleCredential(): Result<PassageGoogleCredential> = suspendCoroutine { continuation ->
         UIApplication.sharedApplication.keyWindow?.rootViewController
             ?.let { rootViewController ->
                 GIDSignIn.sharedInstance.signInWithPresentingViewController(rootViewController) { authResult, error ->
@@ -104,7 +107,16 @@ internal class PassageGoogleGatekeeperIos(
 
                         else -> {
                             safeLet(authResult?.user?.idToken?.tokenString, authResult?.user?.accessToken?.tokenString) { idToken, accessToken ->
-                                continuation.resume(Result.success(GoogleTokens(idToken = idToken, accessToken = accessToken)))
+                                continuation.resume(
+                                    Result.success(
+                                        PassageGoogleCredential(
+                                            idToken = idToken,
+                                            accessToken = accessToken,
+                                            email = authResult?.user?.profile?.email,
+                                            displayName = authResult?.user?.profile?.name,
+                                        )
+                                    )
+                                )
                             } ?: continuation.resumeWithException(PassageGoogleGatekeeperException())
                         }
                     }

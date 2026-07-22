@@ -1,6 +1,7 @@
 package com.tweener.passage.gatekeeper.google
 
 import com.tweener.passage.gatekeeper.PassageGatekeeper
+import com.tweener.passage.model.PassageGoogleCredential
 
 /**
  * An abstract Gatekeeper for handling authentication with Google in the Passage library.
@@ -31,4 +32,11 @@ internal abstract class PassageGoogleGatekeeper(
      * @return A [Result] indicating the success or failure of the re-authentication process.
      */
     abstract suspend fun reauthenticate(): Result<Unit>
+
+    /**
+     * Runs the native Google Sign-In UI and returns the raw [PassageGoogleCredential], without signing into Firebase.
+     *
+     * @return A [Result] with the raw [PassageGoogleCredential], or an error if it fails.
+     */
+    abstract suspend fun retrieveCredential(): Result<PassageGoogleCredential>
 }

@@ -17,7 +17,9 @@ import com.tweener.passage.model.EmailPasswordGatekeeperConfiguration
 import com.tweener.passage.model.Entrant
 import com.tweener.passage.model.GatekeeperType
 import com.tweener.passage.model.GoogleGatekeeperConfiguration
+import com.tweener.passage.model.PassageAppleCredential
 import com.tweener.passage.model.PassageGatekeeperConfiguration
+import com.tweener.passage.model.PassageGoogleCredential
 import com.tweener.passage.model.PassageUniversalLink
 import com.tweener.passage.universallink.PassageUniversalLinkHandler
 import dev.gitlive.firebase.Firebase
@@ -195,6 +197,19 @@ abstract class Passage {
             ?: Result.failure(PassageGatekeeperNotConfiguredException(gatekeeper = GatekeeperType.GOOGLE))
 
     /**
+     * Runs the native Google Sign-In UI and returns the raw Google credential without signing into Firebase.
+     *
+     * Use this to authenticate against a first-party backend that verifies the Google ID token itself; for a
+     * Firebase session, use [authenticateWithGoogle]. On Android, [bindToView] is still required beforehand.
+     *
+     * @return A [Result] with the raw [PassageGoogleCredential], or an error if it fails.
+     */
+    suspend fun retrieveGoogleCredential(): Result<PassageGoogleCredential> =
+        googleGatekeeper
+            ?.retrieveCredential()
+            ?: Result.failure(PassageGatekeeperNotConfiguredException(gatekeeper = GatekeeperType.GOOGLE))
+
+    /**
      * Creates the Google Gatekeeper for handling authentication.
      *
      * @param configuration The configuration for the Google Gatekeeper.
@@ -215,6 +230,19 @@ abstract class Passage {
     suspend fun authenticateWithApple(): Result<Entrant> =
         appleGatekeeper
             ?.signIn(Unit)
+            ?: Result.failure(PassageGatekeeperNotConfiguredException(gatekeeper = GatekeeperType.APPLE))
+
+    /**
+     * Runs the native Apple Sign-In UI and returns the raw Apple credential without signing into Firebase.
+     *
+     * Use this to authenticate against a first-party backend that verifies the Apple identity token itself; for a
+     * Firebase session, use [authenticateWithApple].
+     *
+     * @return A [Result] with the raw [PassageAppleCredential], or an error if it fails.
+     */
+    suspend fun retrieveAppleCredential(): Result<PassageAppleCredential> =
+        appleGatekeeper
+            ?.retrieveCredential()
             ?: Result.failure(PassageGatekeeperNotConfiguredException(gatekeeper = GatekeeperType.APPLE))
 
     /**

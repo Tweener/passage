@@ -5,6 +5,7 @@ import com.tweener.kmpkit.thread.suspendCatching
 import com.tweener.passage.error.PassageGatekeeperNotImplementedException
 import com.tweener.passage.model.Entrant
 import com.tweener.passage.model.GatekeeperType
+import com.tweener.passage.model.PassageAppleCredential
 
 /**
  * An Android-specific implementation of the [PassageAppleGatekeeper].
@@ -33,6 +34,13 @@ internal class PassageAppleGatekeeperAndroid : PassageAppleGatekeeper() {
      * @throws PassageGatekeeperNotImplementedException Always thrown to indicate lack of support.
      */
     override suspend fun signIn(params: Unit): Result<Entrant> = suspendCatching {
+        throw PassageGatekeeperNotImplementedException(gatekeeper = GatekeeperType.APPLE, platform = Platform.ANDROID)
+    }
+
+    /**
+     * Not supported on Android: always fails with [PassageGatekeeperNotImplementedException].
+     */
+    override suspend fun retrieveCredential(): Result<PassageAppleCredential> = suspendCatching {
         throw PassageGatekeeperNotImplementedException(gatekeeper = GatekeeperType.APPLE, platform = Platform.ANDROID)
     }
 
