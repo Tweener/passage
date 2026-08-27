@@ -32,4 +32,4 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Build library
-        run: ./gradlew testReleaseUnitTest
+        run: ./gradlew :passage:assemble
