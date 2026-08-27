@@ -16,6 +16,7 @@ import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
 import com.tweener.kmpkit.thread.suspendCatching
+import com.tweener.passage.error.PassageCanceledException
 import com.tweener.passage.error.PassageGatekeeperUnknownEntrantException
 import com.tweener.passage.gatekeeper.google.error.PassageActivityContextNotInitializedException
 import com.tweener.passage.gatekeeper.google.error.PassageGoogleGatekeeperUnknownCredentialException
@@ -132,7 +133,7 @@ internal class PassageGoogleGatekeeperAndroid(
                     useGoogleButtonFlow = useGoogleButtonFlow.not()
 
                     if (attempts >= maxRetries) {
-                        throw lastThrowable // Only throw on the final attempt
+                        throw lastThrowable.toPassageThrowable() // Only throw on the final attempt
                     }
                 },
             )
@@ -182,7 +183,7 @@ internal class PassageGoogleGatekeeperAndroid(
                     )
                 }
 
-                throw throwable
+                throw throwable.toPassageThrowable()
             },
         )
     }
@@ -245,3 +246,14 @@ internal class PassageGoogleGatekeeperAndroid(
         return credentialManager.getCredential(request = request, context = activityContext.invoke()!!).credential
     }
 }
+
+/**
+ * Distinguishes an entrant dismissing the Credential Manager sheet from the flow genuinely failing, so a caller can
+ * stay silent on a cancellation instead of reporting a sign-in error the entrant already knows they caused. Mirrors
+ * what the iOS gatekeeper reports for the same gesture.
+ */
+private fun Throwable.toPassageThrowable(): Throwable =
+    when (this) {
+        is GetCredentialCancellationException -> PassageCanceledException()
+        else -> this
+    }

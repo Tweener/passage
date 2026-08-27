@@ -3,6 +3,7 @@ package com.tweener.passage.gatekeeper.google
 import cocoapods.GoogleSignIn.GIDSignIn
 import com.tweener.kmpkit.utils.safeLet
 import com.tweener.kmpkit.thread.suspendCatching
+import com.tweener.passage.error.PassageCanceledException
 import com.tweener.passage.error.PassageGatekeeperUnknownEntrantException
 import com.tweener.passage.gatekeeper.google.error.PassageGoogleGatekeeperException
 import com.tweener.passage.mapper.toEntrant
@@ -11,6 +12,7 @@ import com.tweener.passage.model.PassageGoogleCredential
 import dev.gitlive.firebase.auth.FirebaseAuth
 import dev.gitlive.firebase.auth.GoogleAuthProvider
 import kotlinx.cinterop.ExperimentalForeignApi
+import platform.Foundation.NSError
 import platform.UIKit.UIApplication
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -62,8 +64,15 @@ internal class PassageGoogleGatekeeperIos(
         println("Couldn't sign up the user: $throwable")
     }
 
-    override suspend fun retrieveCredential(): Result<PassageGoogleCredential> =
-        retrieveGoogleCredential()
+    /**
+     * Retrieves the raw Google credential via the Google Identity SDK, without authenticating with Firebase.
+     *
+     * [retrieveGoogleCredential] resumes its continuation with an exception when the flow fails or the user cancels,
+     * so it is wrapped here to honour the [Result] contract: a caller must never have to catch a throw from this.
+     */
+    override suspend fun retrieveCredential(): Result<PassageGoogleCredential> = suspendCatching {
+        retrieveGoogleCredential().getOrThrow()
+    }
 
     /**
      * Signs out the current user for Google Sign-In on iOS.
@@ -103,7 +112,7 @@ internal class PassageGoogleGatekeeperIos(
                     error?.let { println("Couldn't sign in with Google on iOS! $error") }
 
                     when {
-                        error != null -> continuation.resumeWithException(PassageGoogleGatekeeperException())
+                        error != null -> continuation.resumeWithException(error.toPassageThrowable())
 
                         else -> {
                             safeLet(authResult?.user?.idToken?.tokenString, authResult?.user?.accessToken?.tokenString) { idToken, accessToken ->
@@ -125,3 +134,17 @@ internal class PassageGoogleGatekeeperIos(
             ?: continuation.resumeWithException(PassageGoogleGatekeeperException())
     }
 }
+
+/** The domain of every error the Google Identity SDK reports, and the code it uses when the entrant dismissed the UI. */
+private const val GOOGLE_SIGN_IN_ERROR_DOMAIN = "com.google.GIDSignIn"
+private const val GOOGLE_SIGN_IN_CANCELED_ERROR_CODE = -5L
+
+/**
+ * Distinguishes an entrant dismissing the Google consent sheet from the flow genuinely failing, so a caller can stay
+ * silent on a cancellation instead of reporting a sign-in error the entrant already knows they caused.
+ */
+private fun NSError.toPassageThrowable(): Throwable =
+    when {
+        domain == GOOGLE_SIGN_IN_ERROR_DOMAIN && code == GOOGLE_SIGN_IN_CANCELED_ERROR_CODE -> PassageCanceledException()
+        else -> PassageGoogleGatekeeperException()
+    }
