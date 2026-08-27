@@ -6,6 +6,7 @@ import com.tweener.kmpkit.contract.requireNotNullOrThrow
 import com.tweener.kmpkit.thread.resumeIfActive
 import com.tweener.kmpkit.thread.resumeWithExceptionIfActive
 import com.tweener.kmpkit.thread.suspendCatching
+import com.tweener.passage.error.PassageCanceledException
 import com.tweener.passage.error.PassageGatekeeperUnknownEntrantException
 import com.tweener.passage.gatekeeper.apple.error.PassageAppleGatekeeperException
 import com.tweener.passage.mapper.toEntrant
@@ -21,6 +22,8 @@ import platform.AuthenticationServices.ASAuthorizationAppleIDProvider
 import platform.AuthenticationServices.ASAuthorizationController
 import platform.AuthenticationServices.ASAuthorizationControllerDelegateProtocol
 import platform.AuthenticationServices.ASAuthorizationControllerPresentationContextProvidingProtocol
+import platform.AuthenticationServices.ASAuthorizationErrorCanceled
+import platform.AuthenticationServices.ASAuthorizationErrorDomain
 import platform.AuthenticationServices.ASAuthorizationScopeEmail
 import platform.AuthenticationServices.ASAuthorizationScopeFullName
 import platform.AuthenticationServices.ASPresentationAnchor
@@ -201,7 +204,7 @@ private class AuthorizationControllerDelegate(
 
     override fun authorizationController(controller: ASAuthorizationController, didCompleteWithError: NSError) {
         println("Didn't get authorization to sign in with Apple: $didCompleteWithError")
-        onResponse(Result.failure(PassageAppleGatekeeperException(message = didCompleteWithError.localizedFailureReason)))
+        onResponse(Result.failure(didCompleteWithError.toPassageThrowable()))
     }
 
     /**
@@ -219,3 +222,14 @@ private class PresentationContextProvider : ASAuthorizationControllerPresentatio
     override fun presentationAnchorForAuthorizationController(controller: ASAuthorizationController): ASPresentationAnchor =
         UIApplication.sharedApplication.keyWindow?.rootViewController?.view?.window
 }
+
+/**
+ * Distinguishes an entrant dismissing the Apple sheet from the authorization genuinely failing, so a caller can stay
+ * silent on a cancellation instead of reporting a sign-in error the entrant already knows they caused. Mirrors what the
+ * Google gatekeepers report for the same gesture.
+ */
+private fun NSError.toPassageThrowable(): Throwable =
+    when {
+        domain == ASAuthorizationErrorDomain && code == ASAuthorizationErrorCanceled -> PassageCanceledException()
+        else -> PassageAppleGatekeeperException(message = localizedFailureReason)
+    }
