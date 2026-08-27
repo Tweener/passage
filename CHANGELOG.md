@@ -4,6 +4,9 @@
 ## [1.8.0] - August 27th, 2026
 - 🐛 **`[FIX]`**: 🍎 `retrieveGoogleCredential()` no longer throws out of its `Result`. The iOS Google gatekeeper resumed its continuation with an exception when the native flow ended badly, so a caller holding only a `Result` had nothing catching it and the app terminated - canceling the Google consent sheet was enough to crash it.
 - ✨ **`[FEATURE]`**: Add `PassageCanceledException`, reported when the entrant dismissed the provider's own Sign In UI instead of the flow failing. Both platforms now agree on it (`GIDSignInErrorCodeCanceled` on iOS, `GetCredentialCancellationException` on Android), so a caller can stay silent on a cancellation rather than reporting an error the entrant already knows they caused.
+- 🔄 Update Compose Multiplatform to 1.12.0.
+- 🔄 Update Crashlytics plugin to 3.0.8.
+- 🔄 Update Gradle Versions plugin to 0.61.0.
 
 ## [1.7.0] - July 22nd, 2026
 - ✨ **`[FEATURE]`**: Add `retrieveGoogleCredential()` and `retrieveAppleCredential()` methods in `Passage` to retrieve the raw Google/Apple provider credential (ID token + profile) **without** signing the user into Firebase, for apps authenticating against a first-party backend.
