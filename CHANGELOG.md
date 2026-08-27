@@ -1,6 +1,9 @@
 
 # Changelog
 
+## [1.8.1] - August 27th, 2026
+- 🐛 **`[FIX]`**: 🍎 Report `PassageCanceledException` when the entrant dismisses the Apple Sign In sheet (`ASAuthorizationErrorCanceled`), as the Google gatekeepers already do for the same gesture. It was reported as a `PassageAppleGatekeeperException`, so a caller had no way to tell a cancellation from a genuine authorization failure.
+
 ## [1.8.0] - August 27th, 2026
 - 🐛 **`[FIX]`**: 🍎 `retrieveGoogleCredential()` no longer throws out of its `Result`. The iOS Google gatekeeper resumed its continuation with an exception when the native flow ended badly, so a caller holding only a `Result` had nothing catching it and the app terminated - canceling the Google consent sheet was enough to crash it.
 - ✨ **`[FEATURE]`**: Add `PassageCanceledException`, reported when the entrant dismissed the provider's own Sign In UI instead of the flow failing. Both platforms now agree on it (`GIDSignInErrorCodeCanceled` on iOS, `GetCredentialCancellationException` on Android), so a caller can stay silent on a cancellation rather than reporting an error the entrant already knows they caused.
