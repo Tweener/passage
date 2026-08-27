@@ -52,7 +52,7 @@ internal class PassageUniversalLinkHandler {
             println("Universal Link is handled! $validLink")
 
             scope.launch {
-                val passageUniversalLink = PassageUniversalLink(link = validLink, mode = linkMode!!, oobCode = oobCodeParam!!, continueUrl = continueUrlParam!!)
+                val passageUniversalLink = PassageUniversalLink(link = validLink, mode = linkMode, oobCode = oobCodeParam, continueUrl = continueUrlParam)
                 _linkToHandle.emit(passageUniversalLink)
             }
         } else {
