@@ -10,7 +10,7 @@
 - 🔄 Update Compose Multiplatform to 1.12.2.
 - 🔄 Update Firebase GitLive to 2.7.0.
 - 🔄 Update Firebase BoM to 35.0.2.
-- 🔄 Update Play Services to 22.0.0.
+- 📦 **`[BUILD]`**: 🤖 Drop the direct `play-services-auth` and `activity-compose` dependencies, which Passage no longer uses. `play-services-auth` still comes in at runtime through `credentials-play-services-auth`, so apps keep control of its version, 22.0.0 included.
 - 🔄 Update Google ID Identity to 1.2.1.
 - 🔄 Update AndroidX Core to 1.19.1.
 - 🔄 Update AndroidX Annotations to 1.11.0.

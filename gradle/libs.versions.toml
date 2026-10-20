@@ -18,7 +18,6 @@ kmpKit = "1.0.14"
 # Android
 androidCore = "1.19.1"
 androidActivity = "1.13.0"
-playServices = "22.0.0"
 googleIdIdentity = "1.2.1"
 androidCredentials = "1.6.0"
 androidStartup = "1.2.0"
@@ -43,13 +42,12 @@ android-activity-compose = { group = "androidx.activity", name = "activity-compo
 android-startup = { group = "androidx.startup", name = "startup-runtime", version.ref = "androidStartup" }
 
 # Google Sign In
-googleSignIn-playServicesAuth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServices" }
 googleSignIn-identity = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleIdIdentity" }
 googleSignIn-credentials = { module = "androidx.credentials:credentials", version.ref = "androidCredentials" }
 googleSignIn-credentials-playServicesAuth = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "androidCredentials" }
 
 [bundles]
-googleSignIn = ["googleSignIn-credentials", "googleSignIn-credentials-playServicesAuth", "googleSignIn-identity", "googleSignIn-playServicesAuth"]
+googleSignIn = ["googleSignIn-credentials", "googleSignIn-credentials-playServicesAuth", "googleSignIn-identity"]
 
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
