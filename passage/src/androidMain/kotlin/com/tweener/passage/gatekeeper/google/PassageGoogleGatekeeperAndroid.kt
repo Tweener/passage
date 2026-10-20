@@ -1,9 +1,6 @@
 package com.tweener.passage.gatekeeper.google
 
 import android.content.Context
-import android.content.Intent
-import androidx.activity.compose.ManagedActivityResultLauncher
-import androidx.activity.result.ActivityResult
 import androidx.credentials.ClearCredentialStateRequest
 import androidx.credentials.Credential
 import androidx.credentials.CredentialManager
@@ -42,8 +39,6 @@ import dev.gitlive.firebase.auth.GoogleAuthProvider
  * @param firebaseAuth The Firebase authentication instance used for managing authenticated users.
  * @param applicationContext The Android [Context] required for accessing system resources and APIs.
  * @param activityContext A lambda that provides the current Android [Context] for activity-related operations.
- * @param activityResultLauncher A lambda that provides the [ManagedActivityResultLauncher] for activity results.
- * @param activityResult A lambda that provides the current [ActivityResult] for activity results.
  * @param useGoogleButtonFlow If true, uses the [Google button flow](https://developer.android.com/identity/sign-in/credential-manager-siwg#trigger-siwg). Otherwise, use the [Google sign-in request](https://developer.android.com/identity/sign-in/credential-manager-siwg#instantiate-google).
  * @param filterByAuthorizedAccounts If true, filters credentials by authorized accounts for the app.
  * @param autoSelectEnabled If true, enables automatic credential selection when possible.
@@ -57,8 +52,6 @@ internal class PassageGoogleGatekeeperAndroid(
     private val firebaseAuth: FirebaseAuth,
     private val applicationContext: Context,
     private val activityContext: () -> Context?,
-    activityResultLauncher: () -> ManagedActivityResultLauncher<Intent, ActivityResult>?,
-    activityResult: () -> ActivityResult?,
     private val useGoogleButtonFlow: Boolean,
     private val filterByAuthorizedAccounts: Boolean,
     private val autoSelectEnabled: Boolean,
@@ -66,13 +59,6 @@ internal class PassageGoogleGatekeeperAndroid(
 ) : PassageGoogleGatekeeper(serverClientId = serverClientId) {
 
     private val credentialManager = CredentialManager.create(applicationContext)
-    private val legacyGatekeeper = PassageGoogleLegacyGatekeeperAndroid(
-        serverClientId = serverClientId,
-        firebaseAuth = firebaseAuth,
-        activityContext = activityContext,
-        activityResultLauncher = activityResultLauncher,
-        activityResult = activityResult,
-    )
 
     /**
      * Signs in a user using Google Sign-In.
@@ -97,9 +83,8 @@ internal class PassageGoogleGatekeeperAndroid(
         retrieveCredentialInternal()
 
     /**
-     * Retrieves the raw Google credential via the Credential Manager API, with the retry loop, the
-     * [GetSignInWithGoogleOption] / [GetGoogleIdOption] toggle, and the legacy fallback. Shared by
-     * [signIn] and [retrieveCredential].
+     * Retrieves the raw Google credential via the Credential Manager API, with the retry loop and the
+     * [GetSignInWithGoogleOption] / [GetGoogleIdOption] toggle. Shared by [signIn] and [retrieveCredential].
      */
     private suspend fun retrieveCredentialInternal(): Result<PassageGoogleCredential> = suspendCatching {
         var attempts = 0
@@ -117,16 +102,6 @@ internal class PassageGoogleGatekeeperAndroid(
 
                     if (throwable is NoCredentialException) {
                         signOut()
-                    }
-
-                    if (throwable !is GetCredentialCancellationException) {
-                        // Try with the legacy gatekeeper, only if the user didn't intentionally cancel the sign in
-                        println("Attempt to retrieve the credential with Google Legacy provider.")
-
-                        legacyGatekeeper.retrieveCredential().fold(
-                            onSuccess = { return@suspendCatching it },
-                            onFailure = { legacyThrowable -> println("Couldn't retrieve the credential with Google Legacy provider. Error:\n$legacyThrowable") }
-                        )
                     }
 
                     // Toggle the use of Google Sign-In method for the next attempt
@@ -148,7 +123,6 @@ internal class PassageGoogleGatekeeperAndroid(
      */
     override suspend fun signOut() {
         credentialManager.clearCredentialState(ClearCredentialStateRequest())
-        legacyGatekeeper.signOut()
     }
 
     /**
@@ -171,16 +145,6 @@ internal class PassageGoogleGatekeeperAndroid(
 
                 if (throwable is NoCredentialException) {
                     signOut()
-                }
-
-                if (throwable !is GetCredentialCancellationException) {
-                    // Try with the legacy gatekeeper, only if the user didn't intentionally cancel the sign in
-                    println("Attempt to re-authenticate with Google Legacy provider.")
-
-                    legacyGatekeeper.reauthenticate().fold(
-                        onSuccess = { return@suspendCatching it },
-                        onFailure = { legacyThrowable -> println("Couldn't re-authenticate the user with Google Legacy provider. Error:\n$legacyThrowable") }
-                    )
                 }
 
                 throw throwable.toPassageThrowable()

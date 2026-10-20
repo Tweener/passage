@@ -211,6 +211,9 @@ result.fold(
 )
 ```
 
+> [!NOTE]  
+> On Android, Google Sign-In relies only on the [Credential Manager API](https://developer.android.com/identity/sign-in/credential-manager-siwg). A failed attempt is retried up to `maxRetries` times, alternating between the Google button flow and the Google ID request. Since 1.8.2, Passage no longer falls back to the legacy Google Sign-In SDK, which Play Services auth 22.0.0 removed.
+
 #### Apple Authentication
 `Passage#authenticateWithApple()` authenticates a user via Apple Sign-In. If the user does not already exist, a new account will be created automatically.
 
