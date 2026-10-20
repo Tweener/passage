@@ -3,6 +3,18 @@
 
 ## [1.8.2] - October 20th, 2026
 - 📦 **`[BUILD]`**: 🍎 Raise the minimum iOS version from 12.0 to 15.0, the lowest deployment target Xcode 27 accepts. With Xcode 27 the GoogleSignIn pods no longer built against iOS 12.0, so apps embedding Passage now need to target iOS 15.0 or later.
+- 🚨 **`[BREAKING]`**: 🤖 Remove the fallback to the legacy Google Sign-In SDK on Android. Play Services auth 22.0.0 removed `GoogleSignIn` and `GoogleSignInClient`, so Google Sign-In now relies only on the Credential Manager API: a failed attempt is still retried up to `maxRetries` times, but no longer falls back to the legacy flow.
+- 🔄 Update Kotlin to 2.4.21.
+- 🔄 Update Gradle to 9.6.0.
+- 🔄 Update Android Gradle Plugin to 9.4.1.
+- 🔄 Update Compose Multiplatform to 1.12.2.
+- 🔄 Update Firebase GitLive to 2.7.0.
+- 🔄 Update Firebase BoM to 35.0.2.
+- 🔄 Update Play Services to 22.0.0.
+- 🔄 Update Google ID Identity to 1.2.1.
+- 🔄 Update AndroidX Core to 1.19.1.
+- 🔄 Update AndroidX Annotations to 1.11.0.
+- 🔄 Update Gradle Versions plugin to 0.66.0.
 
 ## [1.8.1] - August 27th, 2026
 - 🐛 **`[FIX]`**: 🍎 Report `PassageCanceledException` when the entrant dismisses the Apple Sign In sheet (`ASAuthorizationErrorCanceled`), as the Google gatekeepers already do for the same gesture. It was reported as a `PassageAppleGatekeeperException`, so a caller had no way to tell a cancellation from a genuine authorization failure.
