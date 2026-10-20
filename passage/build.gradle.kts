@@ -2,6 +2,7 @@ import com.vanniktech.maven.publish.JavadocJar
 import com.vanniktech.maven.publish.KotlinMultiplatform
 import com.vanniktech.maven.publish.SourcesJar
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.targets.native.tasks.PodGenTask
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
@@ -79,6 +80,21 @@ kotlin {
         iosMain.dependencies {
 
         }
+    }
+}
+
+// The Kotlin CocoaPods plugin only raises pod targets to iOS 12.0 (KT-57741), below what Xcode 27 accepts
+tasks.withType<PodGenTask>().configureEach {
+    doLast {
+        val (major, minor) = ProjectConfiguration.iOS.deploymentTarget.split(".").map(String::toInt)
+        val podfile = podfile.get()
+        podfile.writeText(
+            podfile.readText()
+                .replace("deployment_target_major < 12 ||", "deployment_target_major < $major ||")
+                .replace("deployment_target_major == 12 &&", "deployment_target_major == $major &&")
+                .replace("deployment_target_minor < 0)", "deployment_target_minor < $minor)")
+                .replace("version = \"#{12}.#{0}\"", "version = \"#{$major}.#{$minor}\"")
+        )
     }
 }
 

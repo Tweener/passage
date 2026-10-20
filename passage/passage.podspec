@@ -8,7 +8,7 @@ Pod::Spec.new do |spec|
     spec.summary                  = ''
     spec.vendored_frameworks      = 'build/cocoapods/framework/passage.framework'
     spec.libraries                = 'c++'
-    spec.ios.deployment_target    = '12.0'
+    spec.ios.deployment_target    = '15.0'
     spec.dependency 'GoogleSignIn'
     if !Dir.exist?('build/cocoapods/framework/passage.framework') || Dir.empty?('build/cocoapods/framework/passage.framework')
         raise "

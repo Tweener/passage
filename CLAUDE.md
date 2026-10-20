@@ -75,7 +75,7 @@ The library is built on Firebase Authentication using the GitLive Firebase KMP S
 
 ### iOS  
 - CocoaPods integration for GoogleSignIn framework
-- iOS deployment target: 12.0
+- iOS deployment target: 15.0
 - Framework binaries built as static frameworks
 
 ## Authentication Providers ("Gatekeepers")
