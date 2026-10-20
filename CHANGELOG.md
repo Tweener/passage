@@ -1,6 +1,9 @@
 
 # Changelog
 
+## [1.8.2] - October 20th, 2026
+- 📦 **`[BUILD]`**: 🍎 Raise the minimum iOS version from 12.0 to 15.0, the lowest deployment target Xcode 27 accepts. With Xcode 27 the GoogleSignIn pods no longer built against iOS 12.0, so apps embedding Passage now need to target iOS 15.0 or later.
+
 ## [1.8.1] - August 27th, 2026
 - 🐛 **`[FIX]`**: 🍎 Report `PassageCanceledException` when the entrant dismisses the Apple Sign In sheet (`ASAuthorizationErrorCanceled`), as the Google gatekeepers already do for the same gesture. It was reported as a `PassageAppleGatekeeperException`, so a caller had no way to tell a cancellation from a genuine authorization failure.
 
