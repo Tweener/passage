@@ -1,7 +1,7 @@
 
 # Changelog
 
-## [1.8.2] - October 20th, 2026
+## [1.9.0] - October 20th, 2026
 - 📦 **`[BUILD]`**: 🍎 Raise the minimum iOS version from 12.0 to 15.0, the lowest deployment target Xcode 27 accepts. With Xcode 27 the GoogleSignIn pods no longer built against iOS 12.0, so apps embedding Passage now need to target iOS 15.0 or later.
 - 🚨 **`[BREAKING]`**: 🤖 Remove the fallback to the legacy Google Sign-In SDK on Android. Play Services auth 22.0.0 removed `GoogleSignIn` and `GoogleSignInClient`, so Google Sign-In now relies only on the Credential Manager API: a failed attempt is still retried up to `maxRetries` times, but no longer falls back to the legacy flow.
 - 🔄 Update Kotlin to 2.4.21.
