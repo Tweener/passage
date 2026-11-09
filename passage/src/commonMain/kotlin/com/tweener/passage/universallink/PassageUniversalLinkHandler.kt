@@ -49,14 +49,14 @@ internal class PassageUniversalLinkHandler {
 
         val isUrlHandled = linkMode != null && oobCodeParam != null && continueUrlParam != null
         if (isUrlHandled) {
-            println("Universal Link is handled! $validLink")
+            println("Universal Link is handled! $LINK_QUERY_PARAMETER_MODE: $linkMode")
 
             scope.launch {
                 val passageUniversalLink = PassageUniversalLink(link = validLink, mode = linkMode, oobCode = oobCodeParam, continueUrl = continueUrlParam)
                 _linkToHandle.emit(passageUniversalLink)
             }
         } else {
-            println("Universal Link not handled. At least one of these query params is null: $LINK_QUERY_PARAMETER_MODE: $modeParam / $LINK_QUERY_PARAMETER_OOB_CODE: $oobCodeParam / $LINK_QUERY_PARAMETER_CONTINUE_URL: $continueUrlParam")
+            println("Universal Link not handled. At least one of these query params is null: $LINK_QUERY_PARAMETER_MODE: $modeParam / $LINK_QUERY_PARAMETER_OOB_CODE: ${oobCodeParam?.let { "<redacted>" }} / $LINK_QUERY_PARAMETER_CONTINUE_URL: ${continueUrlParam?.let { "<redacted>" }}")
         }
 
         return isUrlHandled

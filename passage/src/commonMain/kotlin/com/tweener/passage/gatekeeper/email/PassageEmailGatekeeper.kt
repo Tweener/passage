@@ -123,7 +123,7 @@ internal class PassageEmailGatekeeper(
     }.fold(
         onSuccess = { Result.success(it) },
         onFailure = { throwable ->
-            println("Couldn't verify the oobCode ($oobCode) from the password reset email: $throwable")
+            println("Couldn't verify the oobCode from the password reset email: $throwable")
             Result.failure(mapFirebaseAuthError(throwable))
         }
     )
@@ -188,7 +188,7 @@ internal class PassageEmailGatekeeper(
         handleOobCode<ActionCodeResult.VerifyEmail>(oobCode = oobCode).fold(
             onSuccess = { Result.success(it) },
             onFailure = { throwable ->
-                println("Couldn't verify the oobCode ($oobCode) from the email verification email: $throwable")
+                println("Couldn't verify the oobCode from the email verification email: $throwable")
                 Result.failure(mapFirebaseAuthError(throwable))
             }
         )
