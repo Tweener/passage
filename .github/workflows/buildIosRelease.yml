@@ -15,8 +15,13 @@ jobs:
       - name: Validate Gradle Wrapper
         uses: gradle/actions/wrapper-validation@v3
 
+      - name: Set up Java JDK ${{ vars.JAVA_JDK_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: '${{ vars.JAVA_JDK_VERSION }}'
+          distribution: "zulu"
+
       - name: Set Xcode version
-        if: startsWith(matrix.os, 'macos')
         uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: '${{ vars.XCODE_VERSION }}'
@@ -32,4 +37,4 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Build library
-        run: ./gradlew ${{ matrix.target }}
+        run: ./gradlew :passage:compileKotlinIosArm64 :passage:compileKotlinIosSimulatorArm64
