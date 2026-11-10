@@ -309,7 +309,7 @@ These methods run the native provider UI exactly like `authenticateWithGoogle()`
 ```kotlin
 val result = passage.retrieveGoogleCredential()
 result.fold(
-    onSuccess = { credential -> Log.d("Passage", "Google ID token: ${credential.idToken}") },
+    onSuccess = { credential -> myBackend.signInWithGoogle(idToken = credential.idToken) },
     onFailure = { error -> Log.e("Passage", "Couldn't retrieve the credential", error) }
 )
 ```
@@ -321,7 +321,7 @@ result.fold(
 ```kotlin
 val result = passage.retrieveAppleCredential()
 result.fold(
-    onSuccess = { credential -> Log.d("Passage", "Apple identity token: ${credential.identityToken}") },
+    onSuccess = { credential -> myBackend.signInWithApple(identityToken = credential.identityToken, rawNonce = credential.rawNonce) },
     onFailure = { error -> Log.e("Passage", "Couldn't retrieve the credential", error) }
 )
 ```
@@ -421,7 +421,7 @@ val link = passage.universalLinkToHandle.collectAsStateWithLifecycle()
 
 LaunchedEffect(link.value) {
     link.value?.let {
-        println("Universal link handled for mode: ${it.mode} with continueUrl: ${it.continueUrl}")
+        println("Universal link handled for mode: ${it.mode}")
         passage.onLinkHandled() // Important: call 'onLinkHandled()' to let Passage know the link has been handled and can update the authentication state
     }
 }
