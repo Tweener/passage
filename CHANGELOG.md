@@ -1,6 +1,10 @@
 
 # Changelog
 
+## [Unreleased]
+- 🔄 Update Firebase GitLive to 2.8.0.
+- 📦 **`[BUILD]`**: 🍎 GitLive 2.8.0 is built against firebase-ios-sdk 12.19. Apps embedding Passage must move their own Firebase iOS SDK (Swift Package Manager or CocoaPods) to 12.19.0 or later in the same change: keeping 11.x next to GitLive 2.8.0 crashes at launch. The minimum iOS version stays 15.0.
+
 ## [1.9.1] - November 10th, 2026
 - 🐛 **`[FIX]`**: Stop printing secrets to the console. On Android, stdout goes to logcat in every build, so anyone able to read the device log got the full Google ID token on each Google Sign In, and the oobCode (and continue URL) of every password reset, email verification and sign-in link handled by `PassageUniversalLinkHandler` or the email gatekeeper. Those log lines keep the event and the error but no longer include the token, the oobCode, the continue URL or the full link.
 
