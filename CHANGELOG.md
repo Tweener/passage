@@ -1,7 +1,7 @@
 
 # Changelog
 
-## [Unreleased]
+## [1.9.2] - November 16th, 2026
 - 🔄 Update Firebase GitLive to 2.8.0.
 - 📦 **`[BUILD]`**: 🍎 GitLive 2.8.0 is built against firebase-ios-sdk 12.19. Apps embedding Passage must move their own Firebase iOS SDK (Swift Package Manager or CocoaPods) to 12.19.0 or later in the same change: keeping 11.x next to GitLive 2.8.0 crashes at launch. The minimum iOS version stays 15.0.
 
